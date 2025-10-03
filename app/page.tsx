@@ -115,7 +115,7 @@ export default function Home() {
       <Header />
 
       {/* Main Content - Full Viewport Hero */}
-      <main className="relative z-10 px-4 sm:px-6 lg:mx-12 xl:mx-48 h-[calc(100vh-80px)] flex items-center">
+      <main className="relative z-10 px-4 sm:px-6 lg:mx-8 xl:mx-32 h-[calc(100vh-60px)] sm:h-[calc(100vh-64px)] md:h-[calc(100vh-68px)] flex items-center">
         <div className="max-w-7xl mx-auto w-full">
           {/* Compact Hero Section - Everything in viewport */}
           <div className="text-center">

@@ -7,49 +7,50 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="relative z-20 px-4 sm:px-6 py-4 lg:mx-12 xl:mx-48">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <header className="relative z-20 px-3 sm:px-4 md:px-6 py-2 sm:py-3 lg:mx-8 xl:mx-32">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-12 sm:h-14 md:h-16">
         {/* Logo */}
-        <div className="flex items-center space-x-3">
-          <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
+        <div className="flex items-center">
+          <div className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12">
             <Image
               src="/sakura-saloon-images/logo3.png"
               alt="Sakura Salon Logo"
-              width={100}
-              height={100}
+              width={48}
+              height={48}
               className="w-full h-full object-contain"
               priority={true}
             />
           </div>
+          <span className="ml-2 sm:ml-3 text-secondary font-medium text-sm sm:text-base md:text-lg tracking-wider">Sakura</span>
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center space-x-8 xl:space-x-12">
-          <a href="#" className="nav-item text-secondary text-sm xl:text-base font-medium transition-colors border-b-2 border-primary pb-1 hover:text-primary">
+        <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 xl:space-x-8">
+          <a href="#" className="nav-item text-secondary text-xs lg:text-sm font-medium transition-colors border-b border-primary pb-1 hover:text-primary">
             HOME
           </a>
-          <a href="#about" className="nav-item text-secondary/70 text-sm xl:text-base font-medium hover:text-primary transition-colors">
+          <a href="#about" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors">
             ABOUT US
           </a>
-          <a href="#services" className="nav-item text-secondary/70 text-sm xl:text-base font-medium hover:text-primary transition-colors">
+          <a href="#services" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors">
             SERVICES
           </a>
-          <a href="#contact" className="nav-item text-secondary/70 text-sm xl:text-base font-medium hover:text-primary transition-colors">
+          <a href="#contact" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors">
             CONTACT
           </a>
         </nav>
 
         {/* Right Side - Desktop */}
-        <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
-          <a href="#login" className="text-secondary text-sm lg:text-base font-medium hover:text-primary transition-colors">
+        <div className="hidden sm:flex items-center space-x-2 md:space-x-3">
+          <a href="#login" className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors">
             Login
           </a>
-          <span className="text-secondary">|</span>
-          <a href="#register" className="text-secondary text-sm lg:text-base font-medium hover:text-primary transition-colors">
+          <span className="text-secondary text-xs">|</span>
+          <a href="#register" className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors">
             Register
           </a>
           <div className="relative">
-            <select className="text-secondary text-sm lg:text-base bg-transparent focus:outline-none cursor-pointer">
+            <select className="text-secondary text-xs md:text-sm bg-transparent focus:outline-none cursor-pointer">
               <option value="en">EN</option>
               <option value="js">JS</option>
             </select>
@@ -59,10 +60,10 @@ export default function Header() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden text-secondary hover:text-primary transition-colors p-2"
+          className="sm:hidden text-secondary hover:text-primary transition-colors p-1"
           aria-label="Toggle menu"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {mobileMenuOpen ? (
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             ) : (
@@ -74,8 +75,8 @@ export default function Header() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-rose-50/95 backdrop-blur-sm shadow-lg z-30 animate-fadeIn">
-          <nav className="flex flex-col px-6 py-4 space-y-4">
+        <div className="sm:hidden absolute top-full left-0 right-0 bg-rose-50/95 backdrop-blur-sm shadow-lg z-30 animate-fadeIn">
+          <nav className="flex flex-col px-4 py-3 space-y-2">
             <a href="#" className="text-secondary font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
               HOME
             </a>
