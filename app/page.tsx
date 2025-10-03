@@ -39,7 +39,7 @@ export default function Home() {
           alt="Left Cherry Blossom Tree"
           width={1920}
           height={1000}
-          className="h-140 w-full object-cover opacity-80"
+          className="h-120 w-full object-cover opacity-80"
         />
       </div>
 
