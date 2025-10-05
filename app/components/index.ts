@@ -1,7 +1,11 @@
-// Export all components from a single entry point
 export { default as Header } from './Header';
 export { default as BackgroundPattern } from './BackgroundPattern';
 export { default as CherryBlossomTrees } from './CherryBlossomTrees';
 export { default as FallingPetals } from './FallingPetals';
 export { default as HeroSection } from './HeroSection';
 export { default as Features } from './Features';
+export { default as GallerySection } from './GallerySection';
+export { default as TestimonialsSection } from './TestimonialsSection';
+export { default as ContactSection } from './ContactSection';
+export { default as Footer } from './Footer';
+export { default as Chatbot } from './Chatbot';

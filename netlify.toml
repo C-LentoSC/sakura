@@ -1,0 +1,22 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Long-term cache for service images
+[[headers]]
+  for = "/services-images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Optional: Set public currency defaults (override in Netlify UI for production)
+[template.environment]
+  NEXT_PUBLIC_CURRENCY = "LKR"
+  NEXT_PUBLIC_CURRENCY_LOCALE = "en-LK"
+

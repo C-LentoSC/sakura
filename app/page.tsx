@@ -6,7 +6,12 @@ import {
   CherryBlossomTrees,
   FallingPetals,
   HeroSection,
-  Features
+  Features,
+  GallerySection,
+  TestimonialsSection,
+  ContactSection,
+  Footer,
+  Chatbot
 } from './components';
 import ServicesSection from './components/ServicesSection';
 import ExclusiveServices from './components/ExclusiveServices';
@@ -18,6 +23,7 @@ export default function Home() {
       <CherryBlossomTrees />
       <FallingPetals />
       <Header />
+      <Chatbot />
 
       <main className="relative z-10 px-0 sm:px-6 lg:mx-8 xl:mx-32 pt-10">
         <div className="max-w-7xl mx-auto w-full py-8 sm:py-0 min-h-screen flex items-center">
@@ -28,7 +34,11 @@ export default function Home() {
         </div>
         <ServicesSection />
         <ExclusiveServices />
+        <GallerySection />
+        <TestimonialsSection />
+        <ContactSection />
       </main>
+      <Footer />
     </div>
   );
 }

@@ -82,6 +82,114 @@
       "price": "Rs 599"
     }
   },
+  "gallery": {
+    "mainTitle": "Our Gallery",
+    "subtitle": "Explore our beautiful transformations and serene spa atmosphere",
+    "filters": {
+      "all": "All",
+      "spa": "Head Spa",
+      "nails": "Nails",
+      "lashes": "Lashes & Brows"
+    },
+    "items": {
+      "spa1": "Japanese Head Spa Treatment",
+      "spa2": "Relaxing Scalp Massage", 
+      "spa3": "Aromatherapy Session",
+      "spa4": "Deep Cleansing Treatment",
+      "spa5": "Luxury Spa Experience",
+      "nails1": "Premium Nail Art",
+      "nails2": "Gel Manicure",
+      "nails3": "French Manicure",
+      "nails4": "Nail Extensions",
+      "nails5": "Creative Nail Design",
+      "lashes1": "Lash Extensions",
+      "lashes2": "Eyebrow Styling",
+      "lashes3": "Volume Lashes",
+      "lashes4": "Hybrid Lash Set"
+    },
+    "viewMore": "View More"
+  },
+  "testimonials": {
+    "mainTitle": "What Our Clients Say",
+    "subtitle": "Hear from our satisfied clients about their experiences",
+    "client1": {
+      "text": "The Japanese Head Spa was absolutely amazing! I felt so relaxed and rejuvenated. The staff is professional and the atmosphere is so peaceful. Highly recommend!"
+    },
+    "client2": {
+      "text": "Best nail art experience I've ever had! The attention to detail is incredible. My nails look stunning and the service was top-notch. Will definitely come back!"
+    },
+    "client3": {
+      "text": "I've been coming here for months and every visit is perfect. The lash extensions are beautiful and last so long. The team really knows what they're doing!"
+    }
+  },
+  "contact": {
+    "mainTitle": "Get in Touch With Us",
+    "subtitle": "We'd love to hear from you. Reach out for bookings or inquiries",
+    "infoTitle": "Contact Information",
+    "address": "Address",
+    "addressDetails": "123 Sakura Street, Beauty District, City 12345",
+    "phone": "Phone",
+    "phoneNumber": "+1 (555) 123-4567",
+    "email": "Email",
+    "emailAddress": "hello@sakurasaloon.com",
+    "hours": "Business Hours",
+    "hoursDetails": "Mon-Sat: 9:00 AM - 8:00 PM | Sun: 10:00 AM - 6:00 PM",
+    "followUs": "Follow Us",
+    "formTitle": "Send Us a Message",
+    "form": {
+      "name": "Your Name",
+      "namePlaceholder": "Enter your name",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter your email",
+      "phone": "Phone Number",
+      "phonePlaceholder": "Enter your phone",
+      "message": "Message",
+      "messagePlaceholder": "Tell us how we can help you...",
+      "submit": "Send Message"
+    }
+  },
+  "footer": {
+    "about": "Experience authentic Japanese relaxation and beauty services in a serene atmosphere. Your journey to wellness begins here.",
+    "quickLinks": "Quick Links",
+    "links": {
+      "home": "Home",
+      "services": "Services",
+      "about": "About Us",
+      "booking": "Book Now",
+      "contact": "Contact"
+    },
+    "services": "Our Services",
+    "servicesList": {
+      "headSpa": "Japanese Head Spa",
+      "nailArt": "Nail Art",
+      "lashExtensions": "Lash Extensions",
+      "eyebrowStyling": "Eyebrow Styling"
+    },
+    "contactInfo": "Contact Info",
+    "copyright": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "chatbot": {
+    "welcome": "Hello! Welcome to Sakura Saloon. How can I help you today?",
+    "online": "Online now",
+    "quickRepliesTitle": "Quick questions:",
+    "quickReplies": {
+      "booking": "Book an appointment",
+      "services": "View services",
+      "pricing": "Check pricing",
+      "hours": "Business hours",
+      "location": "Find location"
+    },
+    "responses": {
+      "booking": "Great! You can book an appointment by calling us at +1 (555) 123-4567 or clicking the 'Book Now' button on our website. We're available Mon-Sat 9AM-8PM.",
+      "services": "We offer Japanese Head Spa, Nail Art & Extensions, Lash Extensions, and Eyebrow Styling. Each service is performed by our expert team in a serene atmosphere. Would you like to know more about a specific service?",
+      "pricing": "Our pricing varies by service. Head Spa starts at $80, Nail services from $45, and Lash Extensions from $120. Contact us for detailed pricing and package deals!",
+      "hours": "We're open Monday to Saturday: 9:00 AM - 8:00 PM, and Sunday: 10:00 AM - 6:00 PM. Walk-ins welcome, but appointments are recommended!",
+      "location": "We're located at 123 Sakura Street, Beauty District. Easy parking available and just 5 minutes from downtown. See you soon!"
+    },
+    "inputPlaceholder": "Type your message..."
+  },
   "auth": {
     "login": {
       "title": "Welcome Back",
