@@ -113,10 +113,23 @@ h1, h2, h3, h4, h5, h6 {
 /* Button Styles */
 button, .btn {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
 }
 
 button:hover, .btn:hover {
   transform: translateY(-2px);
+}
+
+/* Interactive Elements Cursor */
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+select,
+.clickable,
+[role="button"],
+[tabindex="0"] {
+  cursor: pointer;
 }
 
 /* Link Styles */

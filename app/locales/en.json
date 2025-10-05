@@ -3,6 +3,7 @@
     "home": "HOME",
     "about": "ABOUT US",
     "services": "SERVICES",
+    "bookings": "BOOKINGS",
     "contact": "CONTACT",
     "login": "Login",
     "register": "Register"
@@ -190,11 +191,291 @@
     },
     "inputPlaceholder": "Type your message..."
   },
+  "about": {
+    "hero": {
+      "title": "About Sakura Saloon",
+      "subtitle": "Where Japanese tradition meets modern beauty"
+    },
+    "story": {
+      "title": "Our Story",
+      "paragraph1": "Founded in 2018, Sakura Saloon was born from a passion for authentic Japanese beauty rituals and a vision to create a sanctuary of tranquility in the heart of the city.",
+      "paragraph2": "Our founder, inspired by traditional Japanese wellness practices, sought to bring the serene experience of a Japanese spa to our community. Every detail, from our signature Head Spa treatments to our carefully curated nail art, reflects our commitment to authenticity and excellence.",
+      "paragraph3": "Today, we're proud to be a destination where clients discover the perfect balance of relaxation, beauty, and self-care in an atmosphere that honors Japanese aesthetics and hospitality."
+    },
+    "values": {
+      "title": "Our Values",
+      "subtitle": "The principles that guide everything we do",
+      "excellence": {
+        "title": "Excellence",
+        "description": "We pursue perfection in every service, using premium products and advanced techniques to deliver exceptional results."
+      },
+      "authenticity": {
+        "title": "Authenticity",
+        "description": "We honor traditional Japanese beauty practices while embracing modern innovations to create unique experiences."
+      },
+      "wellness": {
+        "title": "Wellness",
+        "description": "We believe beauty and wellness are interconnected, focusing on holistic care that nurtures body, mind, and spirit."
+      },
+      "innovation": {
+        "title": "Innovation",
+        "description": "We continuously evolve our services and techniques to bring you the latest in beauty and wellness trends."
+      }
+    },
+    "team": {
+      "title": "Meet Our Team",
+      "subtitle": "Skilled professionals dedicated to your beauty journey",
+      "member1": {
+        "name": "Yuki Tanaka",
+        "role": "Founder & Head Spa Specialist",
+        "description": "With over 15 years of experience in Japanese wellness practices, Yuki brings authentic techniques and passion to every treatment."
+      },
+      "member2": {
+        "name": "Sakura Yamamoto",
+        "role": "Master Nail Artist",
+        "description": "Trained in Tokyo's finest salons, Sakura creates stunning nail art that combines precision with creativity."
+      },
+      "member3": {
+        "name": "Hana Suzuki",
+        "role": "Lash & Brow Expert",
+        "description": "Specializing in natural-looking enhancements, Hana has perfected the art of lash extensions and eyebrow styling."
+      }
+    },
+    "cta": {
+      "title": "Experience the Sakura Difference",
+      "description": "Book your appointment today and discover why our clients keep coming back",
+      "button": "Book Now"
+    }
+  },
+  "services": {
+    "hero": {
+      "title": "Our Services",
+      "subtitle": "Exclusive range of packages to please your needs"
+    },
+    "search": {
+      "placeholder": "Search services..."
+    },
+    "mainCategories": {
+      "headSpa": "Head SPA",
+      "nails": "Nails",
+      "lashes": "Lashes",
+      "brows": "Brows"
+    },
+    "subCategories": {
+      "all": "All",
+      "beauty": "Beauty",
+      "relaxation": "Relaxation",
+      "therapy": "Therapy",
+      "manicure": "Manicure",
+      "pedicure": "Pedicure",
+      "acrylic": "Acrylic",
+      "gel": "Gel",
+      "sns": "SNS",
+      "classic": "Classic",
+      "volume": "Volume",
+      "hybrid": "Hybrid",
+      "shaping": "Shaping",
+      "tinting": "Tinting",
+      "microblading": "Microblading"
+    },
+    "items": {
+      "backFacial": {
+        "name": "Back Facial",
+        "description": "Exfoliation + Leg Massage Hot Towel Opens pores and softens the skin for better absorption. Back Exfoliation Gently buffs away dead skin."
+      },
+      "faceRejuvenation": {
+        "name": "Face Rejuvenation",
+        "description": "Advanced facial treatment with deep cleansing, exfoliation, and hydrating mask for radiant, youthful skin."
+      },
+      "traditionalMassage": {
+        "name": "Traditional Massage",
+        "description": "Authentic Japanese massage techniques to relieve tension and promote deep relaxation throughout your body."
+      },
+      "aromatherapy": {
+        "name": "Aromatherapy Session",
+        "description": "Therapeutic aromatherapy with essential oils to calm the mind and rejuvenate the spirit."
+      },
+      "imperialRetreat": {
+        "name": "Imperial Retreat",
+        "description": "Luxurious 120-minute head spa ritual featuring aromatherapy, nourishing hair masks, and herbal tea for complete rejuvenation."
+      },
+      "zenHeadSpa": {
+        "name": "Zen Head Spa",
+        "description": "Mind-calming scalp treatment with acupressure, cooling botanicals, and guided breathing to restore balance."
+      },
+      "sakuraSteam": {
+        "name": "Sakura Steam Therapy",
+        "description": "Gentle steam infusion with cherry blossom essences to detoxify the scalp and revive natural shine."
+      },
+      "crystalScalpMassage": {
+        "name": "Crystal Scalp Massage",
+        "description": "Warm crystal rollers, scalp kneading, and aromatic oils to release deep-rooted stress and tension."
+      },
+      "silkHeadTreatment": {
+        "name": "Silk Head Treatment",
+        "description": "Silkening serum, scalp exfoliation, and restorative massage to leave hair soft, glossy, and healthy."
+      },
+      "midnightCalm": {
+        "name": "Midnight Calm Ritual",
+        "description": "Evening-inspired ritual with lavender compresses and slow rhythm massage to prepare you for restful sleep."
+      },
+      "forestBreeze": {
+        "name": "Forest Breeze Therapy",
+        "description": "Forest-inspired aromatherapy, pressure-point massage, and herbal mist to refresh mind and senses."
+      },
+      "serenityStone": {
+        "name": "Serenity Stone Massage",
+        "description": "Heated basalt stones glide across the scalp, melting away tension while nourishing oils soak in."
+      },
+      "kansoTherapy": {
+        "name": "Kanso Therapy",
+        "description": "Traditional kanso wand massage that stimulates energy flow and promotes total scalp clarity."
+      },
+      "reviveEnergy": {
+        "name": "Revive Energy Boost",
+        "description": "Invigorating peppermint cleanse, scalp brushing, and energizing massage for instant refreshment."
+      },
+      "samuraiFocus": {
+        "name": "Samurai Focus Treatment",
+        "description": "Focus-enhancing ritual with camphor-infused oils, firm pressure techniques, and cooling tonics."
+      },
+      "deepSleepRitual": {
+        "name": "Deep Sleep Ritual",
+        "description": "Slow, hypnotic scalp strokes, warm herbal poultices, and sound bath elements for deeper rest."
+      },
+      "blossomScalpPolish": {
+        "name": "Blossom Scalp Polish",
+        "description": "Gentle sakura scrub, vitamin serum, and scalp massage to brighten hair follicles and skin."
+      },
+      "shizukuHydration": {
+        "name": "Shizuku Hydration",
+        "description": "Ultra-hydrating serum infusion, steam therapy, and lymphatic drainage massage for lasting moisture."
+      },
+      "teawareInfusion": {
+        "name": "Teaware Infusion",
+        "description": "Green tea detox rinse, scalp stretching, and finishing tonic for clarity and lightness."
+      },
+      "auroraHeadLuminance": {
+        "name": "Aurora Head Luminance",
+        "description": "Chromotherapy-inspired treatment with iridescent masks and revitalizing scalp massage to boost radiance."
+      },
+      "classicManicure": {
+        "name": "Classic Manicure",
+        "description": "Nail shaping, cuticle care, hand massage, and polish application with your choice of color."
+      },
+      "gelManicure": {
+        "name": "Gel Manicure",
+        "description": "Long-lasting gel polish that maintains shine and durability for weeks without chipping."
+      },
+      "acrylicSet": {
+        "name": "Acrylic Full Set",
+        "description": "Complete acrylic nail extensions with custom shaping and professional polish application."
+      },
+      "classicLashes": {
+        "name": "Classic Lash Extensions",
+        "description": "Natural-looking lash extensions applied one-to-one. Perfect for everyday elegance and subtle enhancement."
+      },
+      "volumeLashes": {
+        "name": "Volume Lash Set",
+        "description": "Dramatic volume lashes using multiple extensions per natural lash. Fuller, more glamorous look for special occasions."
+      },
+      "browShaping": {
+        "name": "Eyebrow Shaping",
+        "description": "Professional eyebrow shaping and grooming to frame your face perfectly with precise techniques."
+      }
+    },
+    "bookNow": "Book Now",
+    "contactInfo": "Contact me from the same Info",
+    "noResults": "No services found matching your search."
+  },
+  "contact": {
+    "hero": {
+      "title": "Contact Us",
+      "subtitle": "Get in touch with us to book your appointment or ask any questions. We're here to help you look and feel your best."
+    },
+    "form": {
+      "title": "Send us a Message",
+      "name": "Full Name",
+      "namePlaceholder": "Enter your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter your email address",
+      "phone": "Phone Number",
+      "phonePlaceholder": "Enter your phone number",
+      "service": "Service Interest",
+      "selectService": "Select a service",
+      "message": "Message",
+      "messagePlaceholder": "Tell us about your needs or questions...",
+      "send": "Send Message",
+      "sending": "Sending...",
+      "successMessage": "Thank you! Your message has been sent successfully. We'll get back to you soon.",
+      "errorMessage": "Sorry, there was an error sending your message. Please try again or contact us directly."
+    },
+    "info": {
+      "location": {
+        "title": "Our Location",
+        "address": "123 Sakura Street, Beauty District, Tokyo 100-0001, Japan"
+      },
+      "hours": {
+        "title": "Business Hours",
+        "weekdays": "Monday - Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "details": {
+        "title": "Contact Details"
+      },
+      "social": {
+        "title": "Follow Us"
+      }
+    }
+  },
+  "bookings": {
+    "hero": {
+      "title": "Book Your Appointment",
+      "subtitle": "Schedule your perfect beauty experience with our easy booking system. Choose your service, pick your time, and let us pamper you."
+    },
+    "step1": {
+      "title": "Choose Your Service"
+    },
+    "step2": {
+      "title": "Select Date & Time",
+      "selectDate": "Choose Date",
+      "selectTime": "Choose Time"
+    },
+    "step3": {
+      "title": "Your Information",
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "notes": "Special Notes"
+    },
+    "step4": {
+      "title": "Confirm Your Booking",
+      "summary": "Booking Summary",
+      "service": "Service",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "total": "Total",
+      "confirm": "Confirm Booking",
+      "confirming": "Confirming..."
+    },
+    "selectedService": "Selected Service",
+    "back": "Back",
+    "next": "Next",
+    "success": {
+      "title": "Booking Confirmed!",
+      "message": "Your appointment has been successfully booked. We'll send you a confirmation email shortly.",
+      "newBooking": "Book Another Appointment"
+    },
+    "error": {
+      "message": "Sorry, there was an error processing your booking. Please try again or contact us directly."
+    }
+  },
   "auth": {
     "login": {
       "title": "Welcome Back",
       "subtitle": "Sign in to continue your journey",
-      "email": "Email",
       "password": "Password",
       "remember": "Remember me",
       "forgot": "Forgot?",

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Language } from '../locales/config';
@@ -31,18 +32,21 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 xl:space-x-8">
-          <a href="#" className="nav-item text-secondary text-xs lg:text-sm font-medium transition-colors border-b-2 border-primary hover:text-primary">
+          <Link href="/" className="nav-item text-secondary text-xs lg:text-sm font-medium transition-colors border-b-2 border-transparent hover:border-primary hover:text-primary">
             {t('nav.home')}
-          </a>
-          <a href="#about" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+          </Link>
+          <Link href="/about" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
             {t('nav.about')}
-          </a>
-          <a href="#services" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+          </Link>
+          <Link href="/services" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
             {t('nav.services')}
-          </a>
-          <a href="#contact" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+          </Link>
+          <Link href="/bookings" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+            {t('nav.bookings')}
+          </Link>
+          <Link href="/contact" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
             {t('nav.contact')}
-          </a>
+          </Link>
         </nav>
 
         {/* Right Side - Desktop */}
@@ -61,13 +65,13 @@ export default function Header() {
             </>
           ) : (
             <>
-              <a href="/login" className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors leading-none">
+              <Link href="/login" className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors leading-none">
                 {t('nav.login')}
-              </a>
+              </Link>
               <span className="text-secondary text-xs leading-none">|</span>
-              <a href="/register" className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors leading-none">
+              <Link href="/register" className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors leading-none">
                 {t('nav.register')}
-              </a>
+              </Link>
             </>
           )}
           <div className="relative ml-2">
@@ -105,26 +109,29 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="sm:hidden absolute top-full left-0 right-0 bg-rose-50/95 backdrop-blur-sm shadow-lg z-30 animate-fadeIn">
           <nav className="flex flex-col px-4 py-3 space-y-2">
-            <a href="#" className="text-secondary font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
+            <Link href="/" className="text-secondary font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
               {t('nav.home')}
-            </a>
-            <a href="#about" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
+            </Link>
+            <Link href="/about" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
               {t('nav.about')}
-            </a>
-            <a href="#services" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
+            </Link>
+            <Link href="/services" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
               {t('nav.services')}
-            </a>
-            <a href="#contact" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
+            </Link>
+            <Link href="/bookings" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
+              {t('nav.bookings')}
+            </Link>
+            <Link href="/contact" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
               {t('nav.contact')}
-            </a>
+            </Link>
             <div className="flex items-center space-x-4 pt-2">
-              <a href="#login" className="text-secondary font-medium hover:text-primary transition-colors">
+              <Link href="/login" className="text-secondary font-medium hover:text-primary transition-colors">
                 {t('nav.login')}
-              </a>
+              </Link>
               <span className="text-secondary">|</span>
-              <a href="#register" className="text-secondary font-medium hover:text-primary transition-colors">
+              <Link href="/register" className="text-secondary font-medium hover:text-primary transition-colors">
                 {t('nav.register')}
-              </a>
+              </Link>
             </div>
           </nav>
         </div>
