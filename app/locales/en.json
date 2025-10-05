@@ -429,7 +429,7 @@
       }
     }
   },
-  "bookings": {
+  "book": {
     "hero": {
       "title": "Book Your Appointment",
       "subtitle": "Schedule your perfect beauty experience with our easy booking system. Choose your service, pick your time, and let us pamper you."
@@ -470,6 +470,39 @@
     },
     "error": {
       "message": "Sorry, there was an error processing your booking. Please try again or contact us directly."
+    }
+  },
+  "bookings": {
+    "hero": {
+      "title": "My Bookings",
+      "subtitle": "View and manage your appointment history. Keep track of upcoming appointments and past services."
+    },
+    "newBooking": "Book New Appointment",
+    "tabs": {
+      "upcoming": "Upcoming",
+      "completed": "Completed",
+      "all": "All"
+    },
+    "status": {
+      "upcoming": "Upcoming",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "details": {
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "price": "Price"
+    },
+    "actions": {
+      "reschedule": "Reschedule",
+      "cancel": "Cancel",
+      "bookAgain": "Book Again"
+    },
+    "empty": {
+      "title": "No Bookings Found",
+      "message": "You haven't made any bookings yet. Book your first appointment to get started!",
+      "action": "Book Your First Appointment"
     }
   },
   "auth": {

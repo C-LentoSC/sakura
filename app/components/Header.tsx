@@ -41,7 +41,7 @@ export default function Header() {
           <Link href="/services" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
             {t('nav.services')}
           </Link>
-          <Link href="/bookings" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+          <Link href="/my-bookings" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
             {t('nav.bookings')}
           </Link>
           <Link href="/contact" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
@@ -118,7 +118,7 @@ export default function Header() {
             <Link href="/services" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
               {t('nav.services')}
             </Link>
-            <Link href="/bookings" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
+            <Link href="/my-bookings" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
               {t('nav.bookings')}
             </Link>
             <Link href="/contact" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
 import {
@@ -200,9 +201,12 @@ export default function ServicesPage() {
                         </div>
                         
                         <div className="flex flex-col gap-2">
-                          <button className="w-full px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-full hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300 text-xs">
+                          <Link
+                            href={`/book?service=${service.id}`}
+                            className="w-full px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-full hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300 text-xs text-center"
+                          >
                             {t('services.bookNow')} →
-                          </button>
+                          </Link>
                           <button className="w-full px-4 py-1.5 bg-white border border-secondary/30 text-secondary font-medium rounded-full hover:bg-secondary/5 hover:border-secondary/50 transition-all duration-300 text-xs">
                             {t('services.contactInfo')}
                           </button>
