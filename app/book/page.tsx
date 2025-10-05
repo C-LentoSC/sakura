@@ -1,20 +1,20 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useLanguage } from '../contexts/LanguageContext';
-import { formatCurrency } from '../constants/currency';
-import { SERVICES_DATA } from '../constants/services';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
-  Header,
   BackgroundPattern,
   CherryBlossomTrees,
   FallingPetals,
+  Header,
   Footer,
   Chatbot
 } from '../components';
+import { useLanguage } from '../contexts/LanguageContext';
+import { formatCurrency } from '../constants/currency';
+import { SERVICES_DATA } from '../constants/services';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -31,7 +31,7 @@ interface BookingData {
   notes: string;
 }
 
-export default function BookPage() {
+function BookPageContent() {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
   const preSelectedServiceId = searchParams.get('service');
@@ -583,5 +583,33 @@ export default function BookPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function BookPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+        <BackgroundPattern />
+        <CherryBlossomTrees />
+        <FallingPetals />
+        <Header />
+        <Chatbot />
+        <div className="absolute inset-0 bg-pink-100/20 backdrop-blur-xs pointer-events-none z-0" />
+        <main className="relative z-10 pt-16 sm:pt-20">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-6 sm:py-8">
+            <div className="text-center max-w-4xl mx-auto">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sakura text-secondary mb-4">
+                Loading...
+              </h1>
+              <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    }>
+      <BookPageContent />
+    </Suspense>
   );
 }
