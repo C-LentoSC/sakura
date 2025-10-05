@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
+import { formatCurrency } from '../constants/currency';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -24,7 +25,7 @@ export default function ExclusiveServices() {
       duration: '90',
       titleKey: 'exclusiveServices.japaneseHeadSpa.title',
       descKey: 'exclusiveServices.japaneseHeadSpa.description',
-      priceKey: 'exclusiveServices.japaneseHeadSpa.price',
+      price: 969,
     },
     {
       id: 'dry-head-spa',
@@ -32,7 +33,7 @@ export default function ExclusiveServices() {
       duration: '60',
       titleKey: 'exclusiveServices.dryHeadSpa.title',
       descKey: 'exclusiveServices.dryHeadSpa.description',
-      priceKey: 'exclusiveServices.dryHeadSpa.price',
+      price: 599,
     },
     {
       id: 'imperial-retreat',
@@ -40,7 +41,7 @@ export default function ExclusiveServices() {
       duration: '120',
       titleKey: 'exclusiveServices.imperialRetreat.title',
       descKey: 'exclusiveServices.imperialRetreat.description',
-      priceKey: 'exclusiveServices.imperialRetreat.price',
+      price: 1299,
     },
   ];
 
@@ -51,7 +52,7 @@ export default function ExclusiveServices() {
       duration: '60',
       titleKey: 'exclusiveServices.nailArt.title',
       descKey: 'exclusiveServices.nailArt.description',
-      priceKey: 'exclusiveServices.nailArt.price',
+      price: 799,
     },
     {
       id: 'lash-extension',
@@ -59,7 +60,7 @@ export default function ExclusiveServices() {
       duration: '90',
       titleKey: 'exclusiveServices.lashExtension.title',
       descKey: 'exclusiveServices.lashExtension.description',
-      priceKey: 'exclusiveServices.lashExtension.price',
+      price: 1199,
     },
     {
       id: 'brow-styling',
@@ -67,7 +68,7 @@ export default function ExclusiveServices() {
       duration: '45',
       titleKey: 'exclusiveServices.browStyling.title',
       descKey: 'exclusiveServices.browStyling.description',
-      priceKey: 'exclusiveServices.browStyling.price',
+      price: 599,
     },
   ];
 
@@ -170,49 +171,84 @@ export default function ExclusiveServices() {
           {currentServices.map((service) => (
             <div
               key={service.id}
-              className="exclusive-service-card bg-white rounded-xl sm:rounded-2xl overflow-hidden flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6 p-3 sm:p-4 md:p-6 shadow-lg hover:shadow-2xl transition-all duration-300"
+              className="exclusive-service-card group/card bg-white rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col lg:flex-row gap-4 sm:gap-5 md:gap-6 p-4 sm:p-5 md:p-6 shadow-md hover:shadow-2xl border border-secondary/5 hover:border-primary/20 transition-all duration-500 hover:-translate-y-1"
             >
               {/* Service Image */}
-              <div className="relative w-full lg:w-40 xl:w-48 h-48 sm:h-56 md:h-64 lg:h-auto flex-shrink-0 rounded-lg sm:rounded-xl overflow-hidden">
+              <div className="relative w-full lg:w-44 xl:w-52 h-52 sm:h-60 md:h-64 lg:h-auto flex-shrink-0 rounded-xl sm:rounded-2xl overflow-hidden shadow-md group-hover/card:shadow-xl transition-shadow duration-500">
                 <Image
                   src={service.image}
                   alt={t(service.titleKey)}
                   fill
-                  className="object-cover"
+                  className="object-cover group-hover/card:scale-105 transition-transform duration-700"
                 />
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"></div>
+                
                 {/* Duration Badge */}
-                <div className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 bg-white/90 backdrop-blur-sm px-2 sm:px-3 py-1 rounded-full">
-                  <span className="text-xs sm:text-sm font-medium text-secondary">
-                    {service.duration} {t('exclusiveServices.minutes')}
-                  </span>
+                <div className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-gradient-to-r from-primary/95 to-pink-400/95 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-lg">
+                  <div className="flex items-center gap-1.5">
+                    <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-xs sm:text-sm font-semibold text-white">
+                      {service.duration} {t('exclusiveServices.minutes')}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Decorative Corner */}
+                <div className="absolute bottom-3 right-3 w-8 h-8 opacity-20 group-hover/card:opacity-40 transition-opacity duration-500">
+                  <svg viewBox="0 0 50 50" className="w-full h-full text-primary">
+                    <circle cx="25" cy="25" r="8" fill="currentColor" />
+                    <circle cx="25" cy="25" r="15" fill="none" stroke="currentColor" strokeWidth="1" />
+                  </svg>
                 </div>
               </div>
 
               {/* Service Content */}
               <div className="flex-1 flex flex-col justify-between min-h-0">
                 <div className="flex-1">
-                  <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-sakura text-secondary mb-2 sm:mb-3 md:mb-4 group-hover:text-primary transition-colors duration-300 leading-tight">
-                    {t(service.titleKey)}
-                  </h3>
-                  <p className="text-secondary/70 text-xs sm:text-sm md:text-base leading-relaxed mb-3 sm:mb-4 line-clamp-3 sm:line-clamp-none">
+                  {/* Title with decorative line */}
+                  <div className="mb-3 sm:mb-4">
+                    <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-sakura text-secondary group-hover/card:text-primary transition-colors duration-300 leading-tight mb-2">
+                      {t(service.titleKey)}
+                    </h3>
+                    <div className="w-16 h-0.5 bg-gradient-to-r from-primary to-pink-400 rounded-full"></div>
+                  </div>
+                  
+                  <p className="text-secondary/70 group-hover/card:text-secondary/80 text-xs sm:text-sm md:text-base leading-relaxed mb-3 sm:mb-4 line-clamp-3 sm:line-clamp-none transition-colors duration-300">
                     {t(service.descKey)}
                   </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mt-auto pt-2 sm:pt-3 md:pt-4">
-                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-secondary order-2 sm:order-1">
-                    {t(service.priceKey)}
+                {/* Price and Actions */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-5 mt-auto pt-3 sm:pt-4 md:pt-5 border-t border-secondary/5">
+                  {/* Price Badge */}
+                  <div className="flex items-center gap-2 order-2 sm:order-1">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-xl sm:text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-pink-500">
+                        {formatCurrency(service.price)}
+                      </span>
+                    </div>
                   </div>
+
+                  {/* Action Buttons */}
                   <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 w-full sm:w-auto order-1 sm:order-2">
                     <Link
                       href="/booking"
-                      className="flex-1 xs:flex-none text-center px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-primary to-pink-400 text-white text-xs sm:text-sm font-medium rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300"
+                      className="group/btn flex-1 xs:flex-none text-center px-5 sm:px-6 md:px-7 py-2.5 sm:py-3 bg-gradient-to-r from-primary to-pink-400 text-white text-xs sm:text-sm font-semibold rounded-full hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 relative overflow-hidden"
                     >
-                      {t('exclusiveServices.bookNow')}
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {t('exclusiveServices.bookNow')}
+                        <svg className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-primary opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
                     </Link>
                     <Link
                       href={`/services/${service.id}`}
-                      className="flex-1 xs:flex-none text-center px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 bg-secondary/10 text-secondary text-xs sm:text-sm font-medium rounded-full hover:bg-secondary/20 transition-all duration-300"
+                      className="flex-1 xs:flex-none text-center px-5 sm:px-6 md:px-7 py-2.5 sm:py-3 bg-secondary/5 hover:bg-secondary/10 text-secondary text-xs sm:text-sm font-medium rounded-full border border-secondary/10 hover:border-secondary/20 transition-all duration-300 hover:scale-105 active:scale-95"
                     >
                       {t('exclusiveServices.sameInfo')}
                     </Link>
