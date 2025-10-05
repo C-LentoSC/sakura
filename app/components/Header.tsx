@@ -2,13 +2,18 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useSession, signOut } from 'next-auth/react';
+import { useLanguage } from '../contexts/LanguageContext';
+import { Language } from '../locales/config';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: session } = useSession();
+  const { language, setLanguage, t, languages } = useLanguage();
 
   return (
-    <header className="relative z-20 px-3 sm:px-4 md:px-6 py-2 sm:py-3 lg:mx-8 xl:mx-32">
-      <div className="max-w-7xl mx-auto flex items-center justify-between h-12 sm:h-14 md:h-16">
+    <header className="fixed top-0 left-0 right-0 z-20 px-4 sm:px-6 md:px-6 lg:px-8 xl:px-32 bg-gradient-to-b from-rose-50/95 via-pink-50/80 to-transparent backdrop-blur-md">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-14 sm:h-14 md:h-16">
         {/* Logo */}
         <div className="flex items-center">
           <div className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12">
@@ -26,33 +31,56 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 xl:space-x-8">
-          <a href="#" className="nav-item text-secondary text-xs lg:text-sm font-medium transition-colors border-b border-primary pb-1 hover:text-primary">
-            HOME
+          <a href="#" className="nav-item text-secondary text-xs lg:text-sm font-medium transition-colors border-b-2 border-primary hover:text-primary">
+            {t('nav.home')}
           </a>
-          <a href="#about" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors">
-            ABOUT US
+          <a href="#about" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+            {t('nav.about')}
           </a>
-          <a href="#services" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors">
-            SERVICES
+          <a href="#services" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+            {t('nav.services')}
           </a>
-          <a href="#contact" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors">
-            CONTACT
+          <a href="#contact" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+            {t('nav.contact')}
           </a>
         </nav>
 
         {/* Right Side - Desktop */}
         <div className="hidden sm:flex items-center space-x-2 md:space-x-3">
-          <a href="#login" className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors">
-            Login
-          </a>
-          <span className="text-secondary text-xs">|</span>
-          <a href="#register" className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors">
-            Register
-          </a>
-          <div className="relative">
-            <select className="text-secondary text-xs md:text-sm bg-transparent focus:outline-none cursor-pointer">
-              <option value="en">EN</option>
-              <option value="js">JS</option>
+          {session ? (
+            <>
+              <span className="text-secondary text-xs md:text-sm leading-none">
+                Welcome, {session.user?.name || session.user?.email}
+              </span>
+              <button
+                onClick={() => signOut()}
+                className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors leading-none"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <a href="/login" className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors leading-none">
+                {t('nav.login')}
+              </a>
+              <span className="text-secondary text-xs leading-none">|</span>
+              <a href="/register" className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors leading-none">
+                {t('nav.register')}
+              </a>
+            </>
+          )}
+          <div className="relative ml-2">
+            <select 
+              value={language} 
+              onChange={(e) => setLanguage(e.target.value as Language)}
+              className="text-secondary text-xs md:text-sm bg-transparent focus:outline-none cursor-pointer leading-none py-0"
+            >
+              {languages.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.code.toUpperCase()}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -78,24 +106,24 @@ export default function Header() {
         <div className="sm:hidden absolute top-full left-0 right-0 bg-rose-50/95 backdrop-blur-sm shadow-lg z-30 animate-fadeIn">
           <nav className="flex flex-col px-4 py-3 space-y-2">
             <a href="#" className="text-secondary font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
-              HOME
+              {t('nav.home')}
             </a>
             <a href="#about" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
-              ABOUT US
+              {t('nav.about')}
             </a>
             <a href="#services" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
-              SERVICES
+              {t('nav.services')}
             </a>
             <a href="#contact" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
-              CONTACT
+              {t('nav.contact')}
             </a>
             <div className="flex items-center space-x-4 pt-2">
               <a href="#login" className="text-secondary font-medium hover:text-primary transition-colors">
-                Login
+                {t('nav.login')}
               </a>
               <span className="text-secondary">|</span>
               <a href="#register" className="text-secondary font-medium hover:text-primary transition-colors">
-                Register
+                {t('nav.register')}
               </a>
             </div>
           </nav>

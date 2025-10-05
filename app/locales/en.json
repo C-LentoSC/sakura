@@ -1,0 +1,131 @@
+{
+  "nav": {
+    "home": "HOME",
+    "about": "ABOUT US",
+    "services": "SERVICES",
+    "contact": "CONTACT",
+    "login": "Login",
+    "register": "Register"
+  },
+  "hero": {
+    "quote": "Where Beauty Blooms Like Cherry Blossoms",
+    "title": "Sakura",
+    "subtitle": "salon",
+    "description": "Welcome to Sakura Salon, your cozy retreat for relaxation and rejuvenation. Experience our range of services designed to pamper you from head to toe.",
+    "booking": "BOOKING NOW",
+    "story": "Watch Our Story"
+  },
+  "features": {
+    "premium": {
+      "title": "Premium Products",
+      "description": "Organic and natural beauty products for the best care"
+    },
+    "experts": {
+      "title": "Expert Stylists",
+      "description": "Professional team with years of experience"
+    },
+    "relaxing": {
+      "title": "Relaxing Atmosphere",
+      "description": "Peaceful environment for your complete relaxation"
+    }
+  },
+  "services": {
+    "mainTitle": "Our Main Services",
+    "spa": {
+      "title": "Japanese Head Spa & Relaxation",
+      "description": "Immerse yourself in the ancient art of Japanese head spa - a soothing ritual designed to melt stress, improve scalp health, and restore inner peace. Experience our professional and refreshing treatment, crafted with care, and leave feeling rejuvenated and balanced."
+    },
+    "beauty": {
+      "title": "Beauty Care: Nails, Lashes & Brows",
+      "description": "Elevate your elegance with our bespoke beauty services, from flawless nails and gorgeous lashes to perfectly shaped brows. Achieve your natural charm, shine into a world-class experience with confidence, and let your beauty bloom like cherry blossoms."
+    },
+    "contactButton": "Contact for more info"
+  },
+  "exclusiveServices": {
+    "mainTitle": "Our Exclusive Services We Provide",
+    "tabs": {
+      "headSpa": "Head SPA",
+      "beauty": "Beauty"
+    },
+    "minutes": "Minutes",
+    "bookNow": "Book now",
+    "sameInfo": "Contact me from the same Info",
+    "seeMore": "See More Package",
+    "japaneseHeadSpa": {
+      "title": "Japanese Head Spa",
+      "description": "Indulge in the ultimate relaxation with our authentic Japanese Head Spa. Combining traditional techniques with modern care, this treatment includes scalp massage, deep cleansing, aromatherapy, and stress relief. Perfect for rejuvenating your mind and restoring scalp health.",
+      "price": "Rs 969"
+    },
+    "dryHeadSpa": {
+      "title": "Dry Head SPA",
+      "description": "Experience deep relaxation with our Dry Head SPA - a specialized treatment focusing on acupressure, stress relief, and pain release. This soothing session includes head, neck, and shoulder massage, promoting better sleep and mental clarity without water or products.",
+      "price": "Rs 599"
+    },
+    "imperialRetreat": {
+      "title": "The imperial retreat",
+      "description": "Experience deep relaxation and scalp rejuvenation with our exclusive IMPERIAL RETREAT. Enjoy a luxurious 120-minute session featuring Japanese head spa techniques, aromatherapy, hot towel treatment, nourishing hair masks, shoulder & arm massage, and a refreshing herbal tea. Complete bliss for mind and body.",
+      "price": "Rs 1299"
+    },
+    "nailArt": {
+      "title": "Premium Nail Art",
+      "description": "Transform your nails into stunning works of art with our premium nail art services. From classic French manicures to intricate designs, gel polish, nail extensions, and custom artwork. Our skilled technicians use high-quality products for long-lasting, beautiful results.",
+      "price": "Rs 799"
+    },
+    "lashExtension": {
+      "title": "Lash Extensions",
+      "description": "Enhance your natural beauty with our professional lash extension services. Choose from classic, volume, or hybrid styles using premium silk lashes. Our certified lash artists create customized looks that complement your eye shape for stunning, natural-looking results.",
+      "price": "Rs 1199"
+    },
+    "browStyling": {
+      "title": "Eyebrow Styling",
+      "description": "Perfect your brows with our comprehensive eyebrow styling services. Includes shaping, threading, tinting, and microblading consultations. Our expert stylists create the ideal brow shape to frame your face and enhance your natural features.",
+      "price": "Rs 599"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to continue your journey",
+      "email": "Email",
+      "password": "Password",
+      "remember": "Remember me",
+      "forgot": "Forgot?",
+      "submit": "Sign In",
+      "or": "or",
+      "continueWithGoogle": "Continue with Google",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "loading": "Signing in...",
+      "errors": {
+        "invalid": "Invalid email or password",
+        "generic": "An error occurred. Please try again."
+      }
+    },
+    "register": {
+      "title": "Join Us",
+      "subtitle": "Create your account to begin",
+      "name": "Full Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "terms": "I agree to the",
+      "termsLink": "Terms",
+      "and": "and",
+      "privacyLink": "Privacy Policy",
+      "submit": "Create Account",
+      "loading": "Creating...",
+      "or": "or",
+      "continueWithGoogle": "Continue with Google",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "errors": {
+        "passwordMismatch": "Passwords do not match",
+        "passwordMin": "Password must be at least 6 characters long",
+        "registrationFailed": "Registration failed. Please try again.",
+        "generic": "An error occurred. Please try again.",
+        "emailInUse": "Email already in use",
+        "signinFailed": "Registered, but sign-in failed. Please try logging in."
+      }
+    }
+  }
+}
