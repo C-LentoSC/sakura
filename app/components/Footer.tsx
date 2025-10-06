@@ -74,8 +74,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/booking" className="text-secondary/60 hover:text-primary text-sm transition-colors duration-300 inline-flex items-center gap-1 group">
-                  <span className="group-hover:translate-x-1 transition-transform duration-300">{t('footer.links.booking')}</span>
+                <Link href="/bookings" className="text-secondary/60 hover:text-primary text-sm transition-colors duration-300 inline-flex items-center gap-1 group">
+                  <span className="group-hover:translate-x-1 transition-transform duration-300">{t('footer.links.bookings')}</span>
                 </Link>
               </li>
             </ul>

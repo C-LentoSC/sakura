@@ -41,7 +41,7 @@ export default function Header() {
           <Link href="/services" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
             {t('nav.services')}
           </Link>
-          <Link href="/my-bookings" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+          <Link href="/bookings" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
             {t('nav.bookings')}
           </Link>
           <Link href="/contact" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
@@ -107,31 +107,129 @@ export default function Header() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="sm:hidden absolute top-full left-0 right-0 bg-rose-50/95 backdrop-blur-sm shadow-lg z-30 animate-fadeIn">
-          <nav className="flex flex-col px-4 py-3 space-y-2">
-            <Link href="/" className="text-secondary font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
-              {t('nav.home')}
+        <div className="sm:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md shadow-xl border-t border-primary/10 z-30 animate-fadeIn">
+          <nav className="flex flex-col px-4 py-4 space-y-0">
+            <Link 
+              href="/" 
+              className="flex items-center gap-3 text-secondary font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              <span className="text-sm font-medium">{t('nav.home')}</span>
             </Link>
-            <Link href="/about" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
-              {t('nav.about')}
+            
+            <Link 
+              href="/about" 
+              className="flex items-center gap-3 text-secondary/70 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm font-medium">{t('nav.about')}</span>
             </Link>
-            <Link href="/services" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
-              {t('nav.services')}
+            
+            <Link 
+              href="/services" 
+              className="flex items-center gap-3 text-secondary/70 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <span className="text-sm font-medium">{t('nav.services')}</span>
             </Link>
-            <Link href="/my-bookings" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
-              {t('nav.bookings')}
+            
+            <Link 
+              href="/bookings" 
+              className="flex items-center gap-3 text-secondary/70 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span className="text-sm font-medium">{t('nav.bookings')}</span>
             </Link>
-            <Link href="/contact" className="text-secondary/70 font-medium py-2 border-b border-primary/20 hover:text-primary transition-colors">
-              {t('nav.contact')}
+            
+            <Link 
+              href="/contact" 
+              className="flex items-center gap-3 text-secondary/70 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <span className="text-sm font-medium">{t('nav.contact')}</span>
             </Link>
-            <div className="flex items-center space-x-4 pt-2">
-              <Link href="/login" className="text-secondary font-medium hover:text-primary transition-colors">
-                {t('nav.login')}
-              </Link>
-              <span className="text-secondary">|</span>
-              <Link href="/register" className="text-secondary font-medium hover:text-primary transition-colors">
-                {t('nav.register')}
-              </Link>
+            
+            {/* Divider */}
+            <div className="border-t border-primary/10 my-3"></div>
+            
+            {/* Auth Section */}
+            {session ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-secondary text-xs px-3 py-2">
+                  <svg className="w-3 h-3 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span className="truncate">Welcome, {session.user?.name || session.user?.email}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    signOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-gradient-to-r from-primary to-pink-400 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-300 text-sm"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Link 
+                  href="/login" 
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 bg-gradient-to-r from-primary to-pink-400 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-300 text-sm"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  {t('nav.login')}
+                </Link>
+                <Link 
+                  href="/register" 
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 border border-primary text-primary font-medium rounded-lg hover:bg-primary/5 transition-all duration-300 text-sm"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  </svg>
+                  {t('nav.register')}
+                </Link>
+              </div>
+            )}
+            
+            {/* Language Selector */}
+            <div className="flex items-center justify-center gap-2 pt-3">
+              <svg className="w-3 h-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+              </svg>
+              <select 
+                value={language} 
+                onChange={(e) => setLanguage(e.target.value as Language)}
+                className="text-secondary text-xs bg-transparent focus:outline-none cursor-pointer border border-primary/20 rounded px-2 py-1"
+              >
+                {languages.map((lang) => (
+                  <option key={lang.code} value={lang.code}>
+                    {lang.code.toUpperCase()}
+                  </option>
+                ))}
+              </select>
             </div>
           </nav>
         </div>

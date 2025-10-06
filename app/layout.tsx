@@ -3,7 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { LoadingProvider } from "./contexts/LoadingContext";
 import AuthProvider from "./providers/AuthProvider";
+import { ErrorBoundary } from "./components";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,15 +40,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${sakuraFont.variable} antialiased`}
       >
-        <AuthProvider>
-          <LanguageProvider>
-            {children}
-          </LanguageProvider>
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <LanguageProvider>
+              <LoadingProvider>
+                {children}
+              </LoadingProvider>
+            </LanguageProvider>
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

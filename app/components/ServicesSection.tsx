@@ -81,9 +81,15 @@ export default function ServicesSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-20 sm:py-32 relative overflow-hidden" style={{
-      background: 'radial-gradient(ellipse at center, rgba(251, 207, 232, 0.4) 0%, rgba(252, 231, 243, 0.3) 40%, rgba(255, 255, 255, 0) 80%)'
-    }}>
+    <section ref={sectionRef} className="py-20 sm:py-32 relative overflow-hidden">
+      {/* Background with blur effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-rose-50/80 via-pink-50/60 to-amber-50/40 backdrop-blur-sm"></div>
+      <div 
+        className="absolute inset-0 backdrop-blur-xs" 
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(251, 207, 232, 0.4) 0%, rgba(252, 231, 243, 0.3) 40%, rgba(255, 255, 255, 0) 80%)'
+        }}
+      ></div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 max-w-6xl">
         {/* Section Title */}
         <div ref={titleRef} className="text-center mb-16 sm:mb-20">
@@ -110,6 +116,7 @@ export default function ServicesSection() {
                   src={service.image}
                   alt={t(service.titleKey)}
                   fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 {/* Gradient overlay on image */}

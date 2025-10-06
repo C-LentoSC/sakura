@@ -38,7 +38,7 @@ Create a new JSON file with the language code (e.g., `es.json` for Spanish, `fr.
     "title": "Sakura",
     "subtitle": "salón",
     "description": "Bienvenido a Sakura Salon...",
-    "booking": "RESERVAR AHORA",
+    "bookings": "RESERVAR AHORA",
     "story": "Ver nuestra historia"
   },
   "features": {

@@ -84,7 +84,15 @@ export default function TestimonialsSection() {
 
   return (
     <section ref={sectionRef} className="py-16 sm:py-20 md:py-24 lg:py-28 relative overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+      {/* Background with blur effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-rose-50/80 via-pink-50/60 to-amber-50/40 backdrop-blur-sm"></div>
+      <div 
+        className="absolute inset-0 backdrop-blur-xs" 
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(251, 207, 232, 0.2) 0%, rgba(252, 231, 243, 0.15) 40%, rgba(255, 255, 255, 0) 80%)'
+        }}
+      ></div>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         {/* Section Title */}
         <div ref={titleRef} className="text-center mb-12 sm:mb-16 md:mb-20">
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sakura text-secondary mb-3 sm:mb-4">

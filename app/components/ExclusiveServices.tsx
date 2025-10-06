@@ -131,10 +131,16 @@ export default function ExclusiveServices() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32 relative overflow-hidden" style={{
-      background: 'radial-gradient(ellipse at center, rgba(251, 207, 232, 0.3) 0%, rgba(252, 231, 243, 0.2) 40%, rgba(255, 255, 255, 0) 80%)'
-    }}>
-      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 max-w-6xl">
+    <section ref={sectionRef} className="py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32 relative overflow-hidden">
+      {/* Background with blur effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-rose-50/80 via-pink-50/60 to-amber-50/40 backdrop-blur-sm"></div>
+      <div 
+        className="absolute inset-0 backdrop-blur-xs" 
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(251, 207, 232, 0.3) 0%, rgba(252, 231, 243, 0.2) 40%, rgba(255, 255, 255, 0) 80%)'
+        }}
+      ></div>
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 max-w-6xl relative z-10">
         {/* Section Title */}
         <div ref={titleRef} className="text-center mb-8 sm:mb-10 md:mb-12 lg:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-sakura text-secondary mb-3 sm:mb-4 md:mb-6 px-2">
@@ -179,6 +185,7 @@ export default function ExclusiveServices() {
                   src={service.image}
                   alt={t(service.titleKey)}
                   fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   className="object-cover group-hover/card:scale-105 transition-transform duration-700"
                 />
                 {/* Gradient Overlay */}
@@ -235,7 +242,7 @@ export default function ExclusiveServices() {
                   {/* Action Buttons */}
                   <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 w-full sm:w-auto order-1 sm:order-2">
                     <Link
-                      href="/booking"
+                      href="/bookings"
                       className="group/btn flex-1 xs:flex-none text-center px-5 sm:px-6 md:px-7 py-2.5 sm:py-3 bg-gradient-to-r from-primary to-pink-400 text-white text-xs sm:text-sm font-semibold rounded-full hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 relative overflow-hidden"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-2">

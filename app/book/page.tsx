@@ -18,7 +18,7 @@ import { SERVICES_DATA } from '../constants/services';
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface BookingData {
+interface bookingsData {
   service: string;
   serviceId: number;
   date: string;
@@ -37,7 +37,7 @@ function BookPageContent() {
   const preSelectedServiceId = searchParams.get('service');
   
   const [currentStep, setCurrentStep] = useState(2);
-  const [bookingData, setBookingData] = useState<BookingData>({
+  const [bookingsData, setbookingsData] = useState<bookingsData>({
     service: '',
     serviceId: 0,
     date: '',
@@ -60,7 +60,7 @@ function BookPageContent() {
     if (preSelectedServiceId) {
       const service = SERVICES_DATA.find(s => s.id === parseInt(preSelectedServiceId));
       if (service) {
-        setBookingData(prev => ({
+        setbookingsData(prev => ({
           ...prev,
           service: t(service.nameKey),
           serviceId: service.id,
@@ -108,7 +108,7 @@ function BookPageContent() {
   ];
 
 
-  const handleSubmitBooking = async () => {
+  const handleSubmitbookings = async () => {
     setIsSubmitting(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -121,8 +121,8 @@ function BookPageContent() {
     }
   };
 
-  const resetBooking = () => {
-    setBookingData({
+  const resetbookings = () => {
+    setbookingsData({
       service: '',
       serviceId: 0,
       date: '',
@@ -153,7 +153,7 @@ function BookPageContent() {
         <div ref={heroRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-6 sm:py-8">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sakura text-secondary mb-4">
-              Complete Your Booking
+              Complete Your bookings
             </h1>
             <p className="text-base sm:text-lg text-secondary/60 leading-relaxed max-w-2xl mx-auto">
               {t('book.hero.subtitle')}
@@ -161,7 +161,7 @@ function BookPageContent() {
           </div>
         </div>
 
-        {/* Booking Container */}
+        {/* bookings Container */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl pb-16 sm:pb-20">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             
@@ -171,7 +171,7 @@ function BookPageContent() {
                 
                 {/* Progress Steps */}
                 <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-primary/10">
-                  <h3 className="font-semibold text-secondary mb-4 text-sm">Booking Progress</h3>
+                  <h3 className="font-semibold text-secondary mb-4 text-sm">bookings Progress</h3>
                   <div className="space-y-4">
                     {[
                       { step: 2, label: 'Date & Time', icon: 'calendar' },
@@ -218,7 +218,7 @@ function BookPageContent() {
                 </div>
 
                 {/* Selected Service Card */}
-                {bookingData.service && (
+                {bookingsData.service && (
                   <div className="bg-gradient-to-br from-primary/10 via-pink-50/50 to-amber-50/30 rounded-2xl p-6 border border-primary/20">
                     <div className="flex items-start gap-3 mb-4">
                       <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
@@ -232,10 +232,10 @@ function BookPageContent() {
                       </div>
                     </div>
                     <div className="bg-white/80 rounded-xl p-4">
-                      <h4 className="font-semibold text-secondary mb-2">{bookingData.service}</h4>
+                      <h4 className="font-semibold text-secondary mb-2">{bookingsData.service}</h4>
                       <div className="flex justify-between items-center text-sm">
-                        <span className="text-secondary/70">Duration: {bookingData.duration}</span>
-                        <span className="font-bold text-primary text-lg">{formatCurrency(bookingData.price)}</span>
+                        <span className="text-secondary/70">Duration: {bookingsData.duration}</span>
+                        <span className="font-bold text-primary text-lg">{formatCurrency(bookingsData.price)}</span>
                       </div>
                     </div>
                   </div>
@@ -243,7 +243,7 @@ function BookPageContent() {
               </div>
             </div>
 
-            {/* Right Content - Booking Steps */}
+            {/* Right Content - bookings Steps */}
             <div className="lg:col-span-8">
               <div ref={stepRef} className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-primary/10 overflow-hidden">
                 {/* Step 1: Date & Time Selection */}
@@ -277,7 +277,7 @@ function BookPageContent() {
                             type="date"
                             min={new Date().toISOString().split('T')[0]}
                             className="w-full px-4 py-4 rounded-xl border-2 border-primary/20 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-base bg-white/80 backdrop-blur-sm"
-                            onChange={(e) => setBookingData(prev => ({ ...prev, date: e.target.value }))}
+                            onChange={(e) => setbookingsData(prev => ({ ...prev, date: e.target.value }))}
                           />
                         </div>
                       </div>
@@ -294,9 +294,9 @@ function BookPageContent() {
                           {timeSlots.map((time) => (
                             <button
                               key={time}
-                              onClick={() => setBookingData(prev => ({ ...prev, time }))}
+                              onClick={() => setbookingsData(prev => ({ ...prev, time }))}
                               className={`w-full h-12 text-sm font-medium rounded-xl border-2 transition-all duration-300 flex items-center justify-center ${
-                                bookingData.time === time
+                                bookingsData.time === time
                                   ? 'bg-gradient-to-r from-primary to-pink-400 text-white border-primary shadow-lg scale-105'
                                   : 'bg-white/80 border-primary/20 hover:border-primary hover:bg-primary/5 hover:scale-105'
                               }`}
@@ -310,8 +310,8 @@ function BookPageContent() {
 
                     <div className="flex justify-end mt-8 pt-6 border-t border-primary/10">
                       <button
-                        onClick={() => bookingData.date && bookingData.time && setCurrentStep(3)}
-                        disabled={!bookingData.date || !bookingData.time}
+                        onClick={() => bookingsData.date && bookingsData.time && setCurrentStep(3)}
+                        disabled={!bookingsData.date || !bookingsData.time}
                         className="px-8 py-4 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-xl hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-300 flex items-center gap-2"
                       >
                         Continue to Details
@@ -335,7 +335,7 @@ function BookPageContent() {
                         </div>
                         <div>
                           <h2 className="text-xl font-sakura text-secondary">Tell us about yourself</h2>
-                          <p className="text-sm text-secondary/60">We need a few details to complete your booking</p>
+                          <p className="text-sm text-secondary/60">We need a few details to complete your bookings</p>
                         </div>
                       </div>
                     </div>
@@ -354,7 +354,7 @@ function BookPageContent() {
                             required
                             placeholder="Enter your full name"
                             className="w-full px-4 py-4 rounded-xl border-2 border-primary/20 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-base bg-white/80 backdrop-blur-sm"
-                            onChange={(e) => setBookingData(prev => ({ ...prev, name: e.target.value }))}
+                            onChange={(e) => setbookingsData(prev => ({ ...prev, name: e.target.value }))}
                           />
                         </div>
                         <div>
@@ -369,7 +369,7 @@ function BookPageContent() {
                             required
                             placeholder="your.email@example.com"
                             className="w-full px-4 py-4 rounded-xl border-2 border-primary/20 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-base bg-white/80 backdrop-blur-sm"
-                            onChange={(e) => setBookingData(prev => ({ ...prev, email: e.target.value }))}
+                            onChange={(e) => setbookingsData(prev => ({ ...prev, email: e.target.value }))}
                           />
                         </div>
                       </div>
@@ -385,7 +385,7 @@ function BookPageContent() {
                           type="tel"
                           placeholder="+1 (555) 123-4567"
                           className="w-full px-4 py-4 rounded-xl border-2 border-primary/20 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-base bg-white/80 backdrop-blur-sm"
-                          onChange={(e) => setBookingData(prev => ({ ...prev, phone: e.target.value }))}
+                          onChange={(e) => setbookingsData(prev => ({ ...prev, phone: e.target.value }))}
                         />
                       </div>
 
@@ -400,7 +400,7 @@ function BookPageContent() {
                           rows={4}
                           placeholder="Any special requests or notes for your appointment..."
                           className="w-full px-4 py-4 rounded-xl border-2 border-primary/20 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none resize-none text-base bg-white/80 backdrop-blur-sm"
-                          onChange={(e) => setBookingData(prev => ({ ...prev, notes: e.target.value }))}
+                          onChange={(e) => setbookingsData(prev => ({ ...prev, notes: e.target.value }))}
                         />
                       </div>
                     </div>
@@ -416,11 +416,11 @@ function BookPageContent() {
                         Back to Date & Time
                       </button>
                       <button
-                        onClick={() => bookingData.name && bookingData.email && setCurrentStep(4)}
-                        disabled={!bookingData.name || !bookingData.email}
+                        onClick={() => bookingsData.name && bookingsData.email && setCurrentStep(4)}
+                        disabled={!bookingsData.name || !bookingsData.email}
                         className="px-8 py-4 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-xl hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-300 flex items-center gap-2"
                       >
-                        Review Booking
+                        Review bookings
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -440,7 +440,7 @@ function BookPageContent() {
                           </svg>
                         </div>
                         <div>
-                          <h2 className="text-xl font-sakura text-secondary">Review Your Booking</h2>
+                          <h2 className="text-xl font-sakura text-secondary">Review Your bookings</h2>
                           <p className="text-sm text-secondary/60">Please confirm your appointment details</p>
                         </div>
                       </div>
@@ -456,10 +456,10 @@ function BookPageContent() {
                         <h3 className="text-2xl font-sakura text-secondary mb-3">{t('book.success.title')}</h3>
                         <p className="text-secondary/70 mb-8 max-w-md mx-auto">{t('book.success.message')}</p>
                         <button
-                          onClick={resetBooking}
+                          onClick={resetbookings}
                           className="px-8 py-4 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300"
                         >
-                          {t('book.success.newBooking')}
+                          {t('book.success.newbookings')}
                         </button>
                       </div>
                     ) : (
@@ -469,7 +469,7 @@ function BookPageContent() {
                             <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
-                            Booking Summary
+                            bookings Summary
                           </h3>
                           
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -480,7 +480,7 @@ function BookPageContent() {
                                 </svg>
                                 <div>
                                   <div className="text-sm text-secondary/60">Service</div>
-                                  <div className="font-semibold text-secondary">{bookingData.service}</div>
+                                  <div className="font-semibold text-secondary">{bookingsData.service}</div>
                                 </div>
                               </div>
                               
@@ -490,7 +490,7 @@ function BookPageContent() {
                                 </svg>
                                 <div>
                                   <div className="text-sm text-secondary/60">Date</div>
-                                  <div className="font-semibold text-secondary">{bookingData.date}</div>
+                                  <div className="font-semibold text-secondary">{bookingsData.date}</div>
                                 </div>
                               </div>
                             </div>
@@ -502,7 +502,7 @@ function BookPageContent() {
                                 </svg>
                                 <div>
                                   <div className="text-sm text-secondary/60">Time</div>
-                                  <div className="font-semibold text-secondary">{bookingData.time}</div>
+                                  <div className="font-semibold text-secondary">{bookingsData.time}</div>
                                 </div>
                               </div>
                               
@@ -512,7 +512,7 @@ function BookPageContent() {
                                 </svg>
                                 <div>
                                   <div className="text-sm text-secondary/60">Duration</div>
-                                  <div className="font-semibold text-secondary">{bookingData.duration}</div>
+                                  <div className="font-semibold text-secondary">{bookingsData.duration}</div>
                                 </div>
                               </div>
                             </div>
@@ -521,7 +521,7 @@ function BookPageContent() {
                           <div className="border-t border-primary/20 mt-6 pt-6">
                             <div className="flex justify-between items-center">
                               <span className="text-lg font-semibold text-secondary">Total Amount</span>
-                              <span className="text-2xl font-bold text-primary">{formatCurrency(bookingData.price)}</span>
+                              <span className="text-2xl font-bold text-primary">{formatCurrency(bookingsData.price)}</span>
                             </div>
                           </div>
                         </div>
@@ -537,7 +537,7 @@ function BookPageContent() {
                             Back to Details
                           </button>
                           <button
-                            onClick={handleSubmitBooking}
+                            onClick={handleSubmitbookings}
                             disabled={isSubmitting}
                             className="px-8 py-4 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-xl hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-300 flex items-center gap-2"
                           >
@@ -568,7 +568,7 @@ function BookPageContent() {
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span className="font-semibold">Booking Error</span>
+                          <span className="font-semibold">bookings Error</span>
                         </div>
                         <p>{t('book.error.message')}</p>
                       </div>

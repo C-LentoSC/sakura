@@ -89,7 +89,7 @@ export const translations: Record<Language, Record<string, unknown>> = {
 | `hero.title` | Main title | Sakura |
 | `hero.subtitle` | Subtitle | salon |
 | `hero.description` | Description text | Welcome to... |
-| `hero.booking` | Booking button | BOOKING NOW |
+| `hero.bookings` | bookings button | bookings NOW |
 | `hero.story` | Story button | Watch Our Story |
 | `features.premium.title` | Premium feature title | Premium Products |
 | `features.premium.description` | Premium feature desc | Organic and natural... |

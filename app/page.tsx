@@ -32,11 +32,13 @@ export default function Home() {
             <Features />
           </div>
         </div>
-        <ServicesSection />
-        <ExclusiveServices />
-        <GallerySection />
-        <TestimonialsSection />
-        <ContactSection />
+        <div className="space-y-16 sm:space-y-20 md:space-y-24 lg:space-y-32 mb-16 sm:mb-20 md:mb-24 lg:mb-32">
+          <ServicesSection />
+          <ExclusiveServices />
+          <GallerySection />
+          <TestimonialsSection />
+          <ContactSection />
+        </div>
       </main>
       <Footer />
     </div>

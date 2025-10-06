@@ -13,7 +13,7 @@
     "title": "Sakura",
     "subtitle": "salon",
     "description": "Welcome to Sakura Salon, your cozy retreat for relaxation and rejuvenation. Experience our range of services designed to pamper you from head to toe.",
-    "booking": "BOOKING NOW",
+    "bookings": "BOOKING NOW",
     "story": "Watch Our Story"
   },
   "features": {
@@ -29,18 +29,6 @@
       "title": "Relaxing Atmosphere",
       "description": "Peaceful environment for your complete relaxation"
     }
-  },
-  "services": {
-    "mainTitle": "Our Main Services",
-    "spa": {
-      "title": "Japanese Head Spa & Relaxation",
-      "description": "Immerse yourself in the ancient art of Japanese head spa - a soothing ritual designed to melt stress, improve scalp health, and restore inner peace. Experience our professional and refreshing treatment, crafted with care, and leave feeling rejuvenated and balanced."
-    },
-    "beauty": {
-      "title": "Beauty Care: Nails, Lashes & Brows",
-      "description": "Elevate your elegance with our bespoke beauty services, from flawless nails and gorgeous lashes to perfectly shaped brows. Achieve your natural charm, shine into a world-class experience with confidence, and let your beauty bloom like cherry blossoms."
-    },
-    "contactButton": "Contact for more info"
   },
   "exclusiveServices": {
     "mainTitle": "Our Exclusive Services We Provide",
@@ -127,6 +115,7 @@
     "mainTitle": "Get in Touch With Us",
     "subtitle": "We'd love to hear from you. Reach out for bookings or inquiries",
     "infoTitle": "Contact Information",
+    "formTitle": "Send Us a Message",
     "address": "Address",
     "addressDetails": "123 Sakura Street, Beauty District, City 12345",
     "phone": "Phone",
@@ -136,7 +125,6 @@
     "hours": "Business Hours",
     "hoursDetails": "Mon-Sat: 9:00 AM - 8:00 PM | Sun: 10:00 AM - 6:00 PM",
     "followUs": "Follow Us",
-    "formTitle": "Send Us a Message",
     "form": {
       "name": "Your Name",
       "namePlaceholder": "Enter your name",
@@ -156,7 +144,7 @@
       "home": "Home",
       "services": "Services",
       "about": "About Us",
-      "booking": "Book Now",
+      "bookings": "Book Now",
       "contact": "Contact"
     },
     "services": "Our Services",
@@ -176,14 +164,14 @@
     "online": "Online now",
     "quickRepliesTitle": "Quick questions:",
     "quickReplies": {
-      "booking": "Book an appointment",
+      "bookings": "Book an appointment",
       "services": "View services",
       "pricing": "Check pricing",
       "hours": "Business hours",
       "location": "Find location"
     },
     "responses": {
-      "booking": "Great! You can book an appointment by calling us at +1 (555) 123-4567 or clicking the 'Book Now' button on our website. We're available Mon-Sat 9AM-8PM.",
+      "bookings": "Great! You can book an appointment by calling us at +1 (555) 123-4567 or clicking the 'Book Now' button on our website. We're available Mon-Sat 9AM-8PM.",
       "services": "We offer Japanese Head Spa, Nail Art & Extensions, Lash Extensions, and Eyebrow Styling. Each service is performed by our expert team in a serene atmosphere. Would you like to know more about a specific service?",
       "pricing": "Our pricing varies by service. Head Spa starts at $80, Nail services from $45, and Lash Extensions from $120. Contact us for detailed pricing and package deals!",
       "hours": "We're open Monday to Saturday: 9:00 AM - 8:00 PM, and Sunday: 10:00 AM - 6:00 PM. Walk-ins welcome, but appointments are recommended!",
@@ -248,6 +236,16 @@
     }
   },
   "services": {
+    "mainTitle": "Our Main Services",
+    "spa": {
+      "title": "Japanese Head Spa & Relaxation",
+      "description": "Immerse yourself in the ancient art of Japanese head spa - a soothing ritual designed to melt stress, improve scalp health, and restore inner peace. Experience our professional and refreshing treatment, crafted with care, and leave feeling rejuvenated and balanced."
+    },
+    "beauty": {
+      "title": "Beauty Care: Nails, Lashes & Brows",
+      "description": "Elevate your elegance with our bespoke beauty services, from flawless nails and gorgeous lashes to perfectly shaped brows. Achieve your natural charm, shine into a world-class experience with confidence, and let your beauty bloom like cherry blossoms."
+    },
+    "contactButton": "Contact for more info",
     "hero": {
       "title": "Our Services",
       "subtitle": "Exclusive range of packages to please your needs"
@@ -388,51 +386,10 @@
     "contactInfo": "Contact me from the same Info",
     "noResults": "No services found matching your search."
   },
-  "contact": {
-    "hero": {
-      "title": "Contact Us",
-      "subtitle": "Get in touch with us to book your appointment or ask any questions. We're here to help you look and feel your best."
-    },
-    "form": {
-      "title": "Send us a Message",
-      "name": "Full Name",
-      "namePlaceholder": "Enter your full name",
-      "email": "Email Address",
-      "emailPlaceholder": "Enter your email address",
-      "phone": "Phone Number",
-      "phonePlaceholder": "Enter your phone number",
-      "service": "Service Interest",
-      "selectService": "Select a service",
-      "message": "Message",
-      "messagePlaceholder": "Tell us about your needs or questions...",
-      "send": "Send Message",
-      "sending": "Sending...",
-      "successMessage": "Thank you! Your message has been sent successfully. We'll get back to you soon.",
-      "errorMessage": "Sorry, there was an error sending your message. Please try again or contact us directly."
-    },
-    "info": {
-      "location": {
-        "title": "Our Location",
-        "address": "123 Sakura Street, Beauty District, Tokyo 100-0001, Japan"
-      },
-      "hours": {
-        "title": "Business Hours",
-        "weekdays": "Monday - Friday",
-        "saturday": "Saturday",
-        "sunday": "Sunday"
-      },
-      "details": {
-        "title": "Contact Details"
-      },
-      "social": {
-        "title": "Follow Us"
-      }
-    }
-  },
   "book": {
     "hero": {
       "title": "Book Your Appointment",
-      "subtitle": "Schedule your perfect beauty experience with our easy booking system. Choose your service, pick your time, and let us pamper you."
+      "subtitle": "Schedule your perfect beauty experience with our easy bookings system. Choose your service, pick your time, and let us pamper you."
     },
     "step1": {
       "title": "Choose Your Service"
@@ -450,34 +407,34 @@
       "notes": "Special Notes"
     },
     "step4": {
-      "title": "Confirm Your Booking",
-      "summary": "Booking Summary",
+      "title": "Confirm Your bookings",
+      "summary": "bookings Summary",
       "service": "Service",
       "date": "Date",
       "time": "Time",
       "duration": "Duration",
       "total": "Total",
-      "confirm": "Confirm Booking",
+      "confirm": "Confirm bookings",
       "confirming": "Confirming..."
     },
     "selectedService": "Selected Service",
     "back": "Back",
     "next": "Next",
     "success": {
-      "title": "Booking Confirmed!",
+      "title": "bookings Confirmed!",
       "message": "Your appointment has been successfully booked. We'll send you a confirmation email shortly.",
-      "newBooking": "Book Another Appointment"
+      "newbookings": "Book Another Appointment"
     },
     "error": {
-      "message": "Sorry, there was an error processing your booking. Please try again or contact us directly."
+      "message": "Sorry, there was an error processing your bookings. Please try again or contact us directly."
     }
   },
   "bookings": {
     "hero": {
-      "title": "My Bookings",
+      "title": "My bookings",
       "subtitle": "View and manage your appointment history. Keep track of upcoming appointments and past services."
     },
-    "newBooking": "Book New Appointment",
+    "newbookings": "Book New Appointment",
     "tabs": {
       "upcoming": "Upcoming",
       "completed": "Completed",
@@ -500,7 +457,7 @@
       "bookAgain": "Book Again"
     },
     "empty": {
-      "title": "No Bookings Found",
+      "title": "No bookings Found",
       "message": "You haven't made any bookings yet. Book your first appointment to get started!",
       "action": "Book Your First Appointment"
     }

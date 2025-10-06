@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { gsap } from 'gsap';
 
@@ -85,15 +86,21 @@ export default function HeroSection() {
 
       {/* Action Buttons */}
       <div ref={buttonsRef} className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-8">
-        <button className="sakura-button w-full sm:w-auto inline-flex items-center justify-center px-8 sm:px-8 py-3 sm:py-2.5 border-2 border-primary text-primary text-sm sm:text-base font-medium rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95">
-          {t('hero.booking')}
-        </button>
-        <button className="w-full sm:w-auto inline-flex items-center justify-center px-8 sm:px-8 py-3 sm:py-2.5 text-secondary/70 text-sm sm:text-base font-medium hover:text-primary transition-all duration-300 hover:scale-105">
+        <Link 
+          href="/booking"
+          className="sakura-button w-full sm:w-auto inline-flex items-center justify-center px-8 sm:px-8 py-3 sm:py-2.5 border-2 border-primary text-primary text-sm sm:text-base font-medium rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95"
+        >
+          {t('hero.bookings')}
+        </Link>
+        <Link 
+          href="/about"
+          className="w-full sm:w-auto inline-flex items-center justify-center px-8 sm:px-8 py-3 sm:py-2.5 text-secondary/70 text-sm sm:text-base font-medium hover:text-primary transition-all duration-300 hover:scale-105"
+        >
           <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
           </svg>
           {t('hero.story')}
-        </button>
+        </Link>
       </div>
     </div>
   );
