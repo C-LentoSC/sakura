@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
 import {
   Header,
   BackgroundPattern,
@@ -11,8 +10,7 @@ import {
   Chatbot
 } from '../components';
 
-export default function bookingsPage() {
-  const { t } = useLanguage();
+export default function BookingsPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',

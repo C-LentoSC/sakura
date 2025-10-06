@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
+import { Suspense } from "react";
 import "./globals.css";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { LoadingProvider } from "./contexts/LoadingContext";
@@ -47,9 +48,11 @@ export default function RootLayout({
         <ErrorBoundary>
           <AuthProvider>
             <LanguageProvider>
-              <LoadingProvider>
-                {children}
-              </LoadingProvider>
+              <Suspense fallback={null}>
+                <LoadingProvider>
+                  {children}
+                </LoadingProvider>
+              </Suspense>
             </LanguageProvider>
           </AuthProvider>
         </ErrorBoundary>
