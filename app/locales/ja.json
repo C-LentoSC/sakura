@@ -3,6 +3,7 @@
     "home": "ホーム",
     "about": "私たちについて",
     "services": "サービス",
+    "shop": "ショップ",
     "bookings": "予約",
     "contact": "お問い合わせ",
     "login": "ログイン",
@@ -13,7 +14,7 @@
     "title": "さくら",
     "subtitle": "サロン",
     "description": "さくらサロンへようこそ。リラクゼーションと若返りのための居心地の良い隠れ家です。頭からつま先まであなたを甘やかすために設計されたサービスをご体験ください。",
-    "bookings": "今すぐ予約",
+    "booking": "今すぐ予約",
     "story": "私たちのストーリー"
   },
   "features": {
@@ -384,23 +385,40 @@
     },
     "bookNow": "予約する",
     "contactInfo": "同じ情報から連絡してください",
-    "noResults": "検索に一致するサービスが見つかりません"
+    "noResults": "検索に一致するサービスが見つかりません",
+    "headSpa": {
+      "name": "ジャパニーズヘッドスパ"
+    },
+    "nailArt": {
+      "name": "プレミアムネイルアート"
+    },
+    "lashExtensions": {
+      "name": "まつげエクステンション"
+    }
   },
   "book": {
     "hero": {
       "title": "ご予約",
       "subtitle": "簡単な予約システムで完璧な美容体験をスケジュールしてください。サービスを選択し、時間を選んで、私たちにあなたを甘やかさせてください。"
     },
+    "progress": {
+      "title": "予約の進行状況",
+      "step2": "日時選択",
+      "step3": "お客様情報",
+      "step4": "確認"
+    },
     "step1": {
       "title": "サービスを選択"
     },
     "step2": {
-      "title": "日時を選択",
+      "title": "いつご来店されますか？",
+      "subtitle": "ご希望の日付と時間をお選びください",
       "selectDate": "日付を選択",
       "selectTime": "時間を選択"
     },
     "step3": {
-      "title": "お客様情報",
+      "title": "お客様について教えてください",
+      "subtitle": "ご予約完了のため、いくつかの詳細が必要です",
       "name": "お名前",
       "email": "メールアドレス",
       "phone": "電話番号",
@@ -408,6 +426,7 @@
     },
     "step4": {
       "title": "予約の確認",
+      "subtitle": "ご予約内容をご確認ください",
       "summary": "予約内容",
       "service": "サービス",
       "date": "日付",
@@ -418,7 +437,30 @@
       "confirming": "確定中..."
     },
     "selectedService": "選択されたサービス",
+    "selectedService.subtitle": "お選びいただいたトリートメント",
+    "shopHours": "営業時間",
+    "paymentDetails": "お支払い詳細",
+    "placeholders": {
+      "name": "お名前をご入力ください",
+      "email": "メールアドレスをご入力ください",
+      "phone": "+81 (090) 1234-5678",
+      "notes": "ご予約に関する特別なご要望やメモがございましたらご記入ください..."
+    },
+    "validation": {
+      "nameRequired": "お名前は必須です",
+      "nameMinLength": "お名前は2文字以上で入力してください",
+      "nameInvalid": "お名前に無効な文字が含まれています",
+      "emailRequired": "メールアドレスは必須です",
+      "emailInvalid": "有効なメールアドレスを入力してください",
+      "phoneInvalid": "有効な電話番号を入力してください"
+    },
+    "payment": {
+      "error": "お支払いエラー",
+      "initError": "お支払いの初期化に失敗しました。もう一度お試しください。",
+      "initializing": "お支払いを初期化中..."
+    },
     "back": "戻る",
+    "backToDateTime": "日時選択に戻る",
     "next": "次へ",
     "success": {
       "title": "予約が確定しました！",
@@ -436,14 +478,17 @@
     },
     "newbookings": "新しい予約をする",
     "tabs": {
-      "upcoming": "今後の予約",
+      "active": "アクティブ",
       "completed": "完了済み",
+      "cancelled": "キャンセル済み",
       "all": "すべて"
     },
     "status": {
-      "upcoming": "予約済み",
-      "completed": "完了",
-      "cancelled": "キャンセル"
+      "confirmed": "確認済み",
+      "completed": "完了済み",
+      "cancelled": "キャンセル済み",
+      "rescheduled": "変更済み",
+      "noShow": "来店なし"
     },
     "details": {
       "date": "日付",
@@ -460,6 +505,16 @@
       "title": "予約がありません",
       "message": "まだ予約をされていません。最初の予約をして始めましょう！",
       "action": "初回予約をする"
+    },
+    "cancel": {
+      "title": "予約をキャンセル",
+      "message": "この予約をキャンセルしてもよろしいですか？この操作は元に戻せません。",
+      "keep": "予約を保持",
+      "confirm": "予約をキャンセル"
+    },
+    "messages": {
+      "cancelSuccess": "予約が正常にキャンセルされました",
+      "cancelError": "予約のキャンセルに失敗しました。もう一度お試しください。"
     }
   },
   "auth": {
@@ -506,6 +561,97 @@
         "emailInUse": "このメールは既に使用されています",
         "signinFailed": "登録は成功しましたが、サインインに失敗しました。ログインをお試しください。"
       }
+    }
+  },
+  "shop": {
+    "hero": {
+      "title": "さくらショップ",
+      "subtitle": "あなたのセルフケアの旅のために厳選されたプレミアム美容・ウェルネス製品"
+    },
+    "search": {
+      "placeholder": "商品を検索..."
+    },
+    "categories": {
+      "all": "すべて",
+      "hairCare": "ヘアケア",
+      "nailCare": "ネイルケア",
+      "beauty": "ビューティー",
+      "wellness": "ウェルネス"
+    },
+    "product": {
+      "addToCart": "カートに追加",
+      "outOfStock": "在庫切れ",
+      "quickView": "クイックビュー",
+      "reviews": "レビュー"
+    },
+    "cart": {
+      "title": "ショッピングカート",
+      "subtitle": "チェックアウト前に選択した商品を確認してください",
+      "empty": "カートは空です",
+      "emptyMessage": "商品を追加して始めましょう",
+      "continueShopping": "ショッピングを続ける",
+      "proceedCheckout": "チェックアウトに進む",
+      "subtotal": "小計",
+      "shipping": "送料",
+      "total": "合計",
+      "freeShipping": "2,000円以上のご注文で送料無料！",
+      "secureCheckout": "SSL暗号化による安全なチェックアウト"
+    },
+    "noResults": {
+      "title": "商品が見つかりません",
+      "message": "検索条件やフィルター条件を調整してみてください"
+    }
+  },
+  "checkout": {
+    "title": "チェックアウト",
+    "subtitle": "安全なお支払いでご注文を完了してください",
+    "step1": {
+      "title": "配送情報",
+      "name": "お名前",
+      "email": "メールアドレス",
+      "phone": "電話番号",
+      "address": "住所",
+      "city": "市区町村",
+      "postalCode": "郵便番号",
+      "notes": "ご注文メモ（任意）"
+    },
+    "step2": {
+      "title": "お支払い"
+    },
+    "placeholders": {
+      "name": "お名前をご入力ください",
+      "email": "メールアドレスをご入力ください",
+      "phone": "+81 (090) 1234-5678",
+      "address": "住所をご入力ください",
+      "city": "市区町村をご入力ください",
+      "postalCode": "123-4567",
+      "notes": "配送に関する特別なご指示がございましたら..."
+    },
+    "validation": {
+      "nameRequired": "お名前は必須です",
+      "nameMinLength": "お名前は2文字以上で入力してください",
+      "emailRequired": "メールアドレスは必須です",
+      "emailInvalid": "有効なメールアドレスを入力してください",
+      "phoneRequired": "電話番号は必須です",
+      "phoneInvalid": "有効な電話番号を入力してください",
+      "addressRequired": "住所は必須です",
+      "cityRequired": "市区町村は必須です",
+      "postalCodeRequired": "郵便番号は必須です"
+    },
+    "payment": {
+      "error": "お支払いエラー",
+      "initError": "お支払いの初期化に失敗しました。もう一度お試しください。",
+      "initializing": "お支払いを初期化中..."
+    },
+    "orderSummary": "ご注文内容",
+    "subtotal": "小計",
+    "shipping": "送料",
+    "total": "合計",
+    "proceedToPayment": "お支払いに進む",
+    "back": "戻る",
+    "success": {
+      "title": "ご注文が正常に完了しました！",
+      "message": "ご注文ありがとうございます。間もなく確認メールをお送りいたします。"
     }
   }
 }

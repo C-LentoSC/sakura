@@ -41,6 +41,9 @@ export default function Header() {
           <Link href="/services" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
             {t('nav.services')}
           </Link>
+          <Link href="/shop" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+            {t('nav.shop')}
+          </Link>
           <Link href="/bookings" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
             {t('nav.bookings')}
           </Link>
@@ -140,6 +143,17 @@ export default function Header() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
               <span className="text-sm font-medium">{t('nav.services')}</span>
+            </Link>
+            
+            <Link 
+              href="/shop" 
+              className="flex items-center gap-3 text-secondary/70 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              <span className="text-sm font-medium">{t('nav.shop')}</span>
             </Link>
             
             <Link 

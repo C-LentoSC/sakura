@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
+import { SERVICES_DATA } from '../constants/services';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -18,60 +19,24 @@ export default function ExclusiveServices() {
   const tabsRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
-  const headSpaServices = [
-    {
-      id: 'japanese-head-spa',
-      image: '/services-images/head-spa2.jpg',
-      duration: '90',
-      titleKey: 'exclusiveServices.japaneseHeadSpa.title',
-      descKey: 'exclusiveServices.japaneseHeadSpa.description',
-      price: 969,
-    },
-    {
-      id: 'dry-head-spa',
-      image: '/services-images/head-spa.jpg',
-      duration: '60',
-      titleKey: 'exclusiveServices.dryHeadSpa.title',
-      descKey: 'exclusiveServices.dryHeadSpa.description',
-      price: 599,
-    },
-    {
-      id: 'imperial-retreat',
-      image: '/services-images/beauty-nails.jpg',
-      duration: '120',
-      titleKey: 'exclusiveServices.imperialRetreat.title',
-      descKey: 'exclusiveServices.imperialRetreat.description',
-      price: 1299,
-    },
-  ];
+  // Get top 3 most popular services by category
+  const getPopularServices = (category: 'head-spa' | 'beauty') => {
+    const categoryServices = SERVICES_DATA.filter(service => {
+      if (category === 'head-spa') {
+        return service.mainCategory === 'head-spa';
+      } else {
+        return service.mainCategory === 'nails' || service.mainCategory === 'lashes' || service.mainCategory === 'brows';
+      }
+    });
+    
+    // Sort by price (higher price = more premium/popular) and take top 3
+    return categoryServices
+      .sort((a, b) => b.price - a.price)
+      .slice(0, 3);
+  };
 
-  const beautyServices = [
-    {
-      id: 'nail-art',
-      image: '/services-images/nails.jpg',
-      duration: '60',
-      titleKey: 'exclusiveServices.nailArt.title',
-      descKey: 'exclusiveServices.nailArt.description',
-      price: 799,
-    },
-    {
-      id: 'lash-extension',
-      image: '/services-images/beauty-nails.jpg',
-      duration: '90',
-      titleKey: 'exclusiveServices.lashExtension.title',
-      descKey: 'exclusiveServices.lashExtension.description',
-      price: 1199,
-    },
-    {
-      id: 'brow-styling',
-      image: '/services-images/nails.jpg',
-      duration: '45',
-      titleKey: 'exclusiveServices.browStyling.title',
-      descKey: 'exclusiveServices.browStyling.description',
-      price: 599,
-    },
-  ];
-
+  const headSpaServices = getPopularServices('head-spa');
+  const beautyServices = getPopularServices('beauty');
   const currentServices = activeTab === 'headSpa' ? headSpaServices : beautyServices;
 
   useEffect(() => {
@@ -183,7 +148,7 @@ export default function ExclusiveServices() {
               <div className="relative w-full lg:w-44 xl:w-52 h-52 sm:h-60 md:h-64 lg:h-auto flex-shrink-0 rounded-xl sm:rounded-2xl overflow-hidden shadow-md group-hover/card:shadow-xl transition-shadow duration-500">
                 <Image
                   src={service.image}
-                  alt={t(service.titleKey)}
+                  alt={t(service.nameKey)}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   className="object-cover group-hover/card:scale-105 transition-transform duration-700"
@@ -198,7 +163,7 @@ export default function ExclusiveServices() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="text-xs sm:text-sm font-semibold text-white">
-                      {service.duration} {t('exclusiveServices.minutes')}
+                      {service.duration}
                     </span>
                   </div>
                 </div>
@@ -218,7 +183,7 @@ export default function ExclusiveServices() {
                   {/* Title with decorative line */}
                   <div className="mb-3 sm:mb-4">
                     <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-sakura text-secondary group-hover/card:text-primary transition-colors duration-300 leading-tight mb-2">
-                      {t(service.titleKey)}
+                      {t(service.nameKey)}
                     </h3>
                     <div className="w-16 h-0.5 bg-gradient-to-r from-primary to-pink-400 rounded-full"></div>
                   </div>
@@ -242,7 +207,7 @@ export default function ExclusiveServices() {
                   {/* Action Buttons */}
                   <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 w-full sm:w-auto order-1 sm:order-2">
                     <Link
-                      href="/bookings"
+                      href={`/book?service=${service.id}`}
                       className="group/btn flex-1 xs:flex-none text-center px-5 sm:px-6 md:px-7 py-2.5 sm:py-3 bg-gradient-to-r from-primary to-pink-400 text-white text-xs sm:text-sm font-semibold rounded-full hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 relative overflow-hidden"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-2">
@@ -254,7 +219,7 @@ export default function ExclusiveServices() {
                       <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-primary opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
                     </Link>
                     <Link
-                      href={`/services/${service.id}`}
+                      href="/services"
                       className="flex-1 xs:flex-none text-center px-5 sm:px-6 md:px-7 py-2.5 sm:py-3 bg-secondary/5 hover:bg-secondary/10 text-secondary text-xs sm:text-sm font-medium rounded-full border border-secondary/10 hover:border-secondary/20 transition-all duration-300 hover:scale-105 active:scale-95"
                     >
                       {t('exclusiveServices.sameInfo')}

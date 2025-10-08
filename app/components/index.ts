@@ -9,6 +9,8 @@ export { default as TestimonialsSection } from './TestimonialsSection';
 export { default as ContactSection } from './ContactSection';
 export { default as Footer } from './Footer';
 export { default as Chatbot } from './Chatbot';
+export { default as StripeProvider } from './StripeProvider';
+export { default as PaymentForm } from './PaymentForm';
 export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as ErrorFallback } from './ErrorFallback';
 export { default as NavigationLoader } from './NavigationLoader';

@@ -157,7 +157,7 @@ export default function ServicesPage() {
         <div ref={servicesRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pb-12 sm:pb-16">
           {filteredServices.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {filteredServices.map((service) => (
+              {filteredServices.map((service, index) => (
                 <div
                   key={service.id}
                   className="service-card bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-primary/10 hover:border-primary/20"
@@ -171,6 +171,7 @@ export default function ServicesPage() {
                         fill
                         className="object-cover"
                         sizes="(max-width: 640px) 100vw, 176px"
+                        priority={index === 0}
                       />
                       {/* Duration Badge */}
                       <div className="absolute top-3 left-3 bg-primary/90 backdrop-blur-sm px-3 py-1.5 rounded-full z-10">

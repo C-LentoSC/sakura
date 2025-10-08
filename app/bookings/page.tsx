@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
+import { loadBookings, saveBookings, updateBookingStatus, type BookingData } from '../utils/bookingStorage';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
@@ -18,28 +19,24 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface bookings {
-  id: number;
-  service: string;
-  image: string;
-  date: string;
-  time: string;
-  duration: string;
-  price: number;
-  status: 'upcoming' | 'completed' | 'cancelled';
-  createdAt: string;
-}
+// Use the BookingData interface from utils
+type bookings = BookingData;
 
 export default function MybookingsPage() {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<'upcoming' | 'completed' | 'all'>('upcoming');
+  const [activeTab, setActiveTab] = useState<'active' | 'completed' | 'cancelled' | 'all'>('active');
+  const [bookings, setBookings] = useState<bookings[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState<number | null>(null);
+  const [notification, setNotification] = useState<{type: 'success' | 'error'; message: string} | null>(null);
+  const [error, setError] = useState<string | null>(null);
   
   const heroRef = useRef<HTMLDivElement>(null);
   const bookingsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Hero animation
+      // Hero animation - only run once on mount
       gsap.fromTo(heroRef.current,
         { opacity: 0, y: 50 },
         {
@@ -50,7 +47,7 @@ export default function MybookingsPage() {
         }
       );
 
-      // bookings animation
+      // bookings animation - only run once on mount
       gsap.fromTo(bookingsRef.current,
         { opacity: 0, y: 30 },
         {
@@ -64,88 +61,97 @@ export default function MybookingsPage() {
     });
 
     return () => ctx.revert();
-  }, [activeTab]);
+  }, []); // Remove activeTab dependency to prevent re-animation
 
-  // Mock bookings data - in real app this would come from API/database
-  const mockbookings: bookings[] = [
-    {
-      id: 1,
-      service: 'Imperial Retreat',
-      image: '/services-images/beauty-nails.jpg',
-      date: '2025-01-15',
-      time: '2:00 PM',
-      duration: '120 min',
-      price: 160,
-      status: 'upcoming',
-      createdAt: '2025-01-05'
-    },
-    {
-      id: 2,
-      service: 'Zen Head Spa',
-      image: '/services-images/head-spa.jpg',
-      date: '2025-01-20',
-      time: '10:30 AM',
-      duration: '75 min',
-      price: 95,
-      status: 'upcoming',
-      createdAt: '2025-01-06'
-    },
-    {
-      id: 3,
-      service: 'Classic Lashes',
-      image: '/services-images/beauty-nails.jpg',
-      date: '2024-12-28',
-      time: '3:00 PM',
-      duration: '120 min',
-      price: 150,
-      status: 'completed',
-      createdAt: '2024-12-20'
-    },
-    {
-      id: 4,
-      service: 'Gel Manicure',
-      image: '/services-images/nails.jpg',
-      date: '2024-12-15',
-      time: '11:00 AM',
-      duration: '60 min',
-      price: 65,
-      status: 'completed',
-      createdAt: '2024-12-10'
-    },
-    {
-      id: 5,
-      service: 'Crystal Scalp Massage',
-      image: '/services-images/head-spa2.jpg',
-      date: '2024-12-05',
-      time: '4:30 PM',
-      duration: '85 min',
-      price: 135,
-      status: 'cancelled',
-      createdAt: '2024-11-28'
+  // Initialize bookings data
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Load real bookings from storage
+      const userBookings = loadBookings();
+      setBookings(userBookings);
+    } catch (err) {
+      console.error('Failed to load bookings:', err);
+      setError('Failed to load bookings. Please refresh the page.');
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  }, []);
 
-  const filteredbookings = mockbookings.filter(bookings => {
+  // Booking management functions
+  const handleCancelBooking = async (bookingId: number) => {
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Update booking status using utility
+      updateBookingStatus(bookingId, 'CANCELLED');
+      
+      // Update local state
+      const updatedBookings = bookings.map(booking => 
+        booking.id === bookingId 
+          ? { ...booking, status: 'CANCELLED' as const }
+          : booking
+      );
+      setBookings(updatedBookings);
+      setShowCancelModal(null);
+      // Show success notification
+      setNotification({
+        type: 'success',
+        message: t('bookings.messages.cancelSuccess')
+      });
+      
+      // Auto-hide notification after 3 seconds
+      setTimeout(() => setNotification(null), 3000);
+    } catch (error) {
+      setNotification({
+        type: 'error',
+        message: t('bookings.messages.cancelError')
+      });
+      
+      // Auto-hide notification after 3 seconds
+      setTimeout(() => setNotification(null), 3000);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBookAgain = (bookingId: number) => {
+    // In a real app, this would navigate to booking page with service pre-selected
+    const booking = bookings.find(b => b.id === bookingId);
+    if (booking) {
+      // Navigate to booking page with same service
+      window.location.href = `/book?service=${booking.id}`;
+    }
+  };
+
+  const filteredbookings = bookings.filter((booking: bookings) => {
     if (activeTab === 'all') return true;
-    if (activeTab === 'upcoming') return bookings.status === 'upcoming';
-    if (activeTab === 'completed') return bookings.status === 'completed';
+    if (activeTab === 'active') return booking.status === 'CONFIRMED';
+    if (activeTab === 'completed') return booking.status === 'COMPLETED';
+    if (activeTab === 'cancelled') return booking.status === 'CANCELLED' || booking.status === 'NO-SHOW';
     return false;
   });
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'upcoming': return 'text-blue-600 bg-blue-100';
-      case 'completed': return 'text-green-600 bg-green-100';
-      case 'cancelled': return 'text-red-600 bg-red-100';
+      case 'CONFIRMED': return 'text-blue-600 bg-blue-100';
+      case 'COMPLETED': return 'text-green-600 bg-green-100';
+      case 'CANCELLED': return 'text-red-600 bg-red-100';
+      case 'NO-SHOW': return 'text-gray-600 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'upcoming': return t('bookings.status.upcoming');
-      case 'completed': return t('bookings.status.completed');
-      case 'cancelled': return t('bookings.status.cancelled');
+      case 'CONFIRMED': return t('bookings.status.confirmed');
+      case 'COMPLETED': return t('bookings.status.completed');
+      case 'CANCELLED': return t('bookings.status.cancelled');
+      case 'NO-SHOW': return t('bookings.status.noShow');
       default: return status;
     }
   };
@@ -179,7 +185,7 @@ export default function MybookingsPage() {
           <div className="flex justify-center mb-6 sm:mb-8 px-4 sm:px-0">
             <div className="bg-white/90 backdrop-blur-sm rounded-xl p-1.5 sm:p-2 shadow-md border border-primary/10 w-full sm:w-auto">
               <div className="flex space-x-1 sm:space-x-2">
-                {(['upcoming', 'completed', 'all'] as const).map((tab) => (
+                {(['active', 'completed', 'cancelled', 'all'] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -196,9 +202,28 @@ export default function MybookingsPage() {
             </div>
           </div>
 
+          {/* Error Display */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="font-semibold text-red-800">Error</span>
+              </div>
+              <p className="text-red-700">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Refresh Page
+              </button>
+            </div>
+          )}
+
           {/* bookings List */}
           <div className="space-y-4">
-            {filteredbookings.length > 0 ? (
+            {!error && filteredbookings.length > 0 ? (
               filteredbookings.map((bookings) => (
                 <div
                   key={bookings.id}
@@ -276,23 +301,30 @@ export default function MybookingsPage() {
 
                       {/* Action Buttons */}
                       <div className="flex flex-col sm:flex-row gap-2">
-                        {bookings.status === 'upcoming' && (
-                          <>
-                            <button className="flex-1 px-4 py-2.5 bg-gradient-to-r from-primary to-pink-400 text-white font-medium rounded-xl hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 text-sm whitespace-nowrap">
-                              {t('bookings.actions.reschedule')}
-                            </button>
-                            <button className="sm:flex-shrink-0 px-4 py-2.5 bg-white border-2 border-red-200 text-red-600 font-medium rounded-xl hover:bg-red-50 hover:border-red-300 transition-all duration-300 text-sm whitespace-nowrap">
-                              {t('bookings.actions.cancel')}
-                            </button>
-                          </>
+                        {bookings.status === 'CONFIRMED' && (
+                          <button 
+                            onClick={() => setShowCancelModal(bookings.id)}
+                            disabled={isLoading}
+                            className="w-full px-4 py-2.5 bg-white border-2 border-red-200 text-red-600 font-medium rounded-xl hover:bg-red-50 hover:border-red-300 transition-all duration-300 text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {t('bookings.actions.cancel')}
+                          </button>
                         )}
-                        {bookings.status === 'completed' && (
-                          <button className="w-full px-4 py-2.5 bg-gradient-to-r from-primary to-pink-400 text-white font-medium rounded-xl hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 text-sm whitespace-nowrap">
+                        {bookings.status === 'COMPLETED' && (
+                          <button 
+                            onClick={() => handleBookAgain(bookings.id)}
+                            disabled={isLoading}
+                            className="w-full px-4 py-2.5 bg-gradient-to-r from-primary to-pink-400 text-white font-medium rounded-xl hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                          >
                             {t('bookings.actions.bookAgain')}
                           </button>
                         )}
-                        {bookings.status === 'cancelled' && (
-                          <button className="w-full px-4 py-2.5 bg-gradient-to-r from-primary to-pink-400 text-white font-medium rounded-xl hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 text-sm whitespace-nowrap">
+                        {(bookings.status === 'CANCELLED' || bookings.status === 'NO-SHOW') && (
+                          <button 
+                            onClick={() => handleBookAgain(bookings.id)}
+                            disabled={isLoading}
+                            className="w-full px-4 py-2.5 bg-gradient-to-r from-primary to-pink-400 text-white font-medium rounded-xl hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                          >
                             {t('bookings.actions.bookAgain')}
                           </button>
                         )}
@@ -321,6 +353,61 @@ export default function MybookingsPage() {
           </div>
         </div>
       </main>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-secondary mb-2">
+                {t('bookings.cancel.title')}
+              </h3>
+              <p className="text-secondary/70 mb-6">
+                {t('bookings.cancel.message')}
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowCancelModal(null)}
+                  disabled={isLoading}
+                  className="flex-1 px-4 py-2.5 border-2 border-gray-200 text-secondary font-medium rounded-xl hover:bg-gray-50 transition-all duration-300 disabled:opacity-50"
+                >
+                  {t('bookings.cancel.keep')}
+                </button>
+                <button
+                  onClick={() => showCancelModal && handleCancelBooking(showCancelModal)}
+                  disabled={isLoading}
+                  className="flex-1 px-4 py-2.5 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? 'Cancelling...' : t('bookings.cancel.confirm')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Minimal Notification Toast */}
+      {notification && (
+        <div className="fixed top-8 sm:top-12 left-4 right-4 sm:left-1/2 sm:right-auto sm:transform sm:-translate-x-1/2 sm:w-auto z-50 transition-all duration-500 ease-out animate-in fade-in slide-in-from-top-2">
+          <div className={`px-4 sm:px-6 py-3 rounded-2xl shadow-2xl backdrop-blur-md border border-white/20 ${
+            notification.type === 'success' 
+              ? 'bg-white/95 text-secondary' 
+              : 'bg-white/95 text-secondary'
+          }`}>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                notification.type === 'success' ? 'bg-primary' : 'bg-red-400'
+              }`}></div>
+              <span className="text-xs sm:text-sm font-medium leading-tight">{notification.message}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

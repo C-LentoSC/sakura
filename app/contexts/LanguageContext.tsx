@@ -14,9 +14,11 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>(defaultLanguage);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // Initialize from localStorage (client only)
   useEffect(() => {
+    setIsHydrated(true);
     try {
       const stored = typeof window !== 'undefined' ? window.localStorage.getItem('sakura-lang') : null;
       if (stored && (['en', 'ja'] as Language[]).includes(stored as Language)) {
@@ -56,7 +58,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   const t = (key: string): string => {
-    return getNestedTranslation(translations[language], key);
+    // During SSR or before hydration, always use default language to prevent hydration mismatch
+    const currentLanguage = isHydrated ? language : defaultLanguage;
+    return getNestedTranslation(translations[currentLanguage], key);
   };
 
   return (

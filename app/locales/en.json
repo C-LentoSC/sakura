@@ -3,6 +3,7 @@
     "home": "HOME",
     "about": "ABOUT US",
     "services": "SERVICES",
+    "shop": "SHOP",
     "bookings": "BOOKINGS",
     "contact": "CONTACT",
     "login": "Login",
@@ -384,49 +385,90 @@
     },
     "bookNow": "Book Now",
     "contactInfo": "Contact me from the same Info",
-    "noResults": "No services found matching your search."
+    "noResults": "No services found matching your search.",
+    "headSpa": {
+      "name": "Japanese Head Spa"
+    },
+    "nailArt": {
+      "name": "Premium Nail Art"
+    },
+    "lashExtensions": {
+      "name": "Lash Extensions"
+    }
   },
   "book": {
     "hero": {
       "title": "Book Your Appointment",
       "subtitle": "Schedule your perfect beauty experience with our easy bookings system. Choose your service, pick your time, and let us pamper you."
     },
+    "progress": {
+      "title": "Booking Progress",
+      "step2": "Date & Time",
+      "step3": "Your Details",
+      "step4": "Confirmation"
+    },
     "step1": {
       "title": "Choose Your Service"
     },
     "step2": {
-      "title": "Select Date & Time",
-      "selectDate": "Choose Date",
-      "selectTime": "Choose Time"
+      "title": "When would you like to visit?",
+      "subtitle": "Choose your preferred date and time",
+      "selectDate": "Select Date",
+      "selectTime": "Select Time"
     },
     "step3": {
-      "title": "Your Information",
+      "title": "Tell us about yourself",
+      "subtitle": "We need a few details to complete your booking",
       "name": "Full Name",
       "email": "Email Address",
       "phone": "Phone Number",
-      "notes": "Special Notes"
+      "notes": "Special Requests"
     },
     "step4": {
-      "title": "Confirm Your bookings",
-      "summary": "bookings Summary",
+      "title": "Review Your Booking",
+      "subtitle": "Please confirm your appointment details",
+      "summary": "Booking Summary",
       "service": "Service",
       "date": "Date",
       "time": "Time",
       "duration": "Duration",
-      "total": "Total",
-      "confirm": "Confirm bookings",
+      "total": "Total Amount",
+      "confirm": "Confirm Booking",
       "confirming": "Confirming..."
     },
     "selectedService": "Selected Service",
-    "back": "Back",
-    "next": "Next",
+    "selectedService.subtitle": "Your chosen treatment",
+    "shopHours": "Shop Hours",
+    "paymentDetails": "Payment Details",
+    "placeholders": {
+      "name": "Enter your full name",
+      "email": "your.email@example.com",
+      "phone": "+1 (555) 123-4567",
+      "notes": "Any special requests or notes for your appointment..."
+    },
+    "validation": {
+      "nameRequired": "Full name is required",
+      "nameMinLength": "Name must be at least 2 characters",
+      "nameInvalid": "Name contains invalid characters",
+      "emailRequired": "Email address is required",
+      "emailInvalid": "Please enter a valid email address",
+      "phoneInvalid": "Please enter a valid phone number"
+    },
+    "payment": {
+      "error": "Payment Error",
+      "initError": "Failed to initialize payment. Please try again.",
+      "initializing": "Initializing payment..."
+    },
+    "back": "Back to Details",
+    "backToDateTime": "Back to Date & Time",
+    "next": "Continue to Details",
     "success": {
-      "title": "bookings Confirmed!",
+      "title": "Booking Confirmed!",
       "message": "Your appointment has been successfully booked. We'll send you a confirmation email shortly.",
       "newbookings": "Book Another Appointment"
     },
     "error": {
-      "message": "Sorry, there was an error processing your bookings. Please try again or contact us directly."
+      "message": "Sorry, there was an error processing your booking. Please try again or contact us directly."
     }
   },
   "bookings": {
@@ -436,14 +478,17 @@
     },
     "newbookings": "Book New Appointment",
     "tabs": {
-      "upcoming": "Upcoming",
+      "active": "Active",
       "completed": "Completed",
+      "cancelled": "Cancelled",
       "all": "All"
     },
     "status": {
-      "upcoming": "Upcoming",
-      "completed": "Completed",
-      "cancelled": "Cancelled"
+      "confirmed": "CONFIRMED",
+      "completed": "COMPLETED",
+      "cancelled": "CANCELLED",
+      "rescheduled": "RESCHEDULED",
+      "noShow": "NO SHOW"
     },
     "details": {
       "date": "Date",
@@ -460,6 +505,16 @@
       "title": "No bookings Found",
       "message": "You haven't made any bookings yet. Book your first appointment to get started!",
       "action": "Book Your First Appointment"
+    },
+    "cancel": {
+      "title": "Cancel Appointment",
+      "message": "Are you sure you want to cancel this appointment? This action cannot be undone.",
+      "keep": "Keep Booking",
+      "confirm": "Cancel Appointment"
+    },
+    "messages": {
+      "cancelSuccess": "Appointment cancelled successfully",
+      "cancelError": "Failed to cancel appointment. Please try again."
     }
   },
   "auth": {
@@ -505,6 +560,97 @@
         "emailInUse": "Email already in use",
         "signinFailed": "Registered, but sign-in failed. Please try logging in."
       }
+    }
+  },
+  "shop": {
+    "hero": {
+      "title": "Sakura Shop",
+      "subtitle": "Premium beauty and wellness products curated for your self-care journey"
+    },
+    "search": {
+      "placeholder": "Search products..."
+    },
+    "categories": {
+      "all": "All",
+      "hairCare": "Hair Care",
+      "nailCare": "Nail Care",
+      "beauty": "Beauty",
+      "wellness": "Wellness"
+    },
+    "product": {
+      "addToCart": "Add to Cart",
+      "outOfStock": "Out of Stock",
+      "quickView": "Quick View",
+      "reviews": "reviews"
+    },
+    "cart": {
+      "title": "Shopping Cart",
+      "subtitle": "Review your selected items before checkout",
+      "empty": "Your cart is empty",
+      "emptyMessage": "Add some products to get started",
+      "continueShopping": "Continue Shopping",
+      "proceedCheckout": "Proceed to Checkout",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "total": "Total",
+      "freeShipping": "Free shipping on orders over ₹2,000!",
+      "secureCheckout": "Secure checkout with SSL encryption"
+    },
+    "noResults": {
+      "title": "No Products Found",
+      "message": "Try adjusting your search or filter criteria"
+    }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "subtitle": "Complete your order with secure payment",
+    "step1": {
+      "title": "Shipping Information",
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "address": "Street Address",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "notes": "Order Notes (Optional)"
+    },
+    "step2": {
+      "title": "Payment"
+    },
+    "placeholders": {
+      "name": "Enter your full name",
+      "email": "your.email@example.com",
+      "phone": "+1 (555) 123-4567",
+      "address": "123 Main Street",
+      "city": "Your city",
+      "postalCode": "12345",
+      "notes": "Any special delivery instructions..."
+    },
+    "validation": {
+      "nameRequired": "Full name is required",
+      "nameMinLength": "Name must be at least 2 characters",
+      "emailRequired": "Email address is required",
+      "emailInvalid": "Please enter a valid email address",
+      "phoneRequired": "Phone number is required",
+      "phoneInvalid": "Please enter a valid phone number",
+      "addressRequired": "Street address is required",
+      "cityRequired": "City is required",
+      "postalCodeRequired": "Postal code is required"
+    },
+    "payment": {
+      "error": "Payment Error",
+      "initError": "Failed to initialize payment. Please try again.",
+      "initializing": "Initializing payment..."
+    },
+    "orderSummary": "Order Summary",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "total": "Total",
+    "proceedToPayment": "Proceed to Payment",
+    "back": "Back",
+    "success": {
+      "title": "Order Placed Successfully!",
+      "message": "Thank you for your order. You will receive a confirmation email shortly."
     }
   }
 }
