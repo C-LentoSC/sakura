@@ -8,6 +8,7 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
   languages: typeof languages;
+  isHydrated: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -58,13 +59,21 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   const t = (key: string): string => {
-    // During SSR or before hydration, always use default language to prevent hydration mismatch
-    const currentLanguage = isHydrated ? language : defaultLanguage;
-    return getNestedTranslation(translations[currentLanguage], key);
+    // Always use default language during SSR and initial render to prevent hydration mismatch
+    // The UI will update after hydration with the correct language
+    const currentLanguage = !isHydrated ? defaultLanguage : language;
+    const result = getNestedTranslation(translations[currentLanguage], key);
+    
+    // Debug logging (remove in production)
+    if (typeof window !== 'undefined' && result === key) {
+      console.warn(`Translation missing for key: ${key} in language: ${currentLanguage}`);
+    }
+    
+    return result;
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage: setLang, t, languages }}>
+    <LanguageContext.Provider value={{ language, setLanguage: setLang, t, languages, isHydrated }}>
       {children}
     </LanguageContext.Provider>
   );

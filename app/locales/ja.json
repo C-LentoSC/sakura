@@ -7,7 +7,9 @@
     "bookings": "予約",
     "contact": "お問い合わせ",
     "login": "ログイン",
-    "register": "登録"
+    "register": "登録",
+    "welcome": "ようこそ",
+    "signOut": "サインアウト"
   },
   "hero": {
     "quote": "桜のように美しさが咲く場所",
@@ -582,7 +584,22 @@
       "addToCart": "カートに追加",
       "outOfStock": "在庫切れ",
       "quickView": "クイックビュー",
-      "reviews": "レビュー"
+      "reviews": "レビュー",
+      "quantity": "数量",
+      "buyNow": "今すぐ購入",
+      "benefits": "効果",
+      "ingredients": "成分",
+      "howToUse": "使用方法"
+    },
+    "productDetail": {
+      "notFound": {
+        "title": "商品が見つかりません",
+        "message": "お探しの商品は存在しません。",
+        "backToShop": "ショップに戻る"
+      },
+      "breadcrumb": {
+        "shop": "ショップ"
+      }
     },
     "cart": {
       "title": "ショッピングカート",
@@ -652,6 +669,45 @@
     "success": {
       "title": "ご注文が正常に完了しました！",
       "message": "ご注文ありがとうございます。間もなく確認メールをお送りいたします。"
+    }
+  },
+  "booking": {
+    "title": "ご予約",
+    "subtitle": "桜サロンでリラックスした体験をご予約ください。お好みのサービスとお時間をお選びください。",
+    "form": {
+      "fullName": "お名前",
+      "emailAddress": "メールアドレス",
+      "phoneNumber": "電話番号",
+      "service": "サービス",
+      "preferredDate": "ご希望日",
+      "preferredTime": "ご希望時間",
+      "additionalNotes": "追加メモ"
+    },
+    "placeholders": {
+      "fullName": "お名前をご入力ください",
+      "emailAddress": "メールアドレスをご入力ください",
+      "phoneNumber": "電話番号をご入力ください",
+      "service": "サービスを選択してください",
+      "preferredTime": "時間を選択してください",
+      "additionalNotes": "特別なご要望やメモがございましたら..."
+    },
+    "services": {
+      "dryHeadSpa": "ドライヘッドスパ（60分）",
+      "japaneseHeadSpa": "日本式ヘッドスパ（90分）",
+      "imperialRetreat": "インペリアルリトリート（120分）",
+      "nailArt": "ネイルアート（60分）",
+      "lashExtension": "まつげエクステ（90分）",
+      "browStyling": "眉スタイリング（45分）"
+    },
+    "submit": "ご予約",
+    "submitting": "予約中...",
+    "success": {
+      "title": "ご予約を承りました！",
+      "message": "ご予約のお申し込みありがとうございます。間もなくご確認のご連絡をいたします。"
+    },
+    "error": {
+      "title": "予約に失敗しました",
+      "message": "申し訳ございません。ご予約の送信中にエラーが発生しました。もう一度お試しいただくか、直接お問い合わせください。"
     }
   }
 }

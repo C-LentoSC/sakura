@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
@@ -60,7 +61,7 @@ interface CheckoutData {
 export default function CheckoutPage() {
   const { t, language } = useLanguage();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const { data: session } = useSession();
   
   const [cartItems] = useState(getCartItems(language));
   const [currentStep, setCurrentStep] = useState(1);
@@ -150,6 +151,17 @@ export default function CheckoutPage() {
     setValidationErrors(prev => ({ ...prev, [field]: error }));
   };
 
+  // Pre-fill form with user session data
+  useEffect(() => {
+    if (session?.user) {
+      setCheckoutData(prev => ({
+        ...prev,
+        name: session.user?.name || prev.name,
+        email: session.user?.email || prev.email,
+      }));
+    }
+  }, [session]);
+
   // Create payment intent
   const createPaymentIntent = async () => {
     try {
@@ -189,7 +201,8 @@ export default function CheckoutPage() {
   };
 
   // Handle successful payment
-  const handlePaymentSuccess = async (paymentIntentId: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handlePaymentSuccess = async (_paymentIntentId: string) => {
     try {
       setSubmitStatus('success');
       
@@ -255,18 +268,18 @@ export default function CheckoutPage() {
               <p className="text-secondary/60 mb-8">{t('checkout.success.message')}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
               {/* Checkout Form */}
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-3">
                 {currentStep === 1 ? (
                   /* Step 1: Customer Information */
-                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-md border border-primary/10">
-                    <h3 className="text-xl font-sakura text-secondary mb-6">{t('checkout.step1.title')}</h3>
+                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-md border border-primary/10">
+                    <h3 className="text-base sm:text-lg font-sakura text-secondary mb-3 sm:mb-4">{t('checkout.step1.title')}</h3>
                     
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-secondary mb-2">
+                          <label className="block text-xs sm:text-sm font-semibold text-secondary mb-1">
                             {t('checkout.step1.name')} *
                           </label>
                           <input
@@ -274,7 +287,7 @@ export default function CheckoutPage() {
                             required
                             value={checkoutData.name}
                             placeholder={t('checkout.placeholders.name')}
-                            className={`w-full px-4 py-3 rounded-lg border-2 focus:ring-2 focus:ring-primary/10 outline-none text-sm bg-white/80 backdrop-blur-sm transition-colors ${
+                            className={`w-full px-3 py-2 rounded-lg border-2 focus:ring-2 focus:ring-primary/10 outline-none text-sm bg-white/80 backdrop-blur-sm transition-colors ${
                               validationErrors.name 
                                 ? 'border-red-300 focus:border-red-500' 
                                 : 'border-primary/20 focus:border-primary'
@@ -283,7 +296,7 @@ export default function CheckoutPage() {
                             onBlur={() => handleFieldBlur('name')}
                           />
                           {validationErrors.name && (
-                            <div className="mt-2 text-sm text-red-600">{validationErrors.name}</div>
+                            <div className="mt-1 text-xs text-red-600">{validationErrors.name}</div>
                           )}
                         </div>
 
@@ -415,10 +428,10 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    <div className="flex justify-end mt-8">
+                    <div className="flex justify-end mt-6">
                       <button
                         onClick={proceedToPayment}
-                        className="px-8 py-4 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300"
+                        className="px-6 py-3 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300"
                       >
                         {t('checkout.proceedToPayment')}
                       </button>
@@ -470,8 +483,8 @@ export default function CheckoutPage() {
               </div>
 
               {/* Order Summary */}
-              <div className="lg:col-span-1">
-                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-md border border-primary/10 sticky top-24">
+              <div className="lg:col-span-2">
+                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-md border border-primary/10 sticky top-24">
                   <h3 className="text-xl font-sakura text-secondary mb-6">{t('checkout.orderSummary')}</h3>
                   
                   {/* Cart Items */}

@@ -57,13 +57,13 @@ export default function Header() {
           {session ? (
             <>
               <span className="text-secondary text-xs md:text-sm leading-none">
-                Welcome, {session.user?.name || session.user?.email}
+                {t('nav.welcome')}, {session.user?.name || session.user?.email}
               </span>
               <button
                 onClick={() => signOut()}
                 className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors leading-none"
               >
-                Sign Out
+                {t('nav.signOut')}
               </button>
             </>
           ) : (
@@ -188,7 +188,7 @@ export default function Header() {
                   <svg className="w-3 h-3 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                  <span className="truncate">Welcome, {session.user?.name || session.user?.email}</span>
+                  <span className="truncate">{t('nav.welcome')}, {session.user?.name || session.user?.email}</span>
                 </div>
                 <button
                   onClick={() => {
@@ -200,7 +200,7 @@ export default function Header() {
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
-                  Sign Out
+                  {t('nav.signOut')}
                 </button>
               </div>
             ) : (

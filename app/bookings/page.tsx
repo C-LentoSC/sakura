@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
-import { loadBookings, saveBookings, updateBookingStatus, type BookingData } from '../utils/bookingStorage';
+import { loadBookings, updateBookingStatus, type BookingData } from '../utils/bookingStorage';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
@@ -106,7 +106,7 @@ export default function MybookingsPage() {
       
       // Auto-hide notification after 3 seconds
       setTimeout(() => setNotification(null), 3000);
-    } catch (error) {
+    } catch {
       setNotification({
         type: 'error',
         message: t('bookings.messages.cancelError')

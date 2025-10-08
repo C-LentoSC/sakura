@@ -25,8 +25,12 @@ export async function POST(request: NextRequest) {
       };
     } else if (isShopOrder) {
       // Shop order metadata
-      const itemNames = orderDetails.items?.map((item: any) => item.name).join(', ') || '';
-      const itemQuantities = orderDetails.items?.map((item: any) => `${item.name}: ${item.quantity}`).join(', ') || '';
+      type OrderItem = { name: string; quantity: number };
+      const items: OrderItem[] = Array.isArray(orderDetails.items)
+        ? (orderDetails.items as OrderItem[])
+        : [];
+      const itemNames = items.map((item) => item.name).join(', ') || '';
+      const itemQuantities = items.map((item) => `${item.name}: ${item.quantity}`).join(', ') || '';
       
       metadata = {
         type: 'shop_order',

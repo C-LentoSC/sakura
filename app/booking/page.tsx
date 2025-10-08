@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useLanguage } from '../contexts/LanguageContext';
 import {
   Header,
   BackgroundPattern,
@@ -10,16 +12,41 @@ import {
   Chatbot
 } from '../components';
 
-export default function BookingsPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
+interface BookingFormData {
+  fullName: string;
+  emailAddress: string;
+  phoneNumber: string;
+  service: string;
+  preferredDate: string;
+  preferredTime: string;
+  additionalNotes: string;
+}
+
+export default function BookingPage() {
+  const { t } = useLanguage();
+  const { data: session } = useSession();
+  const [formData, setFormData] = useState<BookingFormData>({
+    fullName: '',
+    emailAddress: '',
+    phoneNumber: '',
     service: '',
-    date: '',
-    time: '',
-    message: ''
+    preferredDate: '',
+    preferredTime: '',
+    additionalNotes: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // Pre-fill form with user session data
+  useEffect(() => {
+    if (session?.user) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: session.user?.name || prev.fullName,
+        emailAddress: session.user?.email || prev.emailAddress,
+      }));
+    }
+  }, [session]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -29,11 +56,37 @@ export default function BookingsPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle bookings submission
-    console.log('bookings submitted:', formData);
-    alert('bookings request submitted! We will contact you soon to confirm.');
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      console.log('Booking submitted:', formData);
+      setSubmitStatus('success');
+      
+      // Reset form after successful submission
+      setTimeout(() => {
+        setFormData({
+          fullName: '',
+          emailAddress: '',
+          phoneNumber: '',
+          service: '',
+          preferredDate: '',
+          preferredTime: '',
+          additionalNotes: ''
+        });
+        setSubmitStatus('idle');
+      }, 3000);
+    } catch (error) {
+      console.error('Booking submission failed:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -46,71 +99,100 @@ export default function BookingsPage() {
 
       <main className="relative z-10 pt-20 sm:pt-24">
         {/* Hero Section */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl py-8 sm:py-12">
-          <div className="text-center mb-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-2xl py-8 sm:py-12">
+          <div className="text-center mb-8">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-sakura text-secondary mb-4">
-              Book Your Appointment
+              {t('booking.title')}
             </h1>
-            <p className="text-base sm:text-lg text-secondary/70 leading-relaxed max-w-2xl mx-auto">
-              Schedule your relaxing experience at Sakura Saloon. Choose your preferred service and time.
+            <p className="text-base sm:text-lg text-secondary/70 leading-relaxed">
+              {t('booking.subtitle')}
             </p>
           </div>
 
-          {/* bookings Form */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-primary/10">
+          {/* Success Message */}
+          {submitStatus === 'success' && (
+            <div className="mb-6 p-4 bg-green-50 border-2 border-green-200 rounded-xl text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="font-semibold text-green-800">{t('booking.success.title')}</span>
+              </div>
+              <p className="text-green-700">{t('booking.success.message')}</p>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {submitStatus === 'error' && (
+            <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="font-semibold text-red-800">{t('booking.error.title')}</span>
+              </div>
+              <p className="text-red-700">{t('booking.error.message')}</p>
+            </div>
+          )}
+
+          {/* Booking Form */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-xl border border-primary/10">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-secondary mb-2">
-                    Full Name *
+                  <label htmlFor="fullName" className="block text-sm font-medium text-secondary mb-2">
+                    {t('booking.form.fullName')} *
                   </label>
                   <input
                     type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
+                    id="fullName"
+                    name="fullName"
+                    value={formData.fullName}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-white/80 backdrop-blur-sm"
-                    placeholder="Enter your full name"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-primary/5 backdrop-blur-sm disabled:opacity-50"
+                    placeholder={t('booking.placeholders.fullName')}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-secondary mb-2">
-                    Email Address *
+                  <label htmlFor="emailAddress" className="block text-sm font-medium text-secondary mb-2">
+                    {t('booking.form.emailAddress')} *
                   </label>
                   <input
                     type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
+                    id="emailAddress"
+                    name="emailAddress"
+                    value={formData.emailAddress}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-white/80 backdrop-blur-sm"
-                    placeholder="Enter your email"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-primary/5 backdrop-blur-sm disabled:opacity-50"
+                    placeholder={t('booking.placeholders.emailAddress')}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-secondary mb-2">
-                    Phone Number *
+                  <label htmlFor="phoneNumber" className="block text-sm font-medium text-secondary mb-2">
+                    {t('booking.form.phoneNumber')} *
                   </label>
                   <input
                     type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-white/80 backdrop-blur-sm"
-                    placeholder="Enter your phone number"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-primary/5 backdrop-blur-sm disabled:opacity-50"
+                    placeholder={t('booking.placeholders.phoneNumber')}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="service" className="block text-sm font-medium text-secondary mb-2">
-                    Service *
+                    {t('booking.form.service')} *
                   </label>
                   <select
                     id="service"
@@ -118,47 +200,50 @@ export default function BookingsPage() {
                     value={formData.service}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-white/80 backdrop-blur-sm"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-primary/5 backdrop-blur-sm disabled:opacity-50"
                   >
-                    <option value="">Select a service</option>
-                    <option value="japanese-head-spa">Japanese Head SPA (90 min)</option>
-                    <option value="dry-head-spa">Dry Head SPA (60 min)</option>
-                    <option value="imperial-retreat">Imperial Retreat (120 min)</option>
-                    <option value="nail-art">Nail Art (60 min)</option>
-                    <option value="lash-extension">Lash Extension (90 min)</option>
-                    <option value="brow-styling">Brow Styling (45 min)</option>
+                    <option value="">{t('booking.placeholders.service')}</option>
+                    <option value="dry-head-spa">{t('booking.services.dryHeadSpa')}</option>
+                    <option value="japanese-head-spa">{t('booking.services.japaneseHeadSpa')}</option>
+                    <option value="imperial-retreat">{t('booking.services.imperialRetreat')}</option>
+                    <option value="nail-art">{t('booking.services.nailArt')}</option>
+                    <option value="lash-extension">{t('booking.services.lashExtension')}</option>
+                    <option value="brow-styling">{t('booking.services.browStyling')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-secondary mb-2">
-                    Preferred Date *
+                  <label htmlFor="preferredDate" className="block text-sm font-medium text-secondary mb-2">
+                    {t('booking.form.preferredDate')} *
                   </label>
                   <input
                     type="date"
-                    id="date"
-                    name="date"
-                    value={formData.date}
+                    id="preferredDate"
+                    name="preferredDate"
+                    value={formData.preferredDate}
                     onChange={handleInputChange}
                     required
+                    disabled={isSubmitting}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-white/80 backdrop-blur-sm"
+                    className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-primary/5 backdrop-blur-sm disabled:opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="time" className="block text-sm font-medium text-secondary mb-2">
-                    Preferred Time *
+                  <label htmlFor="preferredTime" className="block text-sm font-medium text-secondary mb-2">
+                    {t('booking.form.preferredTime')} *
                   </label>
                   <select
-                    id="time"
-                    name="time"
-                    value={formData.time}
+                    id="preferredTime"
+                    name="preferredTime"
+                    value={formData.preferredTime}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-white/80 backdrop-blur-sm"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-primary/5 backdrop-blur-sm disabled:opacity-50"
                   >
-                    <option value="">Select time</option>
+                    <option value="">{t('booking.placeholders.preferredTime')}</option>
                     <option value="09:00">9:00 AM</option>
                     <option value="10:00">10:00 AM</option>
                     <option value="11:00">11:00 AM</option>
@@ -174,25 +259,27 @@ export default function BookingsPage() {
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-secondary mb-2">
-                  Additional Notes
+                <label htmlFor="additionalNotes" className="block text-sm font-medium text-secondary mb-2">
+                  {t('booking.form.additionalNotes')}
                 </label>
                 <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
+                  id="additionalNotes"
+                  name="additionalNotes"
+                  value={formData.additionalNotes}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-white/80 backdrop-blur-sm resize-none"
-                  placeholder="Any special requests or notes..."
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-3 rounded-xl border border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-secondary bg-primary/5 backdrop-blur-sm resize-none disabled:opacity-50"
+                  placeholder={t('booking.placeholders.additionalNotes')}
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full px-8 py-4 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-xl hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300"
+                disabled={isSubmitting}
+                className="w-full px-8 py-4 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-xl hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                Book Appointment
+                {isSubmitting ? t('booking.submitting') : t('booking.submit')}
               </button>
             </form>
           </div>

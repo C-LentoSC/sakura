@@ -6,8 +6,10 @@
     "shop": "SHOP",
     "bookings": "BOOKINGS",
     "contact": "CONTACT",
-    "login": "Login",
-    "register": "Register"
+    "login": "LOGIN",
+    "register": "REGISTER",
+    "welcome": "Welcome",
+    "signOut": "Sign Out"
   },
   "hero": {
     "quote": "Where Beauty Blooms Like Cherry Blossoms",
@@ -581,7 +583,22 @@
       "addToCart": "Add to Cart",
       "outOfStock": "Out of Stock",
       "quickView": "Quick View",
-      "reviews": "reviews"
+      "reviews": "reviews",
+      "quantity": "Quantity",
+      "buyNow": "Buy Now",
+      "benefits": "Benefits",
+      "ingredients": "Ingredients",
+      "howToUse": "How to Use"
+    },
+    "productDetail": {
+      "notFound": {
+        "title": "Product Not Found",
+        "message": "The product you're looking for doesn't exist.",
+        "backToShop": "Back to Shop"
+      },
+      "breadcrumb": {
+        "shop": "Shop"
+      }
     },
     "cart": {
       "title": "Shopping Cart",
@@ -651,6 +668,45 @@
     "success": {
       "title": "Order Placed Successfully!",
       "message": "Thank you for your order. You will receive a confirmation email shortly."
+    }
+  },
+  "booking": {
+    "title": "Book Your Appointment",
+    "subtitle": "Schedule your relaxing experience at Sakura Saloon. Choose your preferred service and time.",
+    "form": {
+      "fullName": "Full Name",
+      "emailAddress": "Email Address",
+      "phoneNumber": "Phone Number",
+      "service": "Service",
+      "preferredDate": "Preferred Date",
+      "preferredTime": "Preferred Time",
+      "additionalNotes": "Additional Notes"
+    },
+    "placeholders": {
+      "fullName": "Enter your full name",
+      "emailAddress": "Enter your email address",
+      "phoneNumber": "Enter your phone number",
+      "service": "Select a service",
+      "preferredTime": "Select time",
+      "additionalNotes": "Any special requests or notes..."
+    },
+    "services": {
+      "dryHeadSpa": "Dry Head SPA (60 min)",
+      "japaneseHeadSpa": "Japanese Head SPA (90 min)",
+      "imperialRetreat": "Imperial Retreat (120 min)",
+      "nailArt": "Nail Art (60 min)",
+      "lashExtension": "Lash Extension (90 min)",
+      "browStyling": "Brow Styling (45 min)"
+    },
+    "submit": "Book Appointment",
+    "submitting": "Booking...",
+    "success": {
+      "title": "Booking Submitted!",
+      "message": "Thank you for your booking request. We will contact you soon to confirm your appointment."
+    },
+    "error": {
+      "title": "Booking Failed",
+      "message": "Sorry, there was an error submitting your booking. Please try again or contact us directly."
     }
   }
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
@@ -17,8 +18,8 @@ import {
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
 import { SERVICES_DATA } from '../constants/services';
-import { generateTimeSlots, getShopHours, isDateAvailable, type TimeSlot } from '../utils/timeSlots';
-import { addBooking, getBlockedTimeSlots, getBookedTimeSlots, isTimeSlotAvailable, validateBooking } from '../utils/bookingStorage';
+import { generateTimeSlots, getShopHours, type TimeSlot } from '../utils/timeSlots';
+import { addBooking, getBlockedTimeSlots, getBookedTimeSlots } from '../utils/bookingStorage';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -39,6 +40,7 @@ function BookPageContent() {
   const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
   const preSelectedServiceId = searchParams.get('service');
   
   const [currentStep, setCurrentStep] = useState(2);
@@ -49,8 +51,8 @@ function BookPageContent() {
     time: '',
     duration: '',
     price: 0,
-    name: '',
-    email: '',
+    name: session?.user?.name || '',
+    email: session?.user?.email || '',
     phone: '',
     notes: ''
   });
@@ -86,7 +88,18 @@ function BookPageContent() {
       // No service selected, redirect to services page
       router.push('/services');
     }
-  }, [preSelectedServiceId, router]);
+  }, [preSelectedServiceId, router, t]);
+
+  // Update form data when session becomes available
+  useEffect(() => {
+    if (session?.user) {
+      setbookingsData(prev => ({
+        ...prev,
+        name: session.user?.name || prev.name,
+        email: session.user?.email || prev.email,
+      }));
+    }
+  }, [session]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -149,7 +162,7 @@ function BookPageContent() {
       setAvailableTimeSlots([]);
       setShopHours({isOpen: false});
     }
-  }, [bookingsData.date, bookingsData.duration]);
+  }, [bookingsData.date, bookingsData.duration, bookingsData.time]);
 
   // Validation functions
   const validateField = (field: string, value: string): string => {
@@ -222,26 +235,7 @@ function BookPageContent() {
     }));
   };
 
-  const canProceedToConfirmation = (): boolean => {
-    const hasName = bookingsData.name.trim() !== '';
-    const hasEmail = bookingsData.email.trim() !== '';
-    const nameError = validateField('name', bookingsData.name);
-    const emailError = validateField('email', bookingsData.email);
-    const phoneError = validateField('phone', bookingsData.phone);
-    
-    // Debug logging
-    console.log('Validation check:', {
-      hasName,
-      hasEmail,
-      nameError,
-      emailError,
-      phoneError,
-      validationErrors,
-      canProceed: hasName && hasEmail && !nameError && !emailError && !phoneError
-    });
-    
-    return hasName && hasEmail && !nameError && !emailError && !phoneError;
-  };
+  // Removed unused canProceedToConfirmation helper (was causing lint warning)
 
   // Create payment intent when moving to confirmation step
   const createPaymentIntent = async () => {
@@ -295,7 +289,8 @@ function BookPageContent() {
   };
 
   // Handle successful payment
-  const handlePaymentSuccess = async (paymentIntentId: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handlePaymentSuccess = async (_paymentIntentId: string) => {
     try {
       // Find the selected service to get the image
       const selectedService = SERVICES_DATA.find(service => service.id === bookingsData.serviceId);
@@ -337,53 +332,7 @@ function BookPageContent() {
     setSubmitStatus('error');
   };
 
-  const handleSubmitbookings = async () => {
-    // Final validation before submission
-    if (!validateAllFields()) {
-      setSubmitStatus('error');
-      return;
-    }
-
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Find the selected service to get the image
-      const selectedService = SERVICES_DATA.find(service => service.id === bookingsData.serviceId);
-      
-      // Prepare booking data
-      const bookingData = {
-        service: bookingsData.service,
-        image: selectedService?.image || '/services-images/default.jpg',
-        date: bookingsData.date,
-        time: bookingsData.time,
-        duration: bookingsData.duration,
-        price: bookingsData.price
-      };
-      
-      // Save booking to localStorage using the utility with validation
-      const result = addBooking(bookingData);
-      
-      if (result.success) {
-        setSubmitStatus('success');
-        
-        // Redirect to bookings page after 2 seconds
-        setTimeout(() => {
-          router.push('/bookings');
-        }, 2000);
-      } else {
-        // Handle validation errors
-        console.error('Booking validation failed:', result.errors);
-        setSubmitStatus('error');
-      }
-      
-    } catch (error) {
-      console.error('Booking submission failed:', error);
-      setSubmitStatus('error');
-    } finally {
-      setTimeout(() => setSubmitStatus('idle'), 5000);
-    }
-  };
+  // Removed unused handleSubmitbookings (replaced by payment flow)
 
   const resetbookings = () => {
     setbookingsData({

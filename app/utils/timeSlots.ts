@@ -21,19 +21,7 @@ function formatTime12Hour(time24: string): string {
 /**
  * Convert 12-hour time to 24-hour format
  */
-function parseTime24Hour(time12: string): string {
-  const [time, period] = time12.split(' ');
-  const [hours, minutes] = time.split(':').map(Number);
-  
-  let hour24 = hours;
-  if (period === 'PM' && hours !== 12) {
-    hour24 += 12;
-  } else if (period === 'AM' && hours === 12) {
-    hour24 = 0;
-  }
-  
-  return `${hour24.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-}
+// Removed unused parseTime24Hour helper (not referenced anywhere)
 
 /**
  * Add minutes to a time string

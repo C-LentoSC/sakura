@@ -34,37 +34,37 @@ const getProducts = (lang: 'en' | 'ja') => [
   },
   {
     id: 2,
-    name: 'Sakura Scalp Treatment Oil',
-    category: 'Hair Care',
+    name: lang === 'ja' ? '桜スカルプトリートメントオイル' : 'Sakura Scalp Treatment Oil',
+    category: lang === 'ja' ? 'ヘアケア' : 'Hair Care',
     price: 999,
     originalPrice: null,
     image: '/services-images/head-spa2.jpg',
     rating: 4.9,
     reviews: 89,
     inStock: true,
-    badge: 'New',
-    description: 'Nourishing scalp oil with cherry blossom extract',
-    longDescription: 'Indulge in the therapeutic benefits of cherry blossom with our signature scalp treatment oil. This lightweight formula absorbs quickly to nourish the scalp, promote healthy hair growth, and provide a relaxing aromatherapy experience.',
-    ingredients: ['Cherry Blossom Extract', 'Jojoba Oil', 'Peppermint Oil', 'Tea Tree Oil', 'Rosemary Extract'],
-    howToUse: 'Massage gently into scalp before washing. Leave for 20 minutes, then shampoo as usual.',
-    benefits: ['Promotes hair growth', 'Soothes scalp irritation', 'Improves circulation', 'Aromatherapy benefits', 'Reduces dandruff']
+    badge: lang === 'ja' ? '新商品' : 'New',
+    description: lang === 'ja' ? '桜エキス配合の栄養豊富なスカルプオイル' : 'Nourishing scalp oil with cherry blossom extract',
+    longDescription: lang === 'ja' ? '桜の花の治療効果を体験できる特別なスカルプトリートメントオイルです。軽やかな処方で素早く浸透し、頭皮に栄養を与え、健康的な髪の成長を促進し、リラックスできるアロマテラピー体験を提供します。' : 'Indulge in the therapeutic benefits of cherry blossom with our signature scalp treatment oil. This lightweight formula absorbs quickly to nourish the scalp, promote healthy hair growth, and provide a relaxing aromatherapy experience.',
+    ingredients: lang === 'ja' ? ['桜エキス', 'ホホバオイル', 'ペパーミントオイル', 'ティーツリーオイル', 'ローズマリーエキス'] : ['Cherry Blossom Extract', 'Jojoba Oil', 'Peppermint Oil', 'Tea Tree Oil', 'Rosemary Extract'],
+    howToUse: lang === 'ja' ? '洗髪前に頭皮に優しくマッサージしてください。20分間放置してから、通常通りシャンプーしてください。' : 'Massage gently into scalp before washing. Leave for 20 minutes, then shampoo as usual.',
+    benefits: lang === 'ja' ? ['髪の成長を促進', '頭皮の炎症を和らげる', '血行を改善', 'アロマテラピー効果', 'フケを軽減'] : ['Promotes hair growth', 'Soothes scalp irritation', 'Improves circulation', 'Aromatherapy benefits', 'Reduces dandruff']
   },
   {
     id: 3,
-    name: 'Luxury Nail Care Kit',
-    category: 'Nail Care',
+    name: lang === 'ja' ? 'ラグジュアリーネイルケアキット' : 'Luxury Nail Care Kit',
+    category: lang === 'ja' ? 'ネイルケア' : 'Nail Care',
     price: 1499,
     originalPrice: 1899,
     image: '/services-images/nails.jpg',
     rating: 4.7,
     reviews: 156,
     inStock: true,
-    badge: 'Sale',
-    description: 'Complete professional nail care kit',
-    longDescription: 'Everything you need for salon-quality nail care at home. This comprehensive kit includes professional-grade tools and premium products for manicures and pedicures.',
-    ingredients: ['Cuticle Oil', 'Base Coat', 'Top Coat', 'Nail Strengthener', 'Hand Cream'],
-    howToUse: 'Follow included step-by-step guide for professional results at home.',
-    benefits: ['Professional results', 'Complete nail care', 'Long-lasting manicures', 'Strengthens nails', 'Moisturizes cuticles']
+    badge: lang === 'ja' ? 'セール' : 'Sale',
+    description: lang === 'ja' ? '完全なプロ仕様ネイルケアキット' : 'Complete professional nail care kit',
+    longDescription: lang === 'ja' ? 'ご自宅でサロン品質のネイルケアに必要なすべてが揃っています。この包括的なキットには、マニキュアとペディキュアのためのプロ仕様のツールとプレミアム製品が含まれています。' : 'Everything you need for salon-quality nail care at home. This comprehensive kit includes professional-grade tools and premium products for manicures and pedicures.',
+    ingredients: lang === 'ja' ? ['キューティクルオイル', 'ベースコート', 'トップコート', 'ネイル強化剤', 'ハンドクリーム'] : ['Cuticle Oil', 'Base Coat', 'Top Coat', 'Nail Strengthener', 'Hand Cream'],
+    howToUse: lang === 'ja' ? '付属のステップバイステップガイドに従って、ご自宅でプロの結果を得てください。' : 'Follow included step-by-step guide for professional results at home.',
+    benefits: lang === 'ja' ? ['プロの仕上がり', '完全なネイルケア', '長持ちするマニキュア', '爪を強化', 'キューティクルを保湿'] : ['Professional results', 'Complete nail care', 'Long-lasting manicures', 'Strengthens nails', 'Moisturizes cuticles']
   },
   // Add more products as needed...
 ];
@@ -78,6 +78,7 @@ export default function ProductDetailPage() {
   
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [notification, setNotification] = useState<{message: string; show: boolean}>({message: '', show: false});
 
   if (!product) {
     return (
@@ -88,13 +89,13 @@ export default function ProductDetailPage() {
         <Header />
         <main className="relative z-10 pt-20 sm:pt-24">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl py-16 text-center">
-            <h1 className="text-4xl font-sakura text-secondary mb-4">Product Not Found</h1>
-            <p className="text-secondary/70 mb-8">The product you're looking for doesn't exist.</p>
+            <h1 className="text-4xl font-sakura text-secondary mb-4">{t('productDetail.notFound.title')}</h1>
+            <p className="text-secondary/70 mb-8">{t('productDetail.notFound.message')}</p>
             <Link
               href="/shop"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
             >
-              Back to Shop
+              {t('productDetail.notFound.backToShop')}
             </Link>
           </div>
         </main>
@@ -107,7 +108,8 @@ export default function ProductDetailPage() {
   const productImages = [product.image, product.image, product.image];
 
   const addToCart = () => {
-    alert(`Added ${quantity} x ${product.name} to cart!`);
+    setNotification({message: `Added ${quantity} x ${product.name} to cart!`, show: true});
+    setTimeout(() => setNotification({message: '', show: false}), 3000);
   };
 
   return (
@@ -124,7 +126,7 @@ export default function ProductDetailPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8 sm:py-12">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-secondary/60 mb-8">
-            <Link href="/shop" className="hover:text-primary transition-colors">Shop</Link>
+            <Link href="/shop" className="hover:text-primary transition-colors">{t('nav.shop')}</Link>
             <span>/</span>
             <Link href={`/shop?category=${product.category}`} className="hover:text-primary transition-colors">{product.category}</Link>
             <span>/</span>
@@ -144,13 +146,37 @@ export default function ProductDetailPage() {
                   className="object-cover"
                 />
                 {product.badge && (
-                  <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold ${
-                    product.badge === 'Bestseller' ? 'bg-yellow-400 text-yellow-900' :
-                    product.badge === 'New' ? 'bg-green-400 text-green-900' :
-                    product.badge === 'Sale' ? 'bg-red-400 text-red-900' :
-                    'bg-blue-400 text-blue-900'
-                  }`}>
-                    {product.badge}
+                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-gradient-to-r from-primary/95 to-pink-400/95 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-lg">
+                    <div className="flex items-center gap-1.5">
+                      {product.badge === 'Bestseller' && (
+                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      )}
+                      {product.badge === 'New' && (
+                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                      )}
+                      {product.badge === 'Sale' && (
+                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                      )}
+                      {product.badge === 'Popular' && (
+                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                      )}
+                      {product.badge === 'Out of Stock' && (
+                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364L18.364 5.636" />
+                        </svg>
+                      )}
+                      <span className="text-xs sm:text-sm font-semibold text-white uppercase tracking-wide">
+                        {product.badge}
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>
@@ -206,7 +232,7 @@ export default function ProductDetailPage() {
               {/* Quantity and Add to Cart */}
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <span className="text-secondary font-medium">Quantity:</span>
+                  <span className="text-secondary font-medium">{t('shop.product.quantity')}:</span>
                   <div className="flex items-center border border-primary/20 rounded-lg">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -233,7 +259,7 @@ export default function ProductDetailPage() {
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  {product.inStock ? 'Buy Now' : t('shop.product.outOfStock')}
+                  {product.inStock ? t('shop.product.buyNow') : t('shop.product.outOfStock')}
                 </button>
               </div>
 
@@ -242,13 +268,13 @@ export default function ProductDetailPage() {
                 <div className="border-b border-primary/20">
                   <nav className="flex gap-8">
                     <button className="py-4 border-b-2 border-primary text-primary font-medium">
-                      Benefits
+                      {t('shop.product.benefits')}
                     </button>
                     <button className="py-4 border-b-2 border-transparent text-secondary/60 hover:text-secondary">
-                      Ingredients
+                      {t('shop.product.ingredients')}
                     </button>
                     <button className="py-4 border-b-2 border-transparent text-secondary/60 hover:text-secondary">
-                      How to Use
+                      {t('shop.product.howToUse')}
                     </button>
                   </nav>
                 </div>
@@ -270,6 +296,20 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </main>
+
+      {/* Toast Notification */}
+      {notification.show && (
+        <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-right-2 fade-in duration-300">
+          <div className="bg-white/95 backdrop-blur-md border border-primary/20 rounded-xl px-4 py-3 shadow-lg">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-secondary font-medium text-sm">{notification.message}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
