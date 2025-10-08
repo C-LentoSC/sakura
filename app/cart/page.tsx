@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
+import { getCart, updateQuantity as setCartQuantity, removeItem as removeCartItem } from '../utils/cartStorage';
 import {
   Header,
   BackgroundPattern,
@@ -14,65 +15,31 @@ import {
   Chatbot
 } from '../components';
 
-// Mock cart data with language support
-const getCartItems = (lang: 'en' | 'ja') => [
-  {
-    id: 1,
-    name: lang === 'ja' ? '日本式ヘアセラム' : 'Japanese Hair Serum',
-    price: 1299,
-    originalPrice: 1599,
-    image: '/services-images/head-spa.jpg',
-    quantity: 2,
-    inStock: true
-  },
-  {
-    id: 3,
-    name: lang === 'ja' ? 'ラグジュアリーネイルケアキット' : 'Luxury Nail Care Kit',
-    price: 1499,
-    originalPrice: 1899,
-    image: '/services-images/nails.jpg',
-    quantity: 1,
-    inStock: true
-  },
-  {
-    id: 5,
-    name: lang === 'ja' ? 'まつげ育成セラム' : 'Lash Growth Serum',
-    price: 1599,
-    originalPrice: 1999,
-    image: '/services-images/head-spa.jpg',
-    quantity: 1,
-    inStock: true
-  }
-];
+// No more mock data. We load from persistent cart storage.
 
 export default function CartPage() {
-  const { t, language } = useLanguage();
-  const [cartItems, setCartItems] = useState(getCartItems(language));
+  const { t } = useLanguage();
+  const [cartItems, setCartItems] = useState(getCart());
 
-  // Update cart items when language changes
+  // Load cart on mount and when storage changes (multi-tab support)
   useEffect(() => {
-    setCartItems(prevItems => {
-      const newItems = getCartItems(language);
-      // Preserve quantities from previous items
-      return newItems.map(newItem => {
-        const prevItem = prevItems.find(item => item.id === newItem.id);
-        return prevItem ? { ...newItem, quantity: prevItem.quantity } : newItem;
-      });
-    });
-  }, [language]);
+    const load = () => setCartItems(getCart());
+    load();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'sakura-cart') load();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
 
   const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity === 0) {
-      setCartItems(cartItems.filter(item => item.id !== id));
-    } else {
-      setCartItems(cartItems.map(item => 
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      ));
-    }
+    setCartQuantity(id, Math.max(0, newQuantity));
+    setCartItems(getCart());
   };
 
   const removeItem = (id: number) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
+    removeCartItem(id);
+    setCartItems(getCart());
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -153,11 +120,6 @@ export default function CartPage() {
                               <span className="text-xl font-bold text-primary">
                                 {formatCurrency(item.price)}
                               </span>
-                              {item.originalPrice && (
-                                <span className="text-sm text-secondary/40 line-through">
-                                  {formatCurrency(item.originalPrice)}
-                                </span>
-                              )}
                             </div>
                           </div>
 

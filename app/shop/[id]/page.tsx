@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import Image from 'next/image';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { addItem as addCartItem } from '../../utils/cartStorage';
 import { formatCurrency } from '../../constants/currency';
 import {
   Header,
@@ -72,6 +73,7 @@ const getProducts = (lang: 'en' | 'ja') => [
 export default function ProductDetailPage() {
   const { t, language } = useLanguage();
   const params = useParams();
+  const router = useRouter();
   const productId = parseInt(params.id as string);
   const products = getProducts(language);
   const product = products.find(p => p.id === productId);
@@ -108,8 +110,38 @@ export default function ProductDetailPage() {
   const productImages = [product.image, product.image, product.image];
 
   const addToCart = () => {
+    // Persist to localStorage cart
+    addCartItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity
+    });
+    // UI notification
     setNotification({message: `Added ${quantity} x ${product.name} to cart!`, show: true});
     setTimeout(() => setNotification({message: '', show: false}), 3000);
+  };
+
+  const buyNow = () => {
+    // Create checkout data for direct purchase
+    const checkoutData = {
+      items: [{
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: quantity,
+        image: product.image
+      }],
+      total: product.price * quantity,
+      type: 'direct_purchase'
+    };
+    
+    // Store in sessionStorage for checkout page
+    sessionStorage.setItem('directPurchase', JSON.stringify(checkoutData));
+    
+    // Redirect to checkout
+    router.push('/checkout?type=direct');
   };
 
   return (
@@ -250,17 +282,31 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={addToCart}
-                  disabled={!product.inStock}
-                  className={`w-full px-8 py-4 font-semibold rounded-xl transition-all duration-300 ${
-                    product.inStock
-                      ? 'bg-gradient-to-r from-primary to-pink-400 text-white hover:shadow-lg hover:scale-[1.02] active:scale-95'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {product.inStock ? t('shop.product.buyNow') : t('shop.product.outOfStock')}
-                </button>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    onClick={addToCart}
+                    disabled={!product.inStock}
+                    className={`px-6 py-4 font-semibold rounded-xl transition-all duration-300 ${
+                      product.inStock
+                        ? 'bg-white border-2 border-primary text-primary hover:bg-primary/5 hover:scale-[1.02] active:scale-95'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    {product.inStock ? t('shop.product.addToCart') : t('shop.product.outOfStock')}
+                  </button>
+                  
+                  <button
+                    onClick={buyNow}
+                    disabled={!product.inStock}
+                    className={`px-6 py-4 font-semibold rounded-xl transition-all duration-300 ${
+                      product.inStock
+                        ? 'bg-gradient-to-r from-primary to-pink-400 text-white hover:shadow-lg hover:scale-[1.02] active:scale-95'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    {product.inStock ? t('shop.product.buyNow') : t('shop.product.outOfStock')}
+                  </button>
+                </div>
               </div>
 
               {/* Product Details Tabs */}

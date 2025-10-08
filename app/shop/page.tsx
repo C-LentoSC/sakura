@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
+import { addItem as addCartItem, getTotalQuantity } from '../utils/cartStorage';
 import {
   Header,
   BackgroundPattern,
@@ -135,7 +136,7 @@ const getProducts = (lang: 'en' | 'ja') => [
 export default function ShopPage() {
   const { t, language } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [cart, setCart] = useState<number[]>([]);
+  const [cartQty, setCartQty] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Get products based on current language
@@ -158,8 +159,23 @@ export default function ShopPage() {
 
   const [notification, setNotification] = useState<{message: string; show: boolean}>({message: '', show: false});
 
+  // Load cart quantity from storage
+  useEffect(() => {
+    const load = () => setCartQty(getTotalQuantity());
+    load();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'sakura-cart') load();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
   const addToCart = (productId: number) => {
-    setCart([...cart, productId]);
+    const p = products.find(pr => pr.id === productId);
+    if (!p) return;
+    // Persist to cart storage
+    addCartItem({ id: p.id, name: p.name, price: p.price, image: p.image, quantity: 1 });
+    setCartQty(getTotalQuantity());
     // Show toast notification
     setNotification({message: t('shop.product.addToCart') + '!', show: true});
     setTimeout(() => setNotification({message: '', show: false}), 3000);
@@ -210,9 +226,9 @@ export default function ShopPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
               {t('shop.cart.title')}
-              {cart.length > 0 && (
+              {cartQty > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
-                  {cart.length}
+                  {cartQty}
                 </span>
               )}
             </Link>

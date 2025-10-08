@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
+import { getCart } from '../utils/cartStorage';
 import {
   Header,
   BackgroundPattern,
@@ -17,36 +18,7 @@ import {
   PaymentForm
 } from '../components';
 
-// Mock cart data - in real app this would come from context/state management
-const getCartItems = (lang: 'en' | 'ja') => [
-  {
-    id: 1,
-    name: lang === 'ja' ? '日本式ヘアセラム' : 'Japanese Hair Serum',
-    price: 1299,
-    originalPrice: 1599,
-    image: '/services-images/head-spa.jpg',
-    quantity: 2,
-    inStock: true
-  },
-  {
-    id: 3,
-    name: lang === 'ja' ? 'ラグジュアリーネイルケアキット' : 'Luxury Nail Care Kit',
-    price: 1499,
-    originalPrice: 1899,
-    image: '/services-images/nails.jpg',
-    quantity: 1,
-    inStock: true
-  },
-  {
-    id: 5,
-    name: lang === 'ja' ? 'まつげ育成セラム' : 'Lash Growth Serum',
-    price: 1599,
-    originalPrice: 1999,
-    image: '/services-images/head-spa.jpg',
-    quantity: 1,
-    inStock: true
-  }
-];
+// Load items from direct purchase or persistent cart
 
 interface CheckoutData {
   name: string;
@@ -61,9 +33,10 @@ interface CheckoutData {
 export default function CheckoutPage() {
   const { t, language } = useLanguage();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
   
-  const [cartItems] = useState(getCartItems(language));
+  const [cartItems, setCartItems] = useState<Array<{id:number; name:string; price:number; image:string; quantity:number}>>([]);
   const [currentStep, setCurrentStep] = useState(1);
   const [checkoutData, setCheckoutData] = useState<CheckoutData>({
     name: '',
@@ -83,6 +56,25 @@ export default function CheckoutPage() {
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = subtotal > 2000 ? 0 : 99;
   const total = subtotal + shipping;
+
+  // Initialize items: direct purchase or cart
+  useEffect(() => {
+    const type = searchParams.get('type');
+    if (type === 'direct') {
+      try {
+        const raw = typeof window !== 'undefined' ? sessionStorage.getItem('directPurchase') : null;
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.items)) {
+            setCartItems(parsed.items);
+            return;
+          }
+        }
+      } catch {}
+    }
+    // Fallback to cart storage
+    setCartItems(getCart());
+  }, [language, searchParams]);
 
   // Validation function
   const validateField = (field: string, value: string): string => {
