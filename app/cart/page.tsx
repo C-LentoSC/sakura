@@ -20,9 +20,11 @@ import {
 export default function CartPage() {
   const { t } = useLanguage();
   const [cartItems, setCartItems] = useState(getCart());
+  const [mounted, setMounted] = useState(false);
 
   // Load cart on mount and when storage changes (multi-tab support)
   useEffect(() => {
+    setMounted(true);
     const load = () => setCartItems(getCart());
     load();
     const onStorage = (e: StorageEvent) => {
@@ -45,6 +47,11 @@ export default function CartPage() {
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = subtotal > 2000 ? 0 : 99;
   const total = subtotal + shipping;
+
+  if (!mounted) {
+    // Avoid hydration mismatch: render nothing until client mount
+    return null;
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">

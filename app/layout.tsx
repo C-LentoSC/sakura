@@ -44,6 +44,7 @@ export default function RootLayout({
     <html lang="en" data-scroll-behavior="smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${sakuraFont.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
         <ErrorBoundary>
           <AuthProvider>

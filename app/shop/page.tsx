@@ -138,6 +138,7 @@ export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [cartQty, setCartQty] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [mounted, setMounted] = useState(false);
 
   // Get products based on current language
   const products = getProducts(language);
@@ -161,6 +162,7 @@ export default function ShopPage() {
 
   // Load cart quantity from storage
   useEffect(() => {
+    setMounted(true);
     const load = () => setCartQty(getTotalQuantity());
     load();
     const onStorage = (e: StorageEvent) => {
@@ -226,7 +228,7 @@ export default function ShopPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
               {t('shop.cart.title')}
-              {cartQty > 0 && (
+              {mounted && cartQty > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
                   {cartQty}
                 </span>

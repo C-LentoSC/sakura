@@ -52,6 +52,7 @@ export default function CheckoutPage() {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState<string>('');
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [mounted, setMounted] = useState(false);
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = subtotal > 2000 ? 0 : 99;
@@ -59,6 +60,7 @@ export default function CheckoutPage() {
 
   // Initialize items: direct purchase or cart
   useEffect(() => {
+    setMounted(true);
     const type = searchParams.get('type');
     if (type === 'direct') {
       try {
@@ -75,6 +77,8 @@ export default function CheckoutPage() {
     // Fallback to cart storage
     setCartItems(getCart());
   }, [language, searchParams]);
+
+  // Note: Do not return early before all hooks are declared (rules-of-hooks)
 
   // Validation function
   const validateField = (field: string, value: string): string => {
@@ -225,6 +229,11 @@ export default function CheckoutPage() {
       setCurrentStep(2);
     }
   };
+
+  // Avoid SSR/CSR mismatch when reading browser-only storage
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
