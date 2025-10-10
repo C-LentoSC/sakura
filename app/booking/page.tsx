@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import {
   Header,
@@ -24,7 +23,6 @@ interface BookingFormData {
 
 export default function BookingPage() {
   const { t } = useLanguage();
-  const { data: session } = useSession();
   const [formData, setFormData] = useState<BookingFormData>({
     fullName: '',
     emailAddress: '',
@@ -37,16 +35,7 @@ export default function BookingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  // Pre-fill form with user session data
-  useEffect(() => {
-    if (session?.user) {
-      setFormData(prev => ({
-        ...prev,
-        fullName: session.user?.name || prev.fullName,
-        emailAddress: session.user?.email || prev.emailAddress,
-      }));
-    }
-  }, [session]);
+  // Session auto-fill will be implemented with new auth system
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

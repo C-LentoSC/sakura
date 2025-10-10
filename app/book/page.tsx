@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
@@ -40,7 +39,6 @@ function BookPageContent() {
   const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session } = useSession();
   const preSelectedServiceId = searchParams.get('service');
   
   const [currentStep, setCurrentStep] = useState(2);
@@ -51,8 +49,8 @@ function BookPageContent() {
     time: '',
     duration: '',
     price: 0,
-    name: session?.user?.name || '',
-    email: session?.user?.email || '',
+    name: '',
+    email: '',
     phone: '',
     notes: ''
   });
@@ -90,16 +88,7 @@ function BookPageContent() {
     }
   }, [preSelectedServiceId, router, t]);
 
-  // Update form data when session becomes available
-  useEffect(() => {
-    if (session?.user) {
-      setbookingsData(prev => ({
-        ...prev,
-        name: session.user?.name || prev.name,
-        email: session.user?.email || prev.email,
-      }));
-    }
-  }, [session]);
+  // Session auto-fill will be implemented with new auth system
 
   useEffect(() => {
     const ctx = gsap.context(() => {

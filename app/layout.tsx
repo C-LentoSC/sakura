@@ -5,7 +5,6 @@ import { Suspense } from "react";
 import "./globals.css";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { LoadingProvider } from "./contexts/LoadingContext";
-import AuthProvider from "./providers/AuthProvider";
 import { ErrorBoundary } from "./components";
 
 const inter = Inter({
@@ -43,15 +42,13 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <ErrorBoundary>
-          <AuthProvider>
-            <LanguageProvider>
-              <Suspense fallback={null}>
-                <LoadingProvider>
-                  {children}
-                </LoadingProvider>
-              </Suspense>
-            </LanguageProvider>
-          </AuthProvider>
+          <LanguageProvider>
+            <Suspense fallback={null}>
+              <LoadingProvider>
+                {children}
+              </LoadingProvider>
+            </Suspense>
+          </LanguageProvider>
         </ErrorBoundary>
       </body>
     </html>

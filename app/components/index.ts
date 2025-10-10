@@ -1,4 +1,5 @@
 export { default as Header } from './Header';
+export { default as HeaderClient } from './HeaderClient';
 export { default as BackgroundPattern } from './BackgroundPattern';
 export { default as CherryBlossomTrees } from './CherryBlossomTrees';
 export { default as FallingPetals } from './FallingPetals';

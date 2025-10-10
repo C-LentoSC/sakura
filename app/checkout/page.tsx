@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
@@ -34,7 +33,6 @@ export default function CheckoutPage() {
   const { t, language } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session } = useSession();
   
   const [cartItems, setCartItems] = useState<Array<{id:number; name:string; price:number; image:string; quantity:number}>>([]);
   const [currentStep, setCurrentStep] = useState(1);
@@ -147,16 +145,7 @@ export default function CheckoutPage() {
     setValidationErrors(prev => ({ ...prev, [field]: error }));
   };
 
-  // Pre-fill form with user session data
-  useEffect(() => {
-    if (session?.user) {
-      setCheckoutData(prev => ({
-        ...prev,
-        name: session.user?.name || prev.name,
-        email: session.user?.email || prev.email,
-      }));
-    }
-  }, [session]);
+  // Session auto-fill will be implemented with new auth system
 
   // Create payment intent
   const createPaymentIntent = async () => {
