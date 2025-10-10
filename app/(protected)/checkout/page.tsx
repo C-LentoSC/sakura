@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { useLanguage } from '../contexts/LanguageContext';
-import { formatCurrency } from '../constants/currency';
-import { getCart } from '../utils/cartStorage';
+import { useLanguage } from '@/app/contexts/LanguageContext';
+import { formatCurrency } from '@/app/constants/currency';
+import { getCart } from '@/app/utils/cartStorage';
 import {
   Header,
   BackgroundPattern,
@@ -15,7 +15,7 @@ import {
   Chatbot,
   StripeProvider,
   PaymentForm
-} from '../components';
+} from '@/app/components';
 
 // Load items from direct purchase or persistent cart
 

@@ -13,12 +13,12 @@ import {
   Chatbot,
   StripeProvider,
   PaymentForm
-} from '../components';
-import { useLanguage } from '../contexts/LanguageContext';
-import { formatCurrency } from '../constants/currency';
-import { SERVICES_DATA } from '../constants/services';
-import { generateTimeSlots, getShopHours, type TimeSlot } from '../utils/timeSlots';
-import { addBooking, getBlockedTimeSlots, getBookedTimeSlots } from '../utils/bookingStorage';
+} from '@/app/components';
+import { useLanguage } from '@/app/contexts/LanguageContext';
+import { formatCurrency } from '@/app/constants/currency';
+import { SERVICES_DATA } from '@/app/constants/services';
+import { generateTimeSlots, getShopHours, type TimeSlot } from '@/app/utils/timeSlots';
+import { addBooking, getBlockedTimeSlots, getBookedTimeSlots } from '@/app/utils/bookingStorage';
 
 gsap.registerPlugin(ScrollTrigger);
 

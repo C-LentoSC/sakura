@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '@/app/contexts/LanguageContext';
 import {
   Header,
   BackgroundPattern,
@@ -9,7 +9,7 @@ import {
   FallingPetals,
   Footer,
   Chatbot
-} from '../components';
+} from '@/app/components';
 
 interface BookingFormData {
   fullName: string;

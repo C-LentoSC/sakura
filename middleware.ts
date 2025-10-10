@@ -3,7 +3,8 @@ import type { NextRequest } from 'next/server';
 import { decrypt } from './app/lib/session';
 
 // Define route categories
-const protectedRoutes = ['/dashboard', '/profile', '/bookings'];
+const publicRoutes = ['/', '/about', '/contact', '/services', '/shop'];
+const protectedRoutes = ['/dashboard', '/profile', '/bookings', '/book', '/booking', '/checkout'];
 const authRoutes = ['/login', '/register'];
 const adminRoutes = ['/admin'];
 

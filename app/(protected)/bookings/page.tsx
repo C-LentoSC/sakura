@@ -3,9 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useLanguage } from '../contexts/LanguageContext';
-import { formatCurrency } from '../constants/currency';
-import { loadBookings, updateBookingStatus, type BookingData } from '../utils/bookingStorage';
+import { useLanguage } from '@/app/contexts/LanguageContext';
+import { formatCurrency } from '@/app/constants/currency';
+import { loadBookings, updateBookingStatus, type BookingData } from '@/app/utils/bookingStorage';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
@@ -15,7 +15,7 @@ import {
   FallingPetals,
   Footer,
   Chatbot
-} from '../components';
+} from '@/app/components';
 
 gsap.registerPlugin(ScrollTrigger);
 
