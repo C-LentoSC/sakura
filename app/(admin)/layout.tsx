@@ -1,13 +1,6 @@
 import { redirect } from 'next/navigation';
-import { verifySession, hasRole } from '@/app/lib/dal';
-import {
-  BackgroundPattern,
-  CherryBlossomTrees,
-  FallingPetals,
-  Header,
-  Footer,
-  Chatbot,
-} from '../components';
+import { verifySession, hasRole, getCurrentUser } from '@/app/lib/dal';
+import AdminSidebar from './admin/components/AdminSidebar';
 
 export default async function AdminLayout({
   children,
@@ -29,21 +22,20 @@ export default async function AdminLayout({
     redirect('/dashboard');
   }
 
+  // Get current user info for sidebar
+  const user = await getCurrentUser();
+
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-amber-50">
-      <BackgroundPattern />
-      <CherryBlossomTrees />
-      <FallingPetals />
-      <Header />
-      <Chatbot />
+    <div className="min-h-screen bg-gray-50">
+      {/* Admin Sidebar */}
+      <AdminSidebar userName={user.name || undefined} userEmail={user.email} />
       
-      <main className="relative z-10 px-4 sm:px-6 lg:px-8 pt-20 pb-12">
-        <div className="max-w-7xl mx-auto">
+      {/* Main Content Area */}
+      <main className="lg:ml-64 min-h-screen">
+        <div className="p-6">
           {children}
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

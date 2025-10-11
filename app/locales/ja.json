@@ -258,6 +258,7 @@
     },
     "mainCategories": {
       "headSpa": "ヘッドスパ",
+      "beauty": "ビューティー",
       "nails": "ネイル",
       "lashes": "まつげ",
       "brows": "アイブロウ"
@@ -267,6 +268,10 @@
       "beauty": "ビューティー",
       "relaxation": "リラクゼーション",
       "therapy": "セラピー",
+      "headSpa": "ヘッドスパ",
+      "nails": "ネイル",
+      "brows": "眉毛",
+      "lashes": "まつげ",
       "manicure": "マニキュア",
       "pedicure": "ペディキュア",
       "acrylic": "アクリル",
@@ -278,6 +283,18 @@
       "shaping": "シェーピング",
       "tinting": "ティント",
       "microblading": "マイクロブレーディング"
+    },
+    "subSubCategories": {
+      "aromatherapy": "アロマセラピー",
+      "deepRelaxation": "ディープリラクゼーション",
+      "manicure": "マニキュア",
+      "pedicure": "ペディキュア",
+      "acrylic": "アクリル",
+      "gel": "ジェル",
+      "classic": "クラシック",
+      "volume": "ボリューム",
+      "shaping": "シェーピング",
+      "tinting": "ティント"
     },
     "items": {
       "backFacial": {
@@ -383,6 +400,34 @@
       "browShaping": {
         "name": "アイブロウシェーピング",
         "description": "精密な技術で顔を完璧にフレームするプロフェッショナルなアイブロウシェーピングとグルーミング。"
+      },
+      "aromatherapySession": {
+        "name": "アロマセラピーセッション",
+        "description": "エッセンシャルオイルを使用したリラックスできるアロマセラピートリートメントで、心を癒し感覚を若返らせます。"
+      },
+      "classicManicure": {
+        "name": "クラシックマニキュア",
+        "description": "ネイルシェーピング、キューティクルケア、ポリッシュ塗布による伝統的なマニキュアで美しい手に。"
+      },
+      "luxuryManicure": {
+        "name": "ラグジュアリーマニキュア",
+        "description": "角質除去、保湿トリートメント、長持ちするポリッシュを含むプレミアムマニキュア体験。"
+      },
+      "gelNails": {
+        "name": "ジェルネイル",
+        "description": "最大3週間持続する耐久性のあるジェルネイルトリートメント。"
+      },
+      "classicLashes": {
+        "name": "クラシックラッシュ",
+        "description": "自然なまつげ1本に対してエクステンション1本の自然な見た目のまつげエクステンション。"
+      },
+      "volumeLashes": {
+        "name": "ボリュームラッシュ",
+        "description": "自然なまつげ1本に対して複数のエクステンションを使用したドラマチックなボリュームラッシュ。"
+      },
+      "browTinting": {
+        "name": "アイブロウティンティング",
+        "description": "長持ちする色で眉毛を強調し定義するプロフェッショナルなアイブロウティンティング。"
       }
     },
     "bookNow": "予約する",

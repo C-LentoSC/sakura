@@ -5,12 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
-import {
-  SERVICE_MAIN_CATEGORIES,
-  SERVICE_SUB_CATEGORIES,
-  SERVICES_DATA,
-  type ServiceCategoryId,
-} from '../constants/services';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
@@ -24,13 +18,116 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface Service {
+  id: string;
+  nameKey: string;
+  descKey: string;
+  price: number;
+  duration: string;
+  image: string;
+  category: {
+    id: string;
+    slug: string;
+    nameKey: string;
+  };
+  subCategory?: {
+    id: string;
+    slug: string;
+    nameKey: string;
+  };
+  subSubCategory?: {
+    id: string;
+    slug: string;
+    nameKey: string;
+  };
+}
+
+interface SubSubCategory {
+  id: string;
+  slug: string;
+  nameKey: string;
+  _count?: {
+    services: number;
+  };
+}
+
+interface SubCategory {
+  id: string;
+  slug: string;
+  nameKey: string;
+  subSubCategories: SubSubCategory[];
+  _count?: {
+    services: number;
+  };
+}
+
+interface Category {
+  id: string;
+  slug: string;
+  nameKey: string;
+  subCategories: SubCategory[];
+  _count?: {
+    services: number;
+  };
+}
+
 export default function ServicesPage() {
   const { t } = useLanguage();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [selectedMainCategory, setSelectedMainCategory] = useState('head-spa');
   const [selectedSubCategory, setSelectedSubCategory] = useState('all');
+  const [selectedSubSubCategory, setSelectedSubSubCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
   const heroRef = useRef<HTMLDivElement>(null);
   const servicesRef = useRef<HTMLDivElement>(null);
+
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('/api/categories');
+        const data = await res.json();
+        setCategories(data.categories || []);
+        
+        // Set first category as default if available
+        if (data.categories && data.categories.length > 0) {
+          setSelectedMainCategory(data.categories[0].slug);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Fetch services when category changes
+  useEffect(() => {
+    const fetchServices = async () => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams({
+          category: selectedMainCategory,
+          ...(selectedSubCategory !== 'all' && { subCategory: selectedSubCategory }),
+          ...(selectedSubSubCategory !== 'all' && { subSubCategory: selectedSubSubCategory }),
+        });
+
+        const res = await fetch(`/api/services?${params}`);
+        const data = await res.json();
+        setServices(data.services || []);
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (selectedMainCategory) {
+      fetchServices();
+    }
+  }, [selectedMainCategory, selectedSubCategory, selectedSubSubCategory]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -58,21 +155,28 @@ export default function ServicesPage() {
     });
 
     return () => ctx.revert();
-  }, [selectedMainCategory, selectedSubCategory]);
+  }, [services]);
 
-  // Main Categories (Level 1)
-  const mainCategories = SERVICE_MAIN_CATEGORIES;
+  // Filter services by search query (client-side)
+  const filteredServices = services.filter(service =>
+    searchQuery === '' ||
+    t(service.nameKey).toLowerCase().includes(searchQuery.toLowerCase()) ||
+    t(service.descKey).toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  const filteredServices = SERVICES_DATA.filter(service => {
-    const matchesMainCategory = service.mainCategory === selectedMainCategory;
-    const matchesSubCategory = selectedSubCategory === 'all' || service.subCategory === selectedSubCategory;
-    const matchesSearch = searchQuery === '' || 
-      t(service.nameKey).toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t(service.descKey).toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesMainCategory && matchesSubCategory && matchesSearch;
-  });
+  // Get current category and its sub-categories
+  const currentCategory = categories.find(cat => cat.slug === selectedMainCategory);
+  const currentSubCategories = [
+    { id: 'all', slug: 'all', nameKey: 'services.subCategories.all', subSubCategories: [] },
+    ...(currentCategory?.subCategories || [])
+  ];
 
-  const currentSubCategories = SERVICE_SUB_CATEGORIES[selectedMainCategory as ServiceCategoryId] ?? [];
+  // Get current sub-category and its sub-sub-categories
+  const currentSubCategory = currentSubCategories.find(sub => sub.slug === selectedSubCategory);
+  const currentSubSubCategories = selectedSubCategory !== 'all' && currentSubCategory?.subSubCategories ? [
+    { id: 'all', slug: 'all', nameKey: 'services.subCategories.all' },
+    ...currentSubCategory.subSubCategories
+  ] : [];
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
@@ -117,15 +221,16 @@ export default function ServicesPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl mb-8">
           {/* Main Category Tabs (Level 1) */}
           <div className="flex flex-wrap justify-center gap-2 mb-4">
-            {mainCategories.map((category) => (
+            {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => {
-                  setSelectedMainCategory(category.id);
+                  setSelectedMainCategory(category.slug);
                   setSelectedSubCategory('all');
+                  setSelectedSubSubCategory('all');
                 }}
                 className={`px-5 py-2 rounded-full font-medium transition-all duration-300 text-sm ${
-                  selectedMainCategory === category.id
+                  selectedMainCategory === category.slug
                     ? 'bg-gradient-to-r from-primary to-pink-400 text-white shadow-md'
                     : 'bg-white/90 backdrop-blur-sm text-secondary/70 hover:text-secondary hover:bg-white hover:shadow-sm'
                 }`}
@@ -136,13 +241,16 @@ export default function ServicesPage() {
           </div>
 
           {/* Sub Category Filters (Level 2) */}
-          <div className="flex flex-wrap justify-center gap-2">
+          <div className="flex flex-wrap justify-center gap-2 mb-3">
             {currentSubCategories.map((subCategory) => (
               <button
-                key={subCategory.id}
-                onClick={() => setSelectedSubCategory(subCategory.id)}
+                key={subCategory.slug}
+                onClick={() => {
+                  setSelectedSubCategory(subCategory.slug);
+                  setSelectedSubSubCategory('all');
+                }}
                 className={`px-4 py-1.5 rounded-full font-medium transition-all duration-300 text-xs ${
-                  selectedSubCategory === subCategory.id
+                  selectedSubCategory === subCategory.slug
                     ? 'bg-secondary text-white shadow-sm'
                     : 'bg-white/70 backdrop-blur-sm text-secondary/60 hover:text-secondary hover:bg-white hover:shadow-sm'
                 }`}
@@ -151,11 +259,35 @@ export default function ServicesPage() {
               </button>
             ))}
           </div>
+
+          {/* Sub-Sub Category Filters (Level 3) */}
+          {currentSubSubCategories.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-2">
+              {currentSubSubCategories.map((subSubCategory) => (
+                <button
+                  key={subSubCategory.slug}
+                  onClick={() => setSelectedSubSubCategory(subSubCategory.slug)}
+                  className={`px-3 py-1 rounded-full font-medium transition-all duration-300 text-xs ${
+                    selectedSubSubCategory === subSubCategory.slug
+                      ? 'bg-amber-600 text-white shadow-sm'
+                      : 'bg-white/60 backdrop-blur-sm text-secondary/50 hover:text-secondary hover:bg-white hover:shadow-sm'
+                  }`}
+                >
+                  {t(subSubCategory.nameKey)}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Services Grid */}
         <div ref={servicesRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pb-12 sm:pb-16">
-          {filteredServices.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-16">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <p className="text-secondary/60 text-base mt-4">Loading services...</p>
+            </div>
+          ) : filteredServices.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {filteredServices.map((service, index) => (
                 <div

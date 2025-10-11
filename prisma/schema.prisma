@@ -58,3 +58,79 @@ model Booking {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// Level 1: Main Categories/Packages (head-spa, beauty)
+model ServiceCategory {
+  id            String               @id @default(cuid())
+  slug          String               @unique
+  nameKey       String
+  order         Int                  @default(0)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  
+  subCategories ServiceSubCategory[]
+  services      Service[]
+  
+  @@index([slug])
+}
+
+// Level 2: Sub-Categories (headspa, nails, brows under beauty; beauty, relaxation, therapy under head-spa)
+model ServiceSubCategory {
+  id         String                    @id @default(cuid())
+  slug       String
+  nameKey    String
+  categoryId String
+  order      Int                       @default(0)
+  createdAt  DateTime                  @default(now())
+  updatedAt  DateTime                  @updatedAt
+  
+  category         ServiceCategory        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  subSubCategories ServiceSubSubCategory[]
+  services         Service[]
+  
+  @@unique([categoryId, slug])
+  @@index([categoryId])
+}
+
+// Level 3: Sub-Sub-Categories (specific categories under relaxation, etc.)
+model ServiceSubSubCategory {
+  id            String             @id @default(cuid())
+  slug          String
+  nameKey       String
+  subCategoryId String
+  order         Int                @default(0)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  
+  subCategory   ServiceSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  services      Service[]
+  
+  @@unique([subCategoryId, slug])
+  @@index([subCategoryId])
+}
+
+// Service model (individual service packages)
+model Service {
+  id               String                   @id @default(cuid())
+  nameKey          String
+  descKey          String
+  price            Float
+  duration         String
+  image            String
+  categoryId       String                   // Level 1 - Required
+  subCategoryId    String?                  // Level 2 - Optional
+  subSubCategoryId String?                  // Level 3 - Optional
+  order            Int                      @default(0)
+  isActive         Boolean                  @default(true)
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  
+  category         ServiceCategory          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  subCategory      ServiceSubCategory?      @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  subSubCategory   ServiceSubSubCategory?   @relation(fields: [subSubCategoryId], references: [id], onDelete: Cascade)
+  
+  @@index([categoryId])
+  @@index([subCategoryId])
+  @@index([subSubCategoryId])
+  @@index([isActive])
+}

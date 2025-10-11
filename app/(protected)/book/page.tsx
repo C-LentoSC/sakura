@@ -16,15 +16,21 @@ import {
 } from '@/app/components';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { formatCurrency } from '@/app/constants/currency';
-import { SERVICES_DATA } from '@/app/constants/services';
 import { generateTimeSlots, getShopHours, type TimeSlot } from '@/app/utils/timeSlots';
 import { addBooking, getBlockedTimeSlots, getBookedTimeSlots } from '@/app/utils/bookingStorage';
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface Service {
+  id: string;
+  nameKey: string;
+  price: number;
+  duration: string;
+}
+
 interface bookingsData {
   service: string;
-  serviceId: number;
+  serviceId: string;
   date: string;
   time: string;
   duration: string;
@@ -44,7 +50,7 @@ function BookPageContent() {
   const [currentStep, setCurrentStep] = useState(2);
   const [bookingsData, setbookingsData] = useState<bookingsData>({
     service: '',
-    serviceId: 0,
+    serviceId: '',
     date: '',
     time: '',
     duration: '',
@@ -62,30 +68,47 @@ function BookPageContent() {
   const [clientSecret, setClientSecret] = useState<string>('');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
   const heroRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Load service data from URL parameter
-    if (preSelectedServiceId) {
-      const service = SERVICES_DATA.find(s => s.id === parseInt(preSelectedServiceId));
-      if (service) {
-        setbookingsData(prev => ({
-          ...prev,
-          service: t(service.nameKey),
-          serviceId: service.id,
-          duration: service.duration,
-          price: service.price
-        }));
-      } else {
-        // Invalid service ID, redirect to services page
+    const fetchService = async () => {
+      if (!preSelectedServiceId) {
+        // No service selected, redirect to services page
         router.push('/services');
+        return;
       }
-    } else {
-      // No service selected, redirect to services page
-      router.push('/services');
-    }
+
+      try {
+        setLoading(true);
+        const res = await fetch('/api/services');
+        const data = await res.json();
+        const service = data.services?.find((s: Service) => s.id === preSelectedServiceId);
+        
+        if (service) {
+          setbookingsData(prev => ({
+            ...prev,
+            service: t(service.nameKey),
+            serviceId: service.id,
+            duration: service.duration,
+            price: service.price
+          }));
+        } else {
+          // Invalid service ID, redirect to services page
+          router.push('/services');
+        }
+      } catch (error) {
+        console.error('Error fetching service:', error);
+        router.push('/services');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchService();
   }, [preSelectedServiceId, router, t]);
 
   // Session auto-fill will be implemented with new auth system
@@ -281,13 +304,10 @@ function BookPageContent() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handlePaymentSuccess = async (_paymentIntentId: string) => {
     try {
-      // Find the selected service to get the image
-      const selectedService = SERVICES_DATA.find(service => service.id === bookingsData.serviceId);
-      
       // Prepare booking data
       const bookingData = {
         service: bookingsData.service,
-        image: selectedService?.image || '/services-images/default.jpg',
+        image: '/packages/1.jpg', // Default image - can be enhanced to fetch from API
         date: bookingsData.date,
         time: bookingsData.time,
         duration: bookingsData.duration,
@@ -326,7 +346,7 @@ function BookPageContent() {
   const resetbookings = () => {
     setbookingsData({
       service: '',
-      serviceId: 0,
+      serviceId: '',
       date: '',
       time: '',
       duration: '',
@@ -339,6 +359,23 @@ function BookPageContent() {
     setCurrentStep(2);
     setSubmitStatus('idle');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+        <BackgroundPattern />
+        <CherryBlossomTrees />
+        <FallingPetals />
+        <Header />
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+            <p className="text-secondary/60">Loading service...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">

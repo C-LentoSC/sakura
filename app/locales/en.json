@@ -258,6 +258,7 @@
     },
     "mainCategories": {
       "headSpa": "Head SPA",
+      "beauty": "Beauty",
       "nails": "Nails",
       "lashes": "Lashes",
       "brows": "Brows"
@@ -267,6 +268,10 @@
       "beauty": "Beauty",
       "relaxation": "Relaxation",
       "therapy": "Therapy",
+      "headSpa": "Head Spa",
+      "nails": "Nails",
+      "brows": "Brows",
+      "lashes": "Lashes",
       "manicure": "Manicure",
       "pedicure": "Pedicure",
       "acrylic": "Acrylic",
@@ -278,6 +283,18 @@
       "shaping": "Shaping",
       "tinting": "Tinting",
       "microblading": "Microblading"
+    },
+    "subSubCategories": {
+      "aromatherapy": "Aromatherapy",
+      "deepRelaxation": "Deep Relaxation",
+      "manicure": "Manicure",
+      "pedicure": "Pedicure",
+      "acrylic": "Acrylic",
+      "gel": "Gel",
+      "classic": "Classic",
+      "volume": "Volume",
+      "shaping": "Shaping",
+      "tinting": "Tinting"
     },
     "items": {
       "backFacial": {
@@ -377,12 +394,36 @@
         "description": "Natural-looking lash extensions applied one-to-one. Perfect for everyday elegance and subtle enhancement."
       },
       "volumeLashes": {
-        "name": "Volume Lash Set",
-        "description": "Dramatic volume lashes using multiple extensions per natural lash. Fuller, more glamorous look for special occasions."
+        "name": "Volume Lashes",
+        "description": "Dramatic volume lashes using multiple extensions per natural lash for fuller, glamorous look."
       },
       "browShaping": {
         "name": "Eyebrow Shaping",
         "description": "Professional eyebrow shaping and grooming to frame your face perfectly with precise techniques."
+      },
+      "aromatherapySession": {
+        "name": "Aromatherapy Session",
+        "description": "Relaxing aromatherapy treatment with essential oils to soothe your mind and rejuvenate your senses."
+      },
+      "classicManicure": {
+        "name": "Classic Manicure",
+        "description": "Traditional manicure with nail shaping, cuticle care, and polish application for beautiful hands."
+      },
+      "luxuryManicure": {
+        "name": "Luxury Manicure",
+        "description": "Premium manicure experience with exfoliation, moisturizing treatment, and long-lasting polish."
+      },
+      "gelNails": {
+        "name": "Gel Nails",
+        "description": "Durable gel nail treatment with chip-resistant finish that lasts up to 3 weeks."
+      },
+      "classicLashes": {
+        "name": "Classic Lashes",
+        "description": "Natural-looking lash extensions with one extension per natural lash for subtle enhancement."
+      },
+      "browTinting": {
+        "name": "Brow Tinting",
+        "description": "Professional eyebrow tinting to enhance and define your brows with long-lasting color."
       }
     },
     "bookNow": "Book Now",
