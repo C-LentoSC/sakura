@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# additional ignored folders
+.bmad-core
+.claude
+.cursor
+.gemini
+.github
+.windsurf
+/web-bundles

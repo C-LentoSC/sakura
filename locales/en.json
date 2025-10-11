@@ -1,0 +1,757 @@
+{
+  "nav": {
+    "home": "HOME",
+    "about": "ABOUT US",
+    "services": "SERVICES",
+    "shop": "SHOP",
+    "bookings": "BOOKINGS",
+    "contact": "CONTACT",
+    "login": "LOGIN",
+    "register": "REGISTER",
+    "welcome": "Welcome",
+    "signOut": "Sign Out"
+  },
+  "hero": {
+    "quote": "Where Beauty Blooms Like Cherry Blossoms",
+    "title": "Sakura",
+    "subtitle": "salon",
+    "description": "Welcome to Sakura Salon, your cozy retreat for relaxation and rejuvenation. Experience our range of services designed to pamper you from head to toe.",
+    "bookings": "BOOKING NOW",
+    "story": "Watch Our Story"
+  },
+  "features": {
+    "premium": {
+      "title": "Premium Products",
+      "description": "Organic and natural beauty products for the best care"
+    },
+    "experts": {
+      "title": "Expert Stylists",
+      "description": "Professional team with years of experience"
+    },
+    "relaxing": {
+      "title": "Relaxing Atmosphere",
+      "description": "Peaceful environment for your complete relaxation"
+    }
+  },
+  "exclusiveServices": {
+    "mainTitle": "Our Exclusive Services We Provide",
+    "tabs": {
+      "headSpa": "Head SPA",
+      "beauty": "Beauty"
+    },
+    "minutes": "Minutes",
+    "bookNow": "Book now",
+    "sameInfo": "Contact me from the same Info",
+    "seeMore": "See More Package",
+    "japaneseHeadSpa": {
+      "title": "Japanese Head Spa",
+      "description": "Indulge in the ultimate relaxation with our authentic Japanese Head Spa. Combining traditional techniques with modern care, this treatment includes scalp massage, deep cleansing, aromatherapy, and stress relief. Perfect for rejuvenating your mind and restoring scalp health.",
+      "price": "Rs 969"
+    },
+    "dryHeadSpa": {
+      "title": "Dry Head SPA",
+      "description": "Experience deep relaxation with our Dry Head SPA - a specialized treatment focusing on acupressure, stress relief, and pain release. This soothing session includes head, neck, and shoulder massage, promoting better sleep and mental clarity without water or products.",
+      "price": "Rs 599"
+    },
+    "imperialRetreat": {
+      "title": "The imperial retreat",
+      "description": "Experience deep relaxation and scalp rejuvenation with our exclusive IMPERIAL RETREAT. Enjoy a luxurious 120-minute session featuring Japanese head spa techniques, aromatherapy, hot towel treatment, nourishing hair masks, shoulder & arm massage, and a refreshing herbal tea. Complete bliss for mind and body.",
+      "price": "Rs 1299"
+    },
+    "nailArt": {
+      "title": "Premium Nail Art",
+      "description": "Transform your nails into stunning works of art with our premium nail art services. From classic French manicures to intricate designs, gel polish, nail extensions, and custom artwork. Our skilled technicians use high-quality products for long-lasting, beautiful results.",
+      "price": "Rs 799"
+    },
+    "lashExtension": {
+      "title": "Lash Extensions",
+      "description": "Enhance your natural beauty with our professional lash extension services. Choose from classic, volume, or hybrid styles using premium silk lashes. Our certified lash artists create customized looks that complement your eye shape for stunning, natural-looking results.",
+      "price": "Rs 1199"
+    },
+    "browStyling": {
+      "title": "Eyebrow Styling",
+      "description": "Perfect your brows with our comprehensive eyebrow styling services. Includes shaping, threading, tinting, and microblading consultations. Our expert stylists create the ideal brow shape to frame your face and enhance your natural features.",
+      "price": "Rs 599"
+    }
+  },
+  "gallery": {
+    "mainTitle": "Our Gallery",
+    "subtitle": "Explore our beautiful transformations and serene spa atmosphere",
+    "filters": {
+      "all": "All",
+      "spa": "Head Spa",
+      "nails": "Nails",
+      "lashes": "Lashes & Brows"
+    },
+    "items": {
+      "spa1": "Japanese Head Spa Treatment",
+      "spa2": "Relaxing Scalp Massage",
+      "spa3": "Aromatherapy Session",
+      "spa4": "Deep Cleansing Treatment",
+      "spa5": "Luxury Spa Experience",
+      "nails1": "Premium Nail Art",
+      "nails2": "Gel Manicure",
+      "nails3": "French Manicure",
+      "nails4": "Nail Extensions",
+      "nails5": "Creative Nail Design",
+      "lashes1": "Lash Extensions",
+      "lashes2": "Eyebrow Styling",
+      "lashes3": "Volume Lashes",
+      "lashes4": "Hybrid Lash Set"
+    },
+    "viewMore": "View More"
+  },
+  "testimonials": {
+    "mainTitle": "What Our Clients Say",
+    "subtitle": "Hear from our satisfied clients about their experiences",
+    "client1": {
+      "text": "The Japanese Head Spa was absolutely amazing! I felt so relaxed and rejuvenated. The staff is professional and the atmosphere is so peaceful. Highly recommend!"
+    },
+    "client2": {
+      "text": "Best nail art experience I've ever had! The attention to detail is incredible. My nails look stunning and the service was top-notch. Will definitely come back!"
+    },
+    "client3": {
+      "text": "I've been coming here for months and every visit is perfect. The lash extensions are beautiful and last so long. The team really knows what they're doing!"
+    }
+  },
+  "contact": {
+    "mainTitle": "Get in Touch With Us",
+    "subtitle": "We'd love to hear from you. Reach out for bookings or inquiries",
+    "infoTitle": "Contact Information",
+    "formTitle": "Send Us a Message",
+    "address": "Address",
+    "addressDetails": "123 Sakura Street, Beauty District, City 12345",
+    "phone": "Phone",
+    "phoneNumber": "+1 (555) 123-4567",
+    "email": "Email",
+    "emailAddress": "hello@sakurasaloon.com",
+    "hours": "Business Hours",
+    "hoursDetails": "Mon-Sat: 9:00 AM - 8:00 PM | Sun: 10:00 AM - 6:00 PM",
+    "followUs": "Follow Us",
+    "form": {
+      "name": "Your Name",
+      "namePlaceholder": "Enter your name",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter your email",
+      "phone": "Phone Number",
+      "phonePlaceholder": "Enter your phone",
+      "message": "Message",
+      "messagePlaceholder": "Tell us how we can help you...",
+      "submit": "Send Message"
+    }
+  },
+  "footer": {
+    "about": "Experience authentic Japanese relaxation and beauty services in a serene atmosphere. Your journey to wellness begins here.",
+    "quickLinks": "Quick Links",
+    "links": {
+      "home": "Home",
+      "services": "Services",
+      "about": "About Us",
+      "bookings": "Book Now",
+      "contact": "Contact"
+    },
+    "services": "Our Services",
+    "servicesList": {
+      "headSpa": "Japanese Head Spa",
+      "nailArt": "Nail Art",
+      "lashExtensions": "Lash Extensions",
+      "eyebrowStyling": "Eyebrow Styling"
+    },
+    "contactInfo": "Contact Info",
+    "copyright": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "chatbot": {
+    "welcome": "Hello! Welcome to Sakura Saloon. How can I help you today?",
+    "online": "Online now",
+    "quickRepliesTitle": "Quick questions:",
+    "quickReplies": {
+      "bookings": "Book an appointment",
+      "services": "View services",
+      "pricing": "Check pricing",
+      "hours": "Business hours",
+      "location": "Find location"
+    },
+    "responses": {
+      "bookings": "Great! You can book an appointment by calling us at +1 (555) 123-4567 or clicking the 'Book Now' button on our website. We're available Mon-Sat 9AM-8PM.",
+      "services": "We offer Japanese Head Spa, Nail Art & Extensions, Lash Extensions, and Eyebrow Styling. Each service is performed by our expert team in a serene atmosphere. Would you like to know more about a specific service?",
+      "pricing": "Our pricing varies by service. Head Spa starts at $80, Nail services from $45, and Lash Extensions from $120. Contact us for detailed pricing and package deals!",
+      "hours": "We're open Monday to Saturday: 9:00 AM - 8:00 PM, and Sunday: 10:00 AM - 6:00 PM. Walk-ins welcome, but appointments are recommended!",
+      "location": "We're located at 123 Sakura Street, Beauty District. Easy parking available and just 5 minutes from downtown. See you soon!"
+    },
+    "inputPlaceholder": "Type your message..."
+  },
+  "about": {
+    "hero": {
+      "title": "About Sakura Saloon",
+      "subtitle": "Where Japanese tradition meets modern beauty"
+    },
+    "story": {
+      "title": "Our Story",
+      "paragraph1": "Founded in 2018, Sakura Saloon was born from a passion for authentic Japanese beauty rituals and a vision to create a sanctuary of tranquility in the heart of the city.",
+      "paragraph2": "Our founder, inspired by traditional Japanese wellness practices, sought to bring the serene experience of a Japanese spa to our community. Every detail, from our signature Head Spa treatments to our carefully curated nail art, reflects our commitment to authenticity and excellence.",
+      "paragraph3": "Today, we're proud to be a destination where clients discover the perfect balance of relaxation, beauty, and self-care in an atmosphere that honors Japanese aesthetics and hospitality."
+    },
+    "values": {
+      "title": "Our Values",
+      "subtitle": "The principles that guide everything we do",
+      "excellence": {
+        "title": "Excellence",
+        "description": "We pursue perfection in every service, using premium products and advanced techniques to deliver exceptional results."
+      },
+      "authenticity": {
+        "title": "Authenticity",
+        "description": "We honor traditional Japanese beauty practices while embracing modern innovations to create unique experiences."
+      },
+      "wellness": {
+        "title": "Wellness",
+        "description": "We believe beauty and wellness are interconnected, focusing on holistic care that nurtures body, mind, and spirit."
+      },
+      "innovation": {
+        "title": "Innovation",
+        "description": "We continuously evolve our services and techniques to bring you the latest in beauty and wellness trends."
+      }
+    },
+    "team": {
+      "title": "Meet Our Team",
+      "subtitle": "Skilled professionals dedicated to your beauty journey",
+      "member1": {
+        "name": "Yuki Tanaka",
+        "role": "Founder & Head Spa Specialist",
+        "description": "With over 15 years of experience in Japanese wellness practices, Yuki brings authentic techniques and passion to every treatment."
+      },
+      "member2": {
+        "name": "Sakura Yamamoto",
+        "role": "Master Nail Artist",
+        "description": "Trained in Tokyo's finest salons, Sakura creates stunning nail art that combines precision with creativity."
+      },
+      "member3": {
+        "name": "Hana Suzuki",
+        "role": "Lash & Brow Expert",
+        "description": "Specializing in natural-looking enhancements, Hana has perfected the art of lash extensions and eyebrow styling."
+      }
+    },
+    "cta": {
+      "title": "Experience the Sakura Difference",
+      "description": "Book your appointment today and discover why our clients keep coming back",
+      "button": "Book Now"
+    }
+  },
+  "services": {
+    "mainTitle": "Our Main Services",
+    "spa": {
+      "title": "Japanese Head Spa & Relaxation",
+      "description": "Immerse yourself in the ancient art of Japanese head spa - a soothing ritual designed to melt stress, improve scalp health, and restore inner peace. Experience our professional and refreshing treatment, crafted with care, and leave feeling rejuvenated and balanced."
+    },
+    "beauty": {
+      "title": "Beauty Care: Nails, Lashes & Brows",
+      "description": "Elevate your elegance with our bespoke beauty services, from flawless nails and gorgeous lashes to perfectly shaped brows. Achieve your natural charm, shine into a world-class experience with confidence, and let your beauty bloom like cherry blossoms."
+    },
+    "contactButton": "Contact for more info",
+    "hero": {
+      "title": "Our Services",
+      "subtitle": "Exclusive range of packages to please your needs"
+    },
+    "search": {
+      "placeholder": "Search services..."
+    },
+    "mainCategories": {
+      "headSpa": "Head SPA",
+      "beauty": "Beauty",
+      "nails": "Nails",
+      "lashes": "Lashes",
+      "brows": "Brows",
+      "ttttt": "ttttt",
+      "test": "test",
+      "test2": "test 2",
+      "tests": "tests",
+      "hello": "hello"
+    },
+    "subCategories": {
+      "all": "All",
+      "beauty": "Beauty",
+      "relaxation": "Relaxation",
+      "therapy": "Therapy",
+      "headSpa": "Head Spa",
+      "nails": "Nails",
+      "brows": "Brows",
+      "lashes": "Lashes",
+      "manicure": "Manicure",
+      "pedicure": "Pedicure",
+      "acrylic": "Acrylic",
+      "gel": "Gel",
+      "sns": "SNS",
+      "classic": "Classic",
+      "volume": "Volume",
+      "hybrid": "Hybrid",
+      "shaping": "Shaping",
+      "tinting": "Tinting",
+      "microblading": "Microblading",
+      "aaa": "aaa",
+      "test": "test",
+      "hell": "hell",
+      "do": "do",
+      "helll": "helll",
+      "go": "go",
+      "hello": "hello"
+    },
+    "subSubCategories": {
+      "aromatherapy": "Aromatherapy",
+      "deepRelaxation": "Deep Relaxation",
+      "manicure": "Manicure",
+      "pedicure": "Pedicure",
+      "acrylic": "Acrylic",
+      "gel": "Gel",
+      "classic": "Classic",
+      "volume": "Volume",
+      "shaping": "Shaping",
+      "tinting": "Tinting"
+    },
+    "items": {
+      "backFacial": {
+        "name": "Back Facial",
+        "description": "Exfoliation + Leg Massage Hot Towel Opens pores and softens the skin for better absorption. Back Exfoliation Gently buffs away dead skin."
+      },
+      "faceRejuvenation": {
+        "name": "Face Rejuvenation",
+        "description": "Advanced facial treatment with deep cleansing, exfoliation, and hydrating mask for radiant, youthful skin."
+      },
+      "traditionalMassage": {
+        "name": "Traditional Massage",
+        "description": "Authentic Japanese massage techniques to relieve tension and promote deep relaxation throughout your body."
+      },
+      "aromatherapy": {
+        "name": "Aromatherapy Session",
+        "description": "Therapeutic aromatherapy with essential oils to calm the mind and rejuvenate the spirit."
+      },
+      "imperialRetreat": {
+        "name": "Imperial Retreat",
+        "description": "Luxurious 120-minute head spa ritual featuring aromatherapy, nourishing hair masks, and herbal tea for complete rejuvenation."
+      },
+      "zenHeadSpa": {
+        "name": "Zen Head Spa",
+        "description": "Mind-calming scalp treatment with acupressure, cooling botanicals, and guided breathing to restore balance."
+      },
+      "sakuraSteam": {
+        "name": "Sakura Steam Therapy",
+        "description": "Gentle steam infusion with cherry blossom essences to detoxify the scalp and revive natural shine."
+      },
+      "crystalScalpMassage": {
+        "name": "Crystal Scalp Massage",
+        "description": "Warm crystal rollers, scalp kneading, and aromatic oils to release deep-rooted stress and tension."
+      },
+      "silkHeadTreatment": {
+        "name": "Silk Head Treatment",
+        "description": "Silkening serum, scalp exfoliation, and restorative massage to leave hair soft, glossy, and healthy."
+      },
+      "midnightCalm": {
+        "name": "Midnight Calm Ritual",
+        "description": "Evening-inspired ritual with lavender compresses and slow rhythm massage to prepare you for restful sleep."
+      },
+      "forestBreeze": {
+        "name": "Forest Breeze Therapy",
+        "description": "Forest-inspired aromatherapy, pressure-point massage, and herbal mist to refresh mind and senses."
+      },
+      "serenityStone": {
+        "name": "Serenity Stone Massage",
+        "description": "Heated basalt stones glide across the scalp, melting away tension while nourishing oils soak in."
+      },
+      "kansoTherapy": {
+        "name": "Kanso Therapy",
+        "description": "Traditional kanso wand massage that stimulates energy flow and promotes total scalp clarity."
+      },
+      "reviveEnergy": {
+        "name": "Revive Energy Boost",
+        "description": "Invigorating peppermint cleanse, scalp brushing, and energizing massage for instant refreshment."
+      },
+      "samuraiFocus": {
+        "name": "Samurai Focus Treatment",
+        "description": "Focus-enhancing ritual with camphor-infused oils, firm pressure techniques, and cooling tonics."
+      },
+      "deepSleepRitual": {
+        "name": "Deep Sleep Ritual",
+        "description": "Slow, hypnotic scalp strokes, warm herbal poultices, and sound bath elements for deeper rest."
+      },
+      "blossomScalpPolish": {
+        "name": "Blossom Scalp Polish",
+        "description": "Gentle sakura scrub, vitamin serum, and scalp massage to brighten hair follicles and skin."
+      },
+      "shizukuHydration": {
+        "name": "Shizuku Hydration",
+        "description": "Ultra-hydrating serum infusion, steam therapy, and lymphatic drainage massage for lasting moisture."
+      },
+      "teawareInfusion": {
+        "name": "Teaware Infusion",
+        "description": "Green tea detox rinse, scalp stretching, and finishing tonic for clarity and lightness."
+      },
+      "auroraHeadLuminance": {
+        "name": "Aurora Head Luminance",
+        "description": "Chromotherapy-inspired treatment with iridescent masks and revitalizing scalp massage to boost radiance."
+      },
+      "classicManicure": {
+        "name": "Classic Manicure",
+        "description": "Traditional manicure with nail shaping, cuticle care, and polish application for beautiful hands."
+      },
+      "gelManicure": {
+        "name": "Gel Manicure",
+        "description": "Long-lasting gel polish that maintains shine and durability for weeks without chipping."
+      },
+      "acrylicSet": {
+        "name": "Acrylic Full Set",
+        "description": "Complete acrylic nail extensions with custom shaping and professional polish application."
+      },
+      "classicLashes": {
+        "name": "Classic Lashes",
+        "description": "Natural-looking lash extensions with one extension per natural lash for subtle enhancement."
+      },
+      "volumeLashes": {
+        "name": "Volume Lashes",
+        "description": "Dramatic volume lashes using multiple extensions per natural lash for fuller, glamorous look."
+      },
+      "browShaping": {
+        "name": "Eyebrow Shaping",
+        "description": "Professional eyebrow shaping and grooming to frame your face perfectly with precise techniques."
+      },
+      "aromatherapySession": {
+        "name": "Aromatherapy Session",
+        "description": "Relaxing aromatherapy treatment with essential oils to soothe your mind and rejuvenate your senses."
+      },
+      "luxuryManicure": {
+        "name": "Luxury Manicure",
+        "description": "Premium manicure experience with exfoliation, moisturizing treatment, and long-lasting polish."
+      },
+      "gelNails": {
+        "name": "Gel Nails",
+        "description": "Durable gel nail treatment with chip-resistant finish that lasts up to 3 weeks."
+      },
+      "browTinting": {
+        "name": "Brow Tinting",
+        "description": "Professional eyebrow tinting to enhance and define your brows with long-lasting color."
+      }
+    },
+    "bookNow": "Book Now",
+    "contactInfo": "Contact me from the same Info",
+    "noResults": "No services found matching your search.",
+    "headSpa": {
+      "name": "Japanese Head Spa"
+    },
+    "nailArt": {
+      "name": "Premium Nail Art"
+    },
+    "lashExtensions": {
+      "name": "Lash Extensions"
+    }
+  },
+  "book": {
+    "hero": {
+      "title": "Book Your Appointment",
+      "subtitle": "Schedule your perfect beauty experience with our easy bookings system. Choose your service, pick your time, and let us pamper you."
+    },
+    "progress": {
+      "title": "Booking Progress",
+      "step2": "Date & Time",
+      "step3": "Your Details",
+      "step4": "Confirmation"
+    },
+    "step1": {
+      "title": "Choose Your Service"
+    },
+    "step2": {
+      "title": "When would you like to visit?",
+      "subtitle": "Choose your preferred date and time",
+      "selectDate": "Select Date",
+      "selectTime": "Select Time"
+    },
+    "step3": {
+      "title": "Tell us about yourself",
+      "subtitle": "We need a few details to complete your booking",
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "notes": "Special Requests"
+    },
+    "step4": {
+      "title": "Review Your Booking",
+      "subtitle": "Please confirm your appointment details",
+      "summary": "Booking Summary",
+      "service": "Service",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "total": "Total Amount",
+      "confirm": "Confirm Booking",
+      "confirming": "Confirming..."
+    },
+    "selectedService": "Selected Service",
+    "selectedService.subtitle": "Your chosen treatment",
+    "shopHours": "Shop Hours",
+    "paymentDetails": "Payment Details",
+    "placeholders": {
+      "name": "Enter your full name",
+      "email": "your.email@example.com",
+      "phone": "+1 (555) 123-4567",
+      "notes": "Any special requests or notes for your appointment..."
+    },
+    "validation": {
+      "nameRequired": "Full name is required",
+      "nameMinLength": "Name must be at least 2 characters",
+      "nameInvalid": "Name contains invalid characters",
+      "emailRequired": "Email address is required",
+      "emailInvalid": "Please enter a valid email address",
+      "phoneInvalid": "Please enter a valid phone number"
+    },
+    "payment": {
+      "error": "Payment Error",
+      "initError": "Failed to initialize payment. Please try again.",
+      "initializing": "Initializing payment..."
+    },
+    "back": "Back to Details",
+    "backToDateTime": "Back to Date & Time",
+    "next": "Continue to Details",
+    "success": {
+      "title": "Booking Confirmed!",
+      "message": "Your appointment has been successfully booked. We'll send you a confirmation email shortly.",
+      "newbookings": "Book Another Appointment"
+    },
+    "error": {
+      "message": "Sorry, there was an error processing your booking. Please try again or contact us directly."
+    }
+  },
+  "bookings": {
+    "hero": {
+      "title": "My bookings",
+      "subtitle": "View and manage your appointment history. Keep track of upcoming appointments and past services."
+    },
+    "newbookings": "Book New Appointment",
+    "tabs": {
+      "active": "Active",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "all": "All"
+    },
+    "status": {
+      "confirmed": "CONFIRMED",
+      "completed": "COMPLETED",
+      "cancelled": "CANCELLED",
+      "rescheduled": "RESCHEDULED",
+      "noShow": "NO SHOW"
+    },
+    "details": {
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "price": "Price"
+    },
+    "actions": {
+      "reschedule": "Reschedule",
+      "cancel": "Cancel",
+      "bookAgain": "Book Again"
+    },
+    "empty": {
+      "title": "No bookings Found",
+      "message": "You haven't made any bookings yet. Book your first appointment to get started!",
+      "action": "Book Your First Appointment"
+    },
+    "cancel": {
+      "title": "Cancel Appointment",
+      "message": "Are you sure you want to cancel this appointment? This action cannot be undone.",
+      "keep": "Keep Booking",
+      "confirm": "Cancel Appointment"
+    },
+    "messages": {
+      "cancelSuccess": "Appointment cancelled successfully",
+      "cancelError": "Failed to cancel appointment. Please try again."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to continue your journey",
+      "password": "Password",
+      "remember": "Remember me",
+      "forgot": "Forgot?",
+      "submit": "Sign In",
+      "or": "or",
+      "continueWithGoogle": "Continue with Google",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "loading": "Signing in...",
+      "errors": {
+        "invalid": "Invalid email or password",
+        "generic": "An error occurred. Please try again."
+      }
+    },
+    "register": {
+      "title": "Join Us",
+      "subtitle": "Create your account to begin",
+      "name": "Full Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "terms": "I agree to the",
+      "termsLink": "Terms",
+      "and": "and",
+      "privacyLink": "Privacy Policy",
+      "submit": "Create Account",
+      "loading": "Creating...",
+      "or": "or",
+      "continueWithGoogle": "Continue with Google",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "errors": {
+        "passwordMismatch": "Passwords do not match",
+        "passwordMin": "Password must be at least 6 characters long",
+        "registrationFailed": "Registration failed. Please try again.",
+        "generic": "An error occurred. Please try again.",
+        "emailInUse": "Email already in use",
+        "signinFailed": "Registered, but sign-in failed. Please try logging in."
+      }
+    }
+  },
+  "shop": {
+    "hero": {
+      "title": "Sakura Shop",
+      "subtitle": "Premium beauty and wellness products curated for your self-care journey"
+    },
+    "search": {
+      "placeholder": "Search products..."
+    },
+    "categories": {
+      "all": "All",
+      "hairCare": "Hair Care",
+      "nailCare": "Nail Care",
+      "beauty": "Beauty",
+      "wellness": "Wellness"
+    },
+    "product": {
+      "addToCart": "Add to Cart",
+      "outOfStock": "Out of Stock",
+      "quickView": "Quick View",
+      "reviews": "reviews",
+      "quantity": "Quantity",
+      "buyNow": "Buy Now",
+      "benefits": "Benefits",
+      "ingredients": "Ingredients",
+      "howToUse": "How to Use"
+    },
+    "productDetail": {
+      "notFound": {
+        "title": "Product Not Found",
+        "message": "The product you're looking for doesn't exist.",
+        "backToShop": "Back to Shop"
+      },
+      "breadcrumb": {
+        "shop": "Shop"
+      }
+    },
+    "cart": {
+      "title": "Shopping Cart",
+      "subtitle": "Review your selected items before checkout",
+      "empty": "Your cart is empty",
+      "emptyMessage": "Add some products to get started",
+      "continueShopping": "Continue Shopping",
+      "proceedCheckout": "Proceed to Checkout",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "total": "Total",
+      "freeShipping": "Free shipping on orders over ₹2,000!",
+      "secureCheckout": "Secure checkout with SSL encryption"
+    },
+    "noResults": {
+      "title": "No Products Found",
+      "message": "Try adjusting your search or filter criteria"
+    }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "subtitle": "Complete your order with secure payment",
+    "step1": {
+      "title": "Shipping Information",
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "address": "Street Address",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "notes": "Order Notes (Optional)"
+    },
+    "step2": {
+      "title": "Payment"
+    },
+    "placeholders": {
+      "name": "Enter your full name",
+      "email": "your.email@example.com",
+      "phone": "+1 (555) 123-4567",
+      "address": "123 Main Street",
+      "city": "Your city",
+      "postalCode": "12345",
+      "notes": "Any special delivery instructions..."
+    },
+    "validation": {
+      "nameRequired": "Full name is required",
+      "nameMinLength": "Name must be at least 2 characters",
+      "emailRequired": "Email address is required",
+      "emailInvalid": "Please enter a valid email address",
+      "phoneRequired": "Phone number is required",
+      "phoneInvalid": "Please enter a valid phone number",
+      "addressRequired": "Street address is required",
+      "cityRequired": "City is required",
+      "postalCodeRequired": "Postal code is required"
+    },
+    "payment": {
+      "error": "Payment Error",
+      "initError": "Failed to initialize payment. Please try again.",
+      "initializing": "Initializing payment..."
+    },
+    "orderSummary": "Order Summary",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "total": "Total",
+    "proceedToPayment": "Proceed to Payment",
+    "back": "Back",
+    "success": {
+      "title": "Order Placed Successfully!",
+      "message": "Thank you for your order. You will receive a confirmation email shortly."
+    }
+  },
+  "booking": {
+    "title": "Book Your Appointment",
+    "subtitle": "Schedule your relaxing experience at Sakura Saloon. Choose your preferred service and time.",
+    "form": {
+      "fullName": "Full Name",
+      "emailAddress": "Email Address",
+      "phoneNumber": "Phone Number",
+      "service": "Service",
+      "preferredDate": "Preferred Date",
+      "preferredTime": "Preferred Time",
+      "additionalNotes": "Additional Notes"
+    },
+    "placeholders": {
+      "fullName": "Enter your full name",
+      "emailAddress": "Enter your email address",
+      "phoneNumber": "Enter your phone number",
+      "service": "Select a service",
+      "preferredTime": "Select time",
+      "additionalNotes": "Any special requests or notes..."
+    },
+    "services": {
+      "dryHeadSpa": "Dry Head SPA (60 min)",
+      "japaneseHeadSpa": "Japanese Head SPA (90 min)",
+      "imperialRetreat": "Imperial Retreat (120 min)",
+      "nailArt": "Nail Art (60 min)",
+      "lashExtension": "Lash Extension (90 min)",
+      "browStyling": "Brow Styling (45 min)"
+    },
+    "submit": "Book Appointment",
+    "submitting": "Booking...",
+    "success": {
+      "title": "Booking Submitted!",
+      "message": "Thank you for your booking request. We will contact you soon to confirm your appointment."
+    },
+    "error": {
+      "title": "Booking Failed",
+      "message": "Sorry, there was an error submitting your booking. Please try again or contact us directly."
+    }
+  }
+}
