@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import prisma from '@/app/lib/prisma';
 import { hasRole } from '@/app/lib/dal';
 
 // PUT /api/admin/services/[id] - Update service
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const isAdmin = await hasRole('ADMIN');
     if (!isAdmin) {
@@ -29,7 +30,7 @@ export async function PUT(
 
     // Check if service exists
     const existingService = await prisma.service.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingService) {
@@ -40,7 +41,7 @@ export async function PUT(
     }
 
     const service = await prisma.service.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         nameKey,
         descKey,
@@ -73,8 +74,9 @@ export async function PUT(
 // DELETE /api/admin/services/[id] - Delete service
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const isAdmin = await hasRole('ADMIN');
     if (!isAdmin) {
@@ -83,7 +85,7 @@ export async function DELETE(
 
     // Check if service exists
     const existingService = await prisma.service.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingService) {
@@ -94,7 +96,7 @@ export async function DELETE(
     }
 
     await prisma.service.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Service deleted successfully' });

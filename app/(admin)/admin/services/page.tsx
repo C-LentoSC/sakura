@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { formatCurrency } from '@/app/constants/currency';
+import ImageUpload from '@/app/components/ImageUpload';
 
 interface Service {
   id: string;
@@ -19,10 +20,34 @@ interface Service {
     slug: string;
     nameKey: string;
   };
-  subCategory: {
+  subCategory?: {
     id: string;
     slug: string;
     nameKey: string;
+  };
+  subSubCategory?: {
+    id: string;
+    slug: string;
+    nameKey: string;
+  };
+}
+
+interface SubSubCategory {
+  id: string;
+  slug: string;
+  nameKey: string;
+  _count?: {
+    services: number;
+  };
+}
+
+interface SubCategory {
+  id: string;
+  slug: string;
+  nameKey: string;
+  subSubCategories?: SubSubCategory[];
+  _count?: {
+    services: number;
   };
 }
 
@@ -30,12 +55,23 @@ interface Category {
   id: string;
   slug: string;
   nameKey: string;
-  subCategories: {
-    id: string;
-    slug: string;
-    nameKey: string;
-  }[];
+  subCategories: SubCategory[];
+  _count?: {
+    services: number;
+  };
 }
+
+// Utility function to get display text (handles both translation keys and direct text)
+const getDisplayText = (text: string, t: (key: string) => string): string => {
+  // If text contains dots and starts with known prefixes, treat as translation key
+  if (text.includes('.') && (text.startsWith('services.') || text.startsWith('categories.'))) {
+    const translated = t(text);
+    // If translation returns the same key, it means translation doesn't exist, return the text as-is
+    return translated === text ? text : translated;
+  }
+  // Otherwise, return the text directly
+  return text;
+};
 
 export default function AdminServicesPage() {
   const { t } = useLanguage();
@@ -49,16 +85,19 @@ export default function AdminServicesPage() {
 
   // Form state
   const [formData, setFormData] = useState({
-    nameKey: '',
-    descKey: '',
+    name: '', // User-friendly name input
+    description: '', // User-friendly description input
+    nameKey: '', // Auto-generated translation key
+    descKey: '', // Auto-generated translation key
     price: '',
     duration: '',
     image: '',
     categoryId: '',
     subCategoryId: '',
-    order: '0',
+    subSubCategoryId: '',
     isActive: true,
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetchServices();
@@ -68,10 +107,14 @@ export default function AdminServicesPage() {
   const fetchServices = async () => {
     try {
       const res = await fetch('/api/admin/services');
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       const data = await res.json();
       setServices(data.services || []);
     } catch (error) {
       console.error('Error fetching services:', error);
+      setServices([]); // Ensure services is always an array
     } finally {
       setLoading(false);
     }
@@ -80,10 +123,14 @@ export default function AdminServicesPage() {
   const fetchCategories = async () => {
     try {
       const res = await fetch('/api/admin/categories');
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       const data = await res.json();
       setCategories(data.categories || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
+      setCategories([]); // Ensure categories is always an array
     }
   };
 
@@ -92,14 +139,50 @@ export default function AdminServicesPage() {
     setLoading(true);
 
     try {
+      let imageUrl = formData.image;
+
+      // Upload image if a new file is selected
+      if (selectedFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append('image', selectedFile);
+        uploadFormData.append('serviceName', formData.name); // Send service name for filename
+        // If we are editing and there's an existing image, pass it so the server can replace/delete
+        if (editingService?.image) {
+          uploadFormData.append('oldImageUrl', editingService.image);
+        }
+
+        const uploadRes = await fetch('/api/upload/image', {
+          method: 'POST',
+          body: uploadFormData,
+        });
+
+        if (!uploadRes.ok) {
+          const error = await uploadRes.json();
+          throw new Error(error.error || 'Failed to upload image');
+        }
+
+        const uploadResult = await uploadRes.json();
+        imageUrl = uploadResult.imageUrl;
+      }
+
       const url = editingService
-        ? '/api/admin/services'
+        ? `/api/admin/services/${editingService.id}`
         : '/api/admin/services';
       const method = editingService ? 'PUT' : 'POST';
 
-      const payload = editingService
-        ? { id: editingService.id, ...formData }
-        : formData;
+      // Store the actual name and description from the form
+      const payload = {
+        nameKey: formData.name, // Store the form input directly
+        descKey: formData.description, // Store the form input directly
+        price: formData.price,
+        duration: formData.duration,
+        image: imageUrl,
+        categoryId: formData.categoryId,
+        subCategoryId: formData.subCategoryId || null,
+        subSubCategoryId: formData.subSubCategoryId || null,
+        isActive: formData.isActive,
+        order: editingService ? editingService.order : 0, // Keep existing order for edits, 0 for new
+      };
 
       const res = await fetch(url, {
         method,
@@ -114,6 +197,7 @@ export default function AdminServicesPage() {
       }
     } catch (error) {
       console.error('Error saving service:', error);
+      alert(error instanceof Error ? error.message : 'Failed to save service');
     } finally {
       setLoading(false);
     }
@@ -138,14 +222,16 @@ export default function AdminServicesPage() {
   const handleEdit = (service: Service) => {
     setEditingService(service);
     setFormData({
+      name: getDisplayText(service.nameKey, t), // Show display text (translated or direct)
+      description: getDisplayText(service.descKey, t), // Show display text (translated or direct)
       nameKey: service.nameKey,
       descKey: service.descKey,
       price: service.price.toString(),
       duration: service.duration,
       image: service.image,
       categoryId: service.category.id,
-      subCategoryId: service.subCategory.id,
-      order: service.order.toString(),
+      subCategoryId: service.subCategory?.id || '',
+      subSubCategoryId: service.subSubCategory?.id || '',
       isActive: service.isActive,
     });
     setIsModalOpen(true);
@@ -175,7 +261,10 @@ export default function AdminServicesPage() {
 
   const resetForm = () => {
     setEditingService(null);
+    setSelectedFile(null);
     setFormData({
+      name: '',
+      description: '',
       nameKey: '',
       descKey: '',
       price: '',
@@ -183,7 +272,7 @@ export default function AdminServicesPage() {
       image: '',
       categoryId: '',
       subCategoryId: '',
-      order: '0',
+      subSubCategoryId: '',
       isActive: true,
     });
   };
@@ -191,14 +280,15 @@ export default function AdminServicesPage() {
   const filteredServices = services.filter((service) => {
     const matchesSearch =
       searchQuery === '' ||
-      service.nameKey.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      service.descKey.toLowerCase().includes(searchQuery.toLowerCase());
+      getDisplayText(service.nameKey, t).toLowerCase().includes(searchQuery.toLowerCase()) ||
+      getDisplayText(service.descKey, t).toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
       !filterCategory || service.category.slug === filterCategory;
     return matchesSearch && matchesCategory;
   });
 
   const selectedCategory = categories.find((c) => c.id === formData.categoryId);
+  const selectedSubCategory = selectedCategory?.subCategories.find((s) => s.id === formData.subCategoryId);
 
   return (
     <div className="space-y-6">
@@ -307,11 +397,11 @@ export default function AdminServicesPage() {
               className="w-full px-3 py-2 rounded-sm bg-white shadow-sm focus:shadow-md focus:ring-2 focus:ring-gray-400 outline-none text-sm transition-all"
             >
               <option value="">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.slug}>
-                  {t(cat.nameKey)}
-                </option>
-              ))}
+                    {(categories || []).map((cat) => (
+                      <option key={cat.id} value={cat.slug}>
+                        {t(cat.nameKey)}
+                      </option>
+                    ))}
             </select>
           </div>
         </div>
@@ -385,7 +475,7 @@ export default function AdminServicesPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
-                {filteredServices.map((service) => (
+                {(filteredServices || []).map((service) => (
                   <tr key={service.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
@@ -398,23 +488,30 @@ export default function AdminServicesPage() {
                             className="object-cover"
                           />
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="text-sm font-semibold text-gray-900 mb-1">
-                            {t(service.nameKey)}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {service.nameKey}
-                          </div>
-                        </div>
+                         <div className="min-w-0 flex-1">
+                           <div className="text-sm font-semibold text-gray-900 mb-1">
+                             {getDisplayText(service.nameKey, t)}
+                           </div>
+                           <div className="text-xs text-gray-500 line-clamp-2">
+                             {getDisplayText(service.descKey, t)}
+                           </div>
+                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900">
                         {t(service.category.nameKey)}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {t(service.subCategory.nameKey)}
-                      </div>
+                      {service.subCategory && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          {t(service.subCategory.nameKey)}
+                        </div>
+                      )}
+                      {service.subSubCategory && (
+                        <div className="text-xs text-amber-600 mt-1 font-medium">
+                          {t(service.subSubCategory.nameKey)}
+                        </div>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-semibold text-gray-900">
@@ -499,48 +596,65 @@ export default function AdminServicesPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Name Key (Translation)
+                    Service Name
                   </label>
                   <input
                     type="text"
-                    value={formData.nameKey}
+                    value={formData.name}
                     onChange={(e) =>
-                      setFormData({ ...formData, nameKey: e.target.value })
+                      setFormData({ ...formData, name: e.target.value })
                     }
+                    placeholder="e.g., Back Facial, Aromatherapy Session"
                     className="w-full px-3 py-2 rounded-sm bg-white shadow-sm focus:shadow-md focus:ring-2 focus:ring-gray-400 outline-none transition-all"
                     required
                   />
+                  {/* {formData.name && (
+                    <div className="mt-1 text-xs text-gray-500">
+                      Translation key: <code className="bg-gray-100 px-1 rounded">{generateTranslationKey(formData.name, 'name')}</code>
+                    </div>
+                  )} */}
                 </div>
 
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Description Key (Translation)
+                    Description
                   </label>
-                  <input
-                    type="text"
-                    value={formData.descKey}
+                  <textarea
+                    value={formData.description}
                     onChange={(e) =>
-                      setFormData({ ...formData, descKey: e.target.value })
+                      setFormData({ ...formData, description: e.target.value })
                     }
+                    placeholder="Describe the service benefits and what's included..."
+                    rows={3}
                     className="w-full px-3 py-2 rounded-sm bg-white shadow-sm focus:shadow-md focus:ring-2 focus:ring-gray-400 outline-none transition-all"
                     required
                   />
+                  {/* {formData.description && (
+                    <div className="mt-1 text-xs text-gray-500">
+                      Translation key: <code className="bg-gray-100 px-1 rounded">{generateTranslationKey(formData.description, 'description')}</code>
+                    </div>
+                  )} */}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Price
+                    Price (¥)
                   </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) =>
-                      setFormData({ ...formData, price: e.target.value })
-                    }
-                    className="w-full px-3 py-2 rounded-sm bg-white shadow-sm focus:shadow-md focus:ring-2 focus:ring-gray-400 outline-none transition-all"
-                    required
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">¥</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.price}
+                      onChange={(e) =>
+                        setFormData({ ...formData, price: e.target.value })
+                      }
+                      className="w-full pl-8 pr-3 py-2 rounded-sm bg-white shadow-sm focus:shadow-md focus:ring-2 focus:ring-gray-400 outline-none transition-all"
+                      placeholder="5000"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -553,7 +667,7 @@ export default function AdminServicesPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, duration: e.target.value })
                     }
-                    placeholder="60 min"
+                    placeholder="e.g., 60 min, 90 min, 2 hours"
                     className="w-full px-3 py-2 rounded-sm bg-white shadow-sm focus:shadow-md focus:ring-2 focus:ring-gray-400 outline-none transition-all"
                     required
                   />
@@ -561,7 +675,7 @@ export default function AdminServicesPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Category
+                    Main Category
                   </label>
                   <select
                     value={formData.categoryId}
@@ -570,13 +684,14 @@ export default function AdminServicesPage() {
                         ...formData,
                         categoryId: e.target.value,
                         subCategoryId: '',
+                        subSubCategoryId: '',
                       })
                     }
                     className="w-full px-3 py-2 rounded-sm bg-white shadow-sm focus:shadow-md focus:ring-2 focus:ring-gray-400 outline-none transition-all"
                     required
                   >
                     <option value="">Select Category</option>
-                    {categories.map((cat) => (
+                    {(categories || []).map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {t(cat.nameKey)}
                       </option>
@@ -591,10 +706,13 @@ export default function AdminServicesPage() {
                   <select
                     value={formData.subCategoryId}
                     onChange={(e) =>
-                      setFormData({ ...formData, subCategoryId: e.target.value })
+                      setFormData({ 
+                        ...formData, 
+                        subCategoryId: e.target.value,
+                        subSubCategoryId: '',
+                      })
                     }
                     className="w-full px-3 py-2 rounded-sm bg-white shadow-sm focus:shadow-md focus:ring-2 focus:ring-gray-400 outline-none transition-all"
-                    required
                     disabled={!formData.categoryId}
                   >
                     <option value="">Select Sub-Category</option>
@@ -606,35 +724,41 @@ export default function AdminServicesPage() {
                   </select>
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Specialty
+                  </label>
+                  <select
+                    value={formData.subSubCategoryId}
+                    onChange={(e) =>
+                      setFormData({ ...formData, subSubCategoryId: e.target.value })
+                    }
+                    className="w-full px-3 py-2 rounded-sm bg-white shadow-sm focus:shadow-md focus:ring-2 focus:ring-gray-400 outline-none transition-all"
+                    disabled={!formData.subCategoryId}
+                  >
+                    <option value="">Select Specialty</option>
+                    {(selectedSubCategory?.subSubCategories || []).map((subSub) => (
+                      <option key={subSub.id} value={subSub.id}>
+                        {t(subSub.nameKey)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Image Path
+                    Service Image
                   </label>
-                  <input
-                    type="text"
+                  <ImageUpload
                     value={formData.image}
-                    onChange={(e) =>
-                      setFormData({ ...formData, image: e.target.value })
+                    file={selectedFile}
+                    onChange={(imageUrl) =>
+                      setFormData({ ...formData, image: imageUrl })
                     }
-                    placeholder="/packages/1.jpg"
-                    className="w-full px-3 py-2 rounded-sm bg-white shadow-sm focus:shadow-md focus:ring-2 focus:ring-gray-400 outline-none transition-all"
-                    required
+                    onFileChange={(file) => setSelectedFile(file)}
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Order
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.order}
-                    onChange={(e) =>
-                      setFormData({ ...formData, order: e.target.value })
-                    }
-                    className="w-full px-3 py-2 rounded-sm bg-white shadow-sm focus:shadow-md focus:ring-2 focus:ring-gray-400 outline-none transition-all"
-                  />
-                </div>
 
                 <div className="flex items-center">
                   <label className="flex items-center cursor-pointer">

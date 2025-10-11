@@ -15,6 +15,18 @@ export async function GET() {
     const categories = await prisma.serviceCategory.findMany({
       include: {
         subCategories: {
+          include: {
+            subSubCategories: {
+              orderBy: {
+                order: 'asc',
+              },
+            },
+            _count: {
+              select: {
+                services: true,
+              },
+            },
+          },
           orderBy: {
             order: 'asc',
           },

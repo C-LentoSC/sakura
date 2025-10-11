@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import prisma from '@/app/lib/prisma';
 import { verifySession } from '@/app/lib/dal';
 import { z } from 'zod';
 
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid data', details: error.errors },
+        { error: 'Invalid data', details: error.issues },
         { status: 400 }
       );
     }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import prisma from '@/app/lib/prisma';
 import { verifySession } from '@/app/lib/dal';
 import { z } from 'zod';
 
@@ -13,8 +13,9 @@ const SubSubCategoryUpdateSchema = z.object({
 // PUT /api/admin/subsubcategories/[id] - Update sub-sub-category
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const { isAuth } = await verifySession();
     if (!isAuth) {
@@ -26,7 +27,7 @@ export async function PUT(
 
     // Check if sub-sub-category exists
     const existing = await prisma.serviceSubSubCategory.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existing) {
@@ -43,7 +44,7 @@ export async function PUT(
         where: {
           slug: validatedData.slug,
           subCategoryId,
-          id: { not: params.id },
+          id: { not: id },
         },
       });
 
@@ -56,7 +57,7 @@ export async function PUT(
     }
 
     const subSubCategory = await prisma.serviceSubSubCategory.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
       include: {
         subCategory: {
@@ -76,7 +77,7 @@ export async function PUT(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid data', details: error.errors },
+        { error: 'Invalid data', details: error.issues },
         { status: 400 }
       );
     }
@@ -92,8 +93,9 @@ export async function PUT(
 // DELETE /api/admin/subsubcategories/[id] - Delete sub-sub-category
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const { isAuth } = await verifySession();
     if (!isAuth) {
@@ -102,7 +104,7 @@ export async function DELETE(
 
     // Check if sub-sub-category exists
     const existing = await prisma.serviceSubSubCategory.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -128,7 +130,7 @@ export async function DELETE(
     }
 
     await prisma.serviceSubSubCategory.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Sub-sub-category deleted successfully' });

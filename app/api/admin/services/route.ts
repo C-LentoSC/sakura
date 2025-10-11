@@ -116,7 +116,7 @@ export async function POST(request: Request) {
         categoryId,
         subCategoryId: subCategoryId || null,
         subSubCategoryId: subSubCategoryId || null,
-        order: order || 0,
+        order: parseInt(order) || 0,
         isActive: isActive !== undefined ? isActive : true,
       },
       include: {
