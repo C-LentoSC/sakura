@@ -22,6 +22,10 @@ interface Service {
   id: string;
   nameKey: string;
   descKey: string;
+  nameEn?: string | null;
+  nameJa?: string | null;
+  descEn?: string | null;
+  descJa?: string | null;
   price: number;
   duration: string;
   image: string;
@@ -29,16 +33,22 @@ interface Service {
     id: string;
     slug: string;
     nameKey: string;
+    nameEn?: string | null;
+    nameJa?: string | null;
   };
   subCategory?: {
     id: string;
     slug: string;
     nameKey: string;
+    nameEn?: string | null;
+    nameJa?: string | null;
   };
   subSubCategory?: {
     id: string;
     slug: string;
     nameKey: string;
+    nameEn?: string | null;
+    nameJa?: string | null;
   };
 }
 
@@ -46,6 +56,8 @@ interface SubSubCategory {
   id: string;
   slug: string;
   nameKey: string;
+  nameEn?: string | null;
+  nameJa?: string | null;
   _count?: {
     services: number;
   };
@@ -55,6 +67,8 @@ interface SubCategory {
   id: string;
   slug: string;
   nameKey: string;
+  nameEn?: string | null;
+  nameJa?: string | null;
   subSubCategories: SubSubCategory[];
   _count?: {
     services: number;
@@ -65,6 +79,8 @@ interface Category {
   id: string;
   slug: string;
   nameKey: string;
+  nameEn?: string | null;
+  nameJa?: string | null;
   subCategories: SubCategory[];
   _count?: {
     services: number;
@@ -72,7 +88,7 @@ interface Category {
 }
 
 export default function ServicesPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [categories, setCategories] = useState<Category[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [selectedMainCategory, setSelectedMainCategory] = useState('head-spa');
@@ -157,24 +173,52 @@ export default function ServicesPage() {
     return () => ctx.revert();
   }, [services]);
 
+  const getDisplayText = (key: string, translate: (k: string) => string) => {
+    const translated = translate(key);
+    if (translated && translated !== key) return translated;
+    const pretty = (key || '').split('.').pop() || '';
+    return pretty.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
+  const renderName = (r: { nameKey: string; nameEn?: string | null; nameJa?: string | null }) => {
+    const val = language === 'ja' ? r.nameJa || r.nameEn : r.nameEn || r.nameJa;
+    if (val && String(val).trim().length > 0) return String(val);
+    return getDisplayText(r.nameKey, t);
+  };
+
+  const getServiceName = (s: Service) => {
+    const val = language === 'ja' ? s.nameJa || s.nameEn : s.nameEn || s.nameJa;
+    if (val && String(val).trim().length > 0) return String(val);
+    return getDisplayText(s.nameKey, t);
+  };
+
+  const getServiceDesc = (s: Service) => {
+    const val = language === 'ja' ? s.descJa || s.descEn : s.descEn || s.descJa;
+    if (val && String(val).trim().length > 0) return String(val);
+    return getDisplayText(s.descKey, t);
+  };
+
   // Filter services by search query (client-side)
-  const filteredServices = services.filter(service =>
-    searchQuery === '' ||
-    t(service.nameKey).toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t(service.descKey).toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredServices = services.filter((service) => {
+    if (searchQuery === '') return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      getServiceName(service).toLowerCase().includes(q) ||
+      getServiceDesc(service).toLowerCase().includes(q)
+    );
+  });
 
   // Get current category and its sub-categories
   const currentCategory = categories.find(cat => cat.slug === selectedMainCategory);
   const currentSubCategories = [
-    { id: 'all', slug: 'all', nameKey: 'services.subCategories.all', subSubCategories: [] },
+    { id: 'all', slug: 'all', nameKey: 'services.subCategories.all', nameEn: 'All', nameJa: 'すべて', subSubCategories: [] as SubSubCategory[] },
     ...(currentCategory?.subCategories || [])
   ];
 
   // Get current sub-category and its sub-sub-categories
   const currentSubCategory = currentSubCategories.find(sub => sub.slug === selectedSubCategory);
   const currentSubSubCategories = selectedSubCategory !== 'all' && currentSubCategory?.subSubCategories ? [
-    { id: 'all', slug: 'all', nameKey: 'services.subCategories.all' },
+    { id: 'all', slug: 'all', nameKey: 'services.subCategories.all', nameEn: 'All', nameJa: 'すべて' } as SubSubCategory,
     ...currentSubCategory.subSubCategories
   ] : [];
 
@@ -235,7 +279,7 @@ export default function ServicesPage() {
                     : 'bg-white/90 backdrop-blur-sm text-secondary/70 hover:text-secondary hover:bg-white hover:shadow-sm'
                 }`}
               >
-                {t(category.nameKey)}
+                {renderName(category)}
               </button>
             ))}
           </div>
@@ -255,7 +299,7 @@ export default function ServicesPage() {
                     : 'bg-white/70 backdrop-blur-sm text-secondary/60 hover:text-secondary hover:bg-white hover:shadow-sm'
                 }`}
               >
-                {t(subCategory.nameKey)}
+                {renderName(subCategory)}
               </button>
             ))}
           </div>
@@ -273,7 +317,7 @@ export default function ServicesPage() {
                       : 'bg-white/60 backdrop-blur-sm text-secondary/50 hover:text-secondary hover:bg-white hover:shadow-sm'
                   }`}
                 >
-                  {t(subSubCategory.nameKey)}
+                  {renderName(subSubCategory)}
                 </button>
               ))}
             </div>
@@ -299,7 +343,7 @@ export default function ServicesPage() {
                     <div className="relative w-full sm:w-44 h-40 sm:h-auto flex-shrink-0 overflow-hidden">
                       <Image
                         src={service.image}
-                        alt={t(service.nameKey)}
+                        alt={getServiceName(service)}
                         fill
                         className="object-cover"
                         sizes="(max-width: 640px) 100vw, 176px"
@@ -320,10 +364,10 @@ export default function ServicesPage() {
                     <div className="flex-1 p-4 flex flex-col justify-between">
                       <div>
                         <h3 className="text-lg font-sakura text-secondary mb-2">
-                          {t(service.nameKey)}
+                          {getServiceName(service)}
                         </h3>
                         <p className="text-secondary/70 text-xs leading-relaxed mb-3 line-clamp-2">
-                          {t(service.descKey)}
+                          {getServiceDesc(service)}
                         </p>
                       </div>
 

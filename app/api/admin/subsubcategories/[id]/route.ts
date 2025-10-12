@@ -8,6 +8,8 @@ const SubSubCategoryUpdateSchema = z.object({
   nameKey: z.string().min(1).optional(),
   subCategoryId: z.string().min(1).optional(),
   order: z.number().int().min(0).optional(),
+  nameEn: z.string().optional(),
+  nameJa: z.string().optional(),
 });
 
 // PUT /api/admin/subsubcategories/[id] - Update sub-sub-category
@@ -58,7 +60,11 @@ export async function PUT(
 
     const subSubCategory = await prisma.serviceSubSubCategory.update({
       where: { id },
-      data: validatedData,
+      data: {
+        ...validatedData,
+        ...(typeof validatedData.nameEn !== 'undefined' ? { nameEn: validatedData.nameEn } : {}),
+        ...(typeof validatedData.nameJa !== 'undefined' ? { nameJa: validatedData.nameJa } : {}),
+      },
       include: {
         subCategory: {
           include: {

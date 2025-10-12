@@ -28,6 +28,7 @@ export default async function ProtectedLayout({
       <FallingPetals />
       <Header />
       <Chatbot />
+      <div className="absolute inset-0 bg-pink-100/20 backdrop-blur-xs pointer-events-none z-0" />
       
       <main className="relative z-10 px-4 sm:px-6 lg:px-8 pt-20 pb-12">
         <div className="max-w-7xl mx-auto">

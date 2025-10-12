@@ -64,6 +64,8 @@ model ServiceCategory {
   id            String               @id @default(cuid())
   slug          String               @unique
   nameKey       String
+  nameEn        String?              @default("")
+  nameJa        String?              @default("")
   order         Int                  @default(0)
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
@@ -79,6 +81,8 @@ model ServiceSubCategory {
   id         String                    @id @default(cuid())
   slug       String
   nameKey    String
+  nameEn     String?                   @default("")
+  nameJa     String?                   @default("")
   categoryId String
   order      Int                       @default(0)
   createdAt  DateTime                  @default(now())
@@ -97,6 +101,8 @@ model ServiceSubSubCategory {
   id            String             @id @default(cuid())
   slug          String
   nameKey       String
+  nameEn        String?            @default("")
+  nameJa        String?            @default("")
   subCategoryId String
   order         Int                @default(0)
   createdAt     DateTime           @default(now())
@@ -114,6 +120,10 @@ model Service {
   id               String                   @id @default(cuid())
   nameKey          String
   descKey          String
+  nameEn           String?                  @default("")
+  nameJa           String?                  @default("")
+  descEn           String?                  @default("")
+  descJa           String?                  @default("")
   price            Float
   duration         String
   image            String

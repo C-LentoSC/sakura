@@ -51,12 +51,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { slug, nameKey, categoryId, order } = body;
+    const { slug, nameKey, categoryId, order, nameEn = '', nameJa = '' } = body;
 
     const subCategory = await prisma.serviceSubCategory.create({
       data: {
         slug,
         nameKey,
+        nameEn,
+        nameJa,
         categoryId,
         order: order || 0,
       },
@@ -84,11 +86,15 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { id, ...data } = body;
+    const { id, nameEn, nameJa, ...rest } = body as { id: string; nameEn?: string; nameJa?: string; [k: string]: unknown };
 
     const subCategory = await prisma.serviceSubCategory.update({
       where: { id },
-      data,
+      data: {
+        ...rest,
+        ...(typeof nameEn !== 'undefined' ? { nameEn } : {}),
+        ...(typeof nameJa !== 'undefined' ? { nameJa } : {}),
+      },
       include: {
         category: true,
       },

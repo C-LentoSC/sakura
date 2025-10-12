@@ -6,6 +6,8 @@ import "./globals.css";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import { ErrorBoundary } from "./components";
+import { cookies } from "next/headers";
+import type { Language } from "./locales/config";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,19 +32,23 @@ export const metadata: Metadata = {
   description: "A cozy place for relaxation and rejuvenation",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Read preferred language from cookie on the server
+  const cookieStore = await cookies();
+  const cookieLang = cookieStore.get('sakura-lang')?.value as Language | undefined;
+  const initialLanguage: Language = cookieLang === 'ja' ? 'ja' : 'en';
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html lang={initialLanguage} data-scroll-behavior="smooth">
       <body
         className={`${inter.variable} ${sakuraFont.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <ErrorBoundary>
-          <LanguageProvider>
+          <LanguageProvider initialLanguage={initialLanguage}>
             <Suspense fallback={null}>
               <LoadingProvider>
                 {children}

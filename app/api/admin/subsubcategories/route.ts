@@ -8,6 +8,8 @@ const SubSubCategorySchema = z.object({
   nameKey: z.string().min(1),
   subCategoryId: z.string().min(1),
   order: z.number().int().min(0).optional(),
+  nameEn: z.string().optional(),
+  nameJa: z.string().optional(),
 });
 
 // GET /api/admin/subsubcategories - List all sub-sub-categories
@@ -77,7 +79,14 @@ export async function POST(request: NextRequest) {
     }
 
     const subSubCategory = await prisma.serviceSubSubCategory.create({
-      data: validatedData,
+      data: {
+        slug: validatedData.slug,
+        nameKey: validatedData.nameKey,
+        subCategoryId: validatedData.subCategoryId,
+        order: validatedData.order ?? 0,
+        nameEn: validatedData.nameEn ?? '',
+        nameJa: validatedData.nameJa ?? '',
+      },
       include: {
         subCategory: {
           include: {

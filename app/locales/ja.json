@@ -754,5 +754,74 @@
       "title": "予約に失敗しました",
       "message": "申し訳ございません。ご予約の送信中にエラーが発生しました。もう一度お試しいただくか、直接お問い合わせください。"
     }
+  },
+  "admin": {
+    "sidebar": {
+      "brandTitle": "Sakura 管理",
+      "brandSubtitle": "管理パネル",
+      "nav": {
+        "dashboard": "ダッシュボード",
+        "services": "サービス",
+        "categories": "カテゴリ",
+        "bookings": "予約",
+        "users": "ユーザー",
+        "settings": "設定"
+      },
+      "profile": {
+        "defaultName": "管理者",
+        "defaultEmail": "admin@sakura.com"
+      },
+      "quickActions": {
+        "viewSite": "サイトを見る",
+        "logout": "ログアウト"
+      }
+    },
+    "services": {
+      "title": "サービス管理",
+      "subtitle": "サービスとプランを管理します",
+      "add": "＋ 新しいサービスを追加",
+      "searchLabel": "サービスを検索",
+      "searchPlaceholder": "名前・説明・カテゴリで検索...",
+      "filterByCategory": "カテゴリで絞り込み",
+      "allCategories": "すべてのカテゴリ",
+      "table": {
+        "services": "サービス一覧",
+        "details": "サービス詳細",
+        "category": "カテゴリ",
+        "pricing": "価格",
+        "status": "ステータス",
+        "actions": "アクション"
+      },
+      "status": {
+        "active": "アクティブ",
+        "inactive": "非アクティブ"
+      },
+      "modal": {
+        "addTitle": "新しいサービスを追加",
+        "editTitle": "サービスを編集"
+      },
+      "form": {
+        "name": "サービス名",
+        "nameEn": "英語名（任意）",
+        "nameJa": "日本語名（任意）",
+        "desc": "説明",
+        "descEn": "英語の説明（任意）",
+        "descJa": "日本語の説明（任意）",
+        "price": "価格（¥）",
+        "duration": "所要時間",
+        "category": "メインカテゴリ",
+        "subcategory": "サブカテゴリ",
+        "specialty": "スペシャリティ",
+        "selectCategory": "カテゴリを選択",
+        "selectSubCategory": "サブカテゴリを選択",
+        "selectSpecialty": "スペシャリティを選択",
+        "image": "サービス画像",
+        "save": "保存",
+        "cancel": "キャンセル",
+        "create": "作成",
+        "update": "更新",
+        "saving": "保存中..."
+      }
+    }
   }
 }

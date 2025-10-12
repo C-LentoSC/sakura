@@ -750,4 +750,74 @@
       "message": "Sorry, there was an error submitting your booking. Please try again or contact us directly."
     }
   }
+  ,
+  "admin": {
+    "sidebar": {
+      "brandTitle": "Sakura Admin",
+      "brandSubtitle": "Management Panel",
+      "nav": {
+        "dashboard": "Dashboard",
+        "services": "Services",
+        "categories": "Categories",
+        "bookings": "Bookings",
+        "users": "Users",
+        "settings": "Settings"
+      },
+      "profile": {
+        "defaultName": "Admin",
+        "defaultEmail": "admin@sakura.com"
+      },
+      "quickActions": {
+        "viewSite": "View Site",
+        "logout": "Logout"
+      }
+    },
+    "services": {
+      "title": "Service Management",
+      "subtitle": "Manage your service packages and offerings",
+      "add": "+ Add New Service",
+      "searchLabel": "Search Services",
+      "searchPlaceholder": "Search by name, description, or category...",
+      "filterByCategory": "Filter by Category",
+      "allCategories": "All Categories",
+      "table": {
+        "services": "Services List",
+        "details": "Service Details",
+        "category": "Category",
+        "pricing": "Pricing",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "modal": {
+        "addTitle": "Add New Service",
+        "editTitle": "Edit Service"
+      },
+      "form": {
+        "name": "Service Name",
+        "nameEn": "English name (optional)",
+        "nameJa": "Japanese name (optional)",
+        "desc": "Description",
+        "descEn": "English description (optional)",
+        "descJa": "Japanese description (optional)",
+        "price": "Price (¥)",
+        "duration": "Duration",
+        "category": "Main Category",
+        "subcategory": "Sub-Category",
+        "specialty": "Specialty",
+        "selectCategory": "Select Category",
+        "selectSubCategory": "Select Sub-Category",
+        "selectSpecialty": "Select Specialty",
+        "image": "Service Image",
+        "save": "Save",
+        "cancel": "Cancel",
+        "create": "Create",
+        "update": "Update",
+        "saving": "Saving..."
+      }
+    }
+  }
 }

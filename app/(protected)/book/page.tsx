@@ -111,7 +111,28 @@ function BookPageContent() {
     fetchService();
   }, [preSelectedServiceId, router, t]);
 
-  // Session auto-fill will be implemented with new auth system
+  // Auto-fill from logged-in user (name, email)
+  useEffect(() => {
+    let cancelled = false;
+    const loadUser = async () => {
+      try {
+        const res = await fetch('/api/me', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && data?.isAuth && data.user) {
+          setbookingsData(prev => ({
+            ...prev,
+            name: prev.name || data.user.name || '',
+            email: prev.email || data.user.email || '',
+          }));
+        }
+      } catch {
+        // ignore
+      }
+    };
+    loadUser();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -318,6 +339,24 @@ function BookPageContent() {
       const result = addBooking(bookingData);
       
       if (result.success) {
+        // Persist booking to database for admin visibility
+        try {
+          await fetch('/api/bookings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              serviceId: bookingsData.serviceId,
+              date: bookingsData.date,
+              time: bookingsData.time,
+              name: bookingsData.name,
+              email: bookingsData.email,
+              phone: bookingsData.phone,
+              notes: bookingsData.notes,
+            }),
+          });
+        } catch {
+          // Non-blocking: even if DB save fails, the client flow continues
+        }
         setSubmitStatus('success');
         
         // Redirect to bookings page after 2 seconds

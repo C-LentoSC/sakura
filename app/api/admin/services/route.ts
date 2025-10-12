@@ -96,6 +96,10 @@ export async function POST(request: Request) {
     const {
       nameKey,
       descKey,
+      nameEn = '',
+      nameJa = '',
+      descEn = '',
+      descJa = '',
       price,
       duration,
       image,
@@ -110,6 +114,10 @@ export async function POST(request: Request) {
       data: {
         nameKey,
         descKey,
+        nameEn,
+        nameJa,
+        descEn,
+        descJa,
         price: parseFloat(price),
         duration,
         image,
@@ -145,15 +153,16 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { id, ...data } = body;
+    const { id, ...data } = body as { id: string; [k: string]: unknown };
 
-    if (data.price) {
-      data.price = parseFloat(data.price);
+    const dataRecord = data as Record<string, unknown>;
+    if (typeof dataRecord.price === 'string') {
+      dataRecord.price = parseFloat(dataRecord.price);
     }
 
     const service = await prisma.service.update({
       where: { id },
-      data,
+      data: dataRecord,
       include: {
         category: true,
         subCategory: true,

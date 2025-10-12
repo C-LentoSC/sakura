@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '@/app/contexts/LanguageContext';
@@ -8,14 +8,7 @@ import { formatCurrency } from '@/app/constants/currency';
 import { loadBookings, updateBookingStatus, type BookingData } from '@/app/utils/bookingStorage';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import {
-  Header,
-  BackgroundPattern,
-  CherryBlossomTrees,
-  FallingPetals,
-  Footer,
-  Chatbot
-} from '@/app/components';
+import { Chatbot } from '@/app/components';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -23,8 +16,8 @@ gsap.registerPlugin(ScrollTrigger);
 type bookings = BookingData;
 
 export default function MybookingsPage() {
-  const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<'active' | 'completed' | 'cancelled' | 'all'>('active');
+  const { t, language } = useLanguage();
+  const [activeTab, setActiveTab] = useState<'booked' | 'pending' | 'canceled' | 'all'>('booked');
   const [bookings, setBookings] = useState<bookings[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState<number | null>(null);
@@ -63,22 +56,91 @@ export default function MybookingsPage() {
     return () => ctx.revert();
   }, []); // Remove activeTab dependency to prevent re-animation
 
-  // Initialize bookings data
+  // Helper types for service enrichment
+  interface ServiceLite { id: string; nameKey: string; nameEn?: string | null; nameJa?: string | null; price: number; duration: string; image: string }
+  const renderName = useCallback((r: { nameKey: string; nameEn?: string | null; nameJa?: string | null }) => {
+    const val = language === 'ja' ? r.nameJa || r.nameEn : r.nameEn || r.nameJa;
+    if (val && String(val).trim().length > 0) return String(val);
+    const translated = t(r.nameKey);
+    if (translated && translated !== r.nameKey) return translated;
+    const key = (r.nameKey || '').split('.').pop() || '';
+    return key.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }, [language, t]);
+
+  // Initialize bookings data (merge server + local for resilience)
   useEffect(() => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // Load real bookings from storage
-      const userBookings = loadBookings();
-      setBookings(userBookings);
-    } catch (err) {
-      console.error('Failed to load bookings:', err);
-      setError('Failed to load bookings. Please refresh the page.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    let cancelled = false;
+    const load = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // Read local first
+        let local = loadBookings();
+
+        // Fetch server bookings for logged-in user
+        const res = await fetch('/api/my-bookings', { cache: 'no-store' });
+        let merged = local;
+        if (res.ok) {
+          const data = await res.json();
+          const server = Array.isArray(data.bookings) ? data.bookings : [];
+
+          // Try to enrich with service details in one call
+          let services: ServiceLite[] = [];
+          try {
+            const sres = await fetch('/api/services');
+            if (sres.ok) {
+              const sdata = await sres.json();
+              services = Array.isArray(sdata.services) ? sdata.services : [];
+            }
+          } catch {}
+
+          const serverAsLocal = server.map((b: { serviceId: string; date: string; time: string; status?: string; createdAt?: string }) => {
+            const svc = services.find((s) => s.id === b.serviceId);
+            return {
+              id: Number.MAX_SAFE_INTEGER - Math.floor(Math.random() * 1e6), // prevent collision with local ids
+              service: svc ? renderName(svc) : 'Service',
+              image: svc?.image || '/packages/1.jpg',
+              date: b.date,
+              time: b.time,
+              duration: svc?.duration || '60 min',
+              price: svc?.price ?? 0,
+              status: (b.status || 'CONFIRMED').toUpperCase(),
+              createdAt: new Date(b.createdAt || Date.now()).toISOString().split('T')[0],
+            } as bookings;
+          });
+
+          // Re-localize local-only bookings by best name match
+          if (services.length > 0 && local.length > 0) {
+            local = local.map((lb) => {
+              const match = services.find((s) => {
+                const candidates = [s.nameEn, s.nameJa, t(s.nameKey)].filter(Boolean).map((x) => String(x).trim().toLowerCase());
+                return candidates.includes(lb.service.trim().toLowerCase());
+              });
+              if (match) {
+                return { ...lb, service: renderName(match) };
+              }
+              return lb;
+            });
+          }
+
+          // Merge by (date+time) uniqueness to avoid duplicates
+          const key = (x: bookings) => `${x.date}|${x.time}|${x.service}`;
+          const map = new Map<string, bookings>();
+          [...serverAsLocal, ...local].forEach((b) => map.set(key(b), b));
+          merged = Array.from(map.values());
+        }
+
+        if (!cancelled) setBookings(merged);
+      } catch (err) {
+        console.error('Failed to load bookings:', err);
+        if (!cancelled) setError('Failed to load bookings. Please refresh the page.');
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [renderName, t]);
 
   // Booking management functions
   const handleCancelBooking = async (bookingId: number) => {
@@ -130,44 +192,58 @@ export default function MybookingsPage() {
 
   const filteredbookings = bookings.filter((booking: bookings) => {
     if (activeTab === 'all') return true;
-    if (activeTab === 'active') return booking.status === 'CONFIRMED';
-    if (activeTab === 'completed') return booking.status === 'COMPLETED';
-    if (activeTab === 'cancelled') return booking.status === 'CANCELLED' || booking.status === 'NO-SHOW';
-    return false;
+    // Normalize to lowercase for comparison
+    const s = String(booking.status).toLowerCase();
+    if (activeTab === 'booked') return s === 'booked' || s === 'confirmed';
+    if (activeTab === 'pending') return s === 'pending' || s === 'no-show';
+    if (activeTab === 'canceled') return s === 'canceled' || s === 'cancelled';
+    return true;
   });
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'CONFIRMED': return 'text-blue-600 bg-blue-100';
-      case 'COMPLETED': return 'text-green-600 bg-green-100';
-      case 'CANCELLED': return 'text-red-600 bg-red-100';
-      case 'NO-SHOW': return 'text-gray-600 bg-gray-100';
-      default: return 'text-gray-600 bg-gray-100';
+    const s = String(status).toLowerCase();
+    switch (s) {
+      case 'booked':
+      case 'confirmed':
+        return 'text-blue-600 bg-blue-100';
+      case 'completed':
+        return 'text-green-600 bg-green-100';
+      case 'canceled':
+      case 'cancelled':
+        return 'text-red-600 bg-red-100';
+      case 'pending':
+      case 'no-show':
+        return 'text-gray-600 bg-gray-100';
+      default:
+        return 'text-gray-600 bg-gray-100';
     }
   };
 
   const getStatusText = (status: string) => {
-    switch (status) {
-      case 'CONFIRMED': return t('bookings.status.confirmed');
-      case 'COMPLETED': return t('bookings.status.completed');
-      case 'CANCELLED': return t('bookings.status.cancelled');
-      case 'NO-SHOW': return t('bookings.status.noShow');
-      default: return status;
+    const s = String(status).toLowerCase();
+    switch (s) {
+      case 'booked':
+      case 'confirmed':
+        return language === 'ja' ? '予約済み' : 'BOOKED';
+      case 'pending':
+      case 'no-show':
+        return language === 'ja' ? '保留中' : 'PENDING';
+      case 'canceled':
+      case 'cancelled':
+        return language === 'ja' ? 'キャンセル済み' : 'CANCELED';
+      case 'completed':
+        return t('bookings.status.completed');
+      default:
+        return s.toUpperCase();
     }
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
-      <BackgroundPattern />
-      <CherryBlossomTrees />
-      <FallingPetals />
-      <Header />
+    <div className="relative">
       <Chatbot />
 
-      <div className="absolute inset-0 bg-pink-100/20 backdrop-blur-xs pointer-events-none z-0" />
-
-      <main className="relative z-10 pt-20 sm:pt-24">
-        {/* Hero Section */}
+      {/* Hero Section */}
+      <div className="relative z-10 pt-2">
         <div ref={heroRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-8 sm:py-12">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-sakura text-secondary mb-4">
@@ -178,24 +254,30 @@ export default function MybookingsPage() {
             </p>
           </div>
         </div>
+      </div>
 
-        {/* bookings Section */}
-        <div ref={bookingsRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl pb-16 sm:pb-20">
+      {/* bookings Section */}
+      <div ref={bookingsRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl pb-16 sm:pb-20">
           {/* Tabs */}
           <div className="flex justify-center mb-6 sm:mb-8 px-4 sm:px-0">
             <div className="bg-white/90 backdrop-blur-sm rounded-xl p-1.5 sm:p-2 shadow-md border border-primary/10 w-full sm:w-auto">
               <div className="flex space-x-1 sm:space-x-2">
-                {(['active', 'completed', 'cancelled', 'all'] as const).map((tab) => (
+                {([
+                  { key: 'booked', label: language === 'ja' ? '予約済み' : 'Booked' },
+                  { key: 'pending', label: language === 'ja' ? '保留中' : 'Pending' },
+                  { key: 'canceled', label: language === 'ja' ? 'キャンセル済み' : 'Cancelled' },
+                  { key: 'all', label: t('bookings.tabs.all') },
+                ] as const).map((tab) => (
                   <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key as 'booked' | 'pending' | 'canceled' | 'all')}
                     className={`flex-1 sm:flex-none px-3 sm:px-6 py-2 rounded-lg font-medium transition-all duration-300 text-xs sm:text-sm whitespace-nowrap ${
-                      activeTab === tab
+                      activeTab === tab.key
                         ? 'bg-gradient-to-r from-primary to-pink-400 text-white shadow-md'
                         : 'text-secondary/70 hover:text-secondary hover:bg-primary/5'
                     }`}
                   >
-                    {t(`bookings.tabs.${tab}`)}
+                    {tab.label}
                   </button>
                 ))}
               </div>
@@ -224,7 +306,7 @@ export default function MybookingsPage() {
           {/* bookings List */}
           <div className="space-y-4">
             {!error && filteredbookings.length > 0 ? (
-              filteredbookings.map((bookings) => (
+              filteredbookings.map((bookings, index) => (
                 <div
                   key={bookings.id}
                   className="group bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-3xl overflow-hidden shadow-md border border-primary/10 hover:shadow-xl hover:border-primary/30 transition-all duration-300"
@@ -237,11 +319,12 @@ export default function MybookingsPage() {
                         alt={bookings.service}
                         fill
                         sizes="(max-width: 1024px) 100vw, 33vw"
+                        priority={index === 0}
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
-                      <div className="absolute top-3 right-3">
-                        <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${getStatusColor(bookings.status)}`}>
+                      <div className="absolute top-3 right-3 z-10">
+                        <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold border border-white/60 shadow-sm backdrop-blur-sm ${getStatusColor(bookings.status)}`}>
                           {getStatusText(bookings.status)}
                         </span>
                       </div>
@@ -351,8 +434,7 @@ export default function MybookingsPage() {
               </div>
             )}
           </div>
-        </div>
-      </main>
+      </div>
 
       {/* Cancel Confirmation Modal */}
       {showCancelModal && (
@@ -408,8 +490,6 @@ export default function MybookingsPage() {
           </div>
         </div>
       )}
-
-      <Footer />
     </div>
   );
 }

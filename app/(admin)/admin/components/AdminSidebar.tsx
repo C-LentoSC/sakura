@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useLanguage } from '@/app/contexts/LanguageContext';
+import type { Language } from '@/app/locales/config';
 
 interface NavItem {
   name: string;
@@ -19,10 +21,11 @@ interface AdminSidebarProps {
 export default function AdminSidebar({ userName, userEmail }: AdminSidebarProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { language, setLanguage, languages, t } = useLanguage();
 
   const navigation: NavItem[] = [
     {
-      name: 'Dashboard',
+      name: t('admin.sidebar.nav.dashboard'),
       href: '/admin',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,7 +34,7 @@ export default function AdminSidebar({ userName, userEmail }: AdminSidebarProps)
       ),
     },
     {
-      name: 'Services',
+      name: t('admin.sidebar.nav.services'),
       href: '/admin/services',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,7 +43,7 @@ export default function AdminSidebar({ userName, userEmail }: AdminSidebarProps)
       ),
     },
     {
-      name: 'Categories',
+      name: t('admin.sidebar.nav.categories'),
       href: '/admin/categories',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,7 +52,7 @@ export default function AdminSidebar({ userName, userEmail }: AdminSidebarProps)
       ),
     },
     {
-      name: 'Bookings',
+      name: t('admin.sidebar.nav.bookings'),
       href: '/admin/bookings',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,7 +61,7 @@ export default function AdminSidebar({ userName, userEmail }: AdminSidebarProps)
       ),
     },
     {
-      name: 'Users',
+      name: t('admin.sidebar.nav.users'),
       href: '/admin/users',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,7 +70,7 @@ export default function AdminSidebar({ userName, userEmail }: AdminSidebarProps)
       ),
     },
     {
-      name: 'Settings',
+      name: t('admin.sidebar.nav.settings'),
       href: '/admin/settings',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,7 +93,7 @@ export default function AdminSidebar({ userName, userEmail }: AdminSidebarProps)
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-sm bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-sm bg-white border border-pink-200 hover:bg-pink-50 transition-colors shadow-md"
       >
         <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {isMobileMenuOpen ? (
@@ -112,21 +115,29 @@ export default function AdminSidebar({ userName, userEmail }: AdminSidebarProps)
        {/* Sidebar */}
        <aside
          className={`
-           fixed top-0 left-0 h-screen w-64 bg-white shadow-lg z-40
+           fixed top-0 left-0 h-screen w-64 shadow-lg z-40
            transform transition-transform duration-300 ease-in-out
            ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
          `}
+         style={{
+           backgroundImage: 'url(/sakura-saloon-images/side-bg-2.jpg)',
+           backgroundSize: 'cover',
+          //  backgroundPosition: 'center',
+           backgroundRepeat: 'no-repeat'
+         }}
        >
-        <div className="flex flex-col h-full">
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0"></div>
+        <div className="flex flex-col h-full relative z-10">
           {/* Logo/Brand */}
           <div className="p-6">
             <Link href="/admin" className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gray-900 rounded-sm flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-pink-400 rounded-sm flex items-center justify-center shadow-md">
                 <span className="text-white font-semibold text-sm">SA</span>
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-gray-900">Sakura Admin</h1>
-                <p className="text-xs text-gray-500">Management Panel</p>
+                <h1 className="text-lg font-semibold text-gray-900">{t('admin.sidebar.brandTitle')}</h1>
+                <p className="text-xs text-gray-500">{t('admin.sidebar.brandSubtitle')}</p>
               </div>
             </Link>
           </div>
@@ -140,11 +151,11 @@ export default function AdminSidebar({ userName, userEmail }: AdminSidebarProps)
                     href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`
-                      flex items-center gap-3 px-3 py-2 rounded-sm font-medium transition-colors duration-200
+                      flex items-center gap-3 px-3 py-2 rounded-sm font-medium transition-all duration-200
                       ${
                         isActive(item.href)
-                          ? 'bg-gray-900 text-white'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          ? 'bg-gradient-to-r from-primary to-pink-400 text-white shadow-md'
+                          : 'text-gray-600 hover:text-primary hover:bg-pink-50/50'
                       }
                     `}
                   >
@@ -163,34 +174,51 @@ export default function AdminSidebar({ userName, userEmail }: AdminSidebarProps)
 
           {/* User Profile */}
           <div className="p-4">
-            <div className="flex items-center gap-3 p-3 rounded-sm bg-gray-50 shadow-sm">
-              <div className="w-8 h-8 bg-gray-600 rounded-sm flex items-center justify-center text-white font-medium text-sm shadow-sm">
+            <div className="flex items-center gap-3 p-3 rounded-sm bg-white/90 backdrop-blur-md shadow-lg border border-gray-200">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-pink-400 rounded-sm flex items-center justify-center text-white font-medium text-sm shadow-md">
                 {userName ? userName.charAt(0).toUpperCase() : 'A'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {userName || 'Admin'}
+                <p className="text-sm font-semibold text-gray-900 truncate">
+                  {userName || t('admin.sidebar.profile.defaultName')}
                 </p>
-                <p className="text-xs text-gray-500 truncate">
-                  {userEmail || 'admin@sakura.com'}
+                <p className="text-xs font-medium text-gray-700 truncate">
+                  {userEmail || t('admin.sidebar.profile.defaultEmail')}
                 </p>
               </div>
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {languages.map((l) => (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => setLanguage(l.code as Language)}
+                  className={`px-3 py-2 text-xs font-medium rounded-sm shadow-sm transition-all ${
+                    language === l.code
+                      ? 'bg-gradient-to-r from-primary to-pink-400 text-white shadow-md'
+                      : 'bg-white text-gray-600 hover:text-primary hover:bg-pink-50 border border-pink-100'
+                  }`}
+                >
+                  {l.nativeName}
+                </button>
+              ))}
             </div>
 
             {/* Quick Actions */}
             <div className="mt-3 flex gap-2">
               <Link
                 href="/"
-                className="flex-1 px-3 py-2 text-xs font-medium text-gray-600 hover:text-gray-900 bg-white hover:bg-gray-50 rounded-sm shadow-sm transition-colors text-center"
+                className="flex-1 px-3 py-2 text-xs font-medium text-gray-600 hover:text-primary bg-white hover:bg-pink-50 rounded-sm shadow-sm transition-colors text-center border border-pink-100"
               >
-                View Site
+                {t('admin.sidebar.quickActions.viewSite')}
               </Link>
               <form action="/api/auth/logout" method="POST" className="flex-1">
                 <button
                   type="submit"
-                  className="w-full px-3 py-2 text-xs font-medium text-red-600 hover:text-red-700 bg-white hover:bg-red-50 rounded-sm shadow-sm transition-colors"
+                  className="w-full px-3 py-2 text-xs font-medium text-rose-500 hover:text-rose-600 bg-white hover:bg-rose-50 rounded-sm shadow-sm transition-colors border border-rose-200"
                 >
-                  Logout
+                  {t('admin.sidebar.quickActions.logout')}
                 </button>
               </form>
             </div>

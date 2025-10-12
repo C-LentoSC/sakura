@@ -13,14 +13,16 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>(defaultLanguage);
+export function LanguageProvider({ children, initialLanguage }: { children: ReactNode; initialLanguage?: Language }) {
+  const [language, setLanguage] = useState<Language>(initialLanguage || defaultLanguage);
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Initialize from localStorage (client only)
   useEffect(() => {
     setIsHydrated(true);
     try {
+      // If server provided an initialLanguage (via cookie), do NOT override it
+      if (initialLanguage) return;
       const stored = typeof window !== 'undefined' ? window.localStorage.getItem('sakura-lang') : null;
       if (stored && (['en', 'ja'] as Language[]).includes(stored as Language)) {
         setLanguage(stored as Language);
@@ -28,7 +30,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore storage errors
     }
-  }, []);
+  }, [initialLanguage]);
 
   // Setter that also persists to localStorage
   const setLang = (lang: Language) => {
@@ -36,6 +38,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     try {
       if (typeof window !== 'undefined') {
         window.localStorage.setItem('sakura-lang', lang);
+        // Also persist to cookie so the server can SSR the same language
+        const expires = new Date();
+        expires.setFullYear(expires.getFullYear() + 1);
+        document.cookie = `sakura-lang=${lang}; path=/; expires=${expires.toUTCString()}`;
       }
     } catch {
       // ignore storage errors
@@ -59,14 +65,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   const t = (key: string): string => {
-    // Always use default language during SSR and initial render to prevent hydration mismatch
-    // The UI will update after hydration with the correct language
-    const currentLanguage = !isHydrated ? defaultLanguage : language;
-    const result = getNestedTranslation(translations[currentLanguage], key);
+    const result = getNestedTranslation(translations[language], key);
     
     // Debug logging (remove in production)
     if (typeof window !== 'undefined' && result === key) {
-      console.warn(`Translation missing for key: ${key} in language: ${currentLanguage}`);
+      console.warn(`Translation missing for key: ${key} in language: ${language}`);
     }
     
     return result;
