@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+// Lazy initialize Stripe inside the handler to avoid build-time evaluation errors
+const getStripe = () => {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error('STRIPE_SECRET_KEY is not set');
+  }
+  return new Stripe(key);
+};
 
 export async function POST(request: NextRequest) {
   try {
+    const stripe = getStripe();
     const { amount, currency = 'usd', bookingDetails, orderDetails } = await request.json();
 
     // Determine if this is a booking or shop order
