@@ -1,5 +1,5 @@
 import { getCurrentUser } from '@/app/lib/dal';
-import Link from 'next/link';
+import ProfileClient from './ProfileClient';
 
 export default async function ProfilePage() {
   const user = await getCurrentUser();
@@ -8,15 +8,6 @@ export default async function ProfilePage() {
     <div className="py-12">
       {/* Page Header */}
       <div className="mb-8">
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center text-primary hover:text-pink-600 mb-4 transition-colors"
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Dashboard
-        </Link>
         <h1 className="text-4xl font-sakura text-secondary mb-2">Profile</h1>
         <p className="text-secondary/70">View and manage your account information</p>
       </div>
@@ -65,40 +56,8 @@ export default async function ProfilePage() {
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div>
-            <h3 className="text-lg font-sakura text-secondary mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <button
-                disabled
-                className="p-4 bg-white rounded-lg border-2 border-primary/20 hover:border-primary transition-colors text-left opacity-50 cursor-not-allowed"
-              >
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-primary mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  <div>
-                    <p className="text-sm font-semibold text-secondary">Edit Profile</p>
-                    <p className="text-xs text-secondary/60">Coming soon</p>
-                  </div>
-                </div>
-              </button>
-              <button
-                disabled
-                className="p-4 bg-white rounded-lg border-2 border-primary/20 hover:border-primary transition-colors text-left opacity-50 cursor-not-allowed"
-              >
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-primary mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                  </svg>
-                  <div>
-                    <p className="text-sm font-semibold text-secondary">Change Password</p>
-                    <p className="text-xs text-secondary/60">Coming soon</p>
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
+          {/* Password Change Section */}
+          <ProfileClient />
         </div>
       </div>
 

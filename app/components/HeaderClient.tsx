@@ -65,7 +65,7 @@ export default function HeaderClient() {
           {user ? (
             <>
               <Link
-                href="/dashboard"
+                href="/profile"
                 className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors leading-none"
               >
                 {t('nav.welcome')}, {user.name || user.email}
@@ -197,12 +197,16 @@ export default function HeaderClient() {
             {/* Auth Section - Mobile */}
             {user ? (
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-secondary text-xs px-3 py-2">
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 text-secondary text-xs px-3 py-2 hover:text-primary transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
                   <svg className="w-3 h-3 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   <span className="truncate">{t('nav.welcome')}, {user.name || user.email}</span>
-                </div>
+                </Link>
                 <form action={logout}>
                   <button
                     type="submit"
