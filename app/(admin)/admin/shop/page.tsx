@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { formatCurrency } from '@/app/constants/currency';
+import ProductCardBase, { ProductCardData } from '@/app/components/shop/ProductCardBase';
+import ImageUpload from '@/app/components/ImageUpload';
 
 interface Product {
   id: number;
@@ -32,6 +33,8 @@ export default function AdminShopPage() {
   const [filterCategory, setFilterCategory] = useState('');
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [errors, setErrors] = useState<{ price?: string; originalPrice?: string }>({});
 
   const [formData, setFormData] = useState({
     name: '',
@@ -52,83 +55,115 @@ export default function AdminShopPage() {
   const categories = ['Hair Care', 'Nail Care', 'Beauty', 'Wellness'];
   const badgeTypes = ['', 'Bestseller', 'New', 'Sale', 'Popular', 'Out of Stock'];
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
-      const mockProducts: Product[] = [
-        {
-          id: 1,
-          name: 'Japanese Hair Serum',
-          nameEn: 'Japanese Hair Serum',
-          nameJa: '日本式ヘアセラム',
-          category: 'Hair Care',
-          price: 1299,
-          originalPrice: 1599,
-          image: '/services-images/head-spa.jpg',
-          inStock: true,
-          badge: 'Bestseller',
-          badgeType: 'Bestseller',
-          description: 'Premium Japanese hair serum for silky smooth hair',
-          descriptionEn: 'Premium Japanese hair serum for silky smooth hair',
-          descriptionJa: 'シルクのように滑らかな髪のためのプレミアム日本式ヘアセラム',
-        },
-        {
-          id: 2,
-          name: 'Sakura Scalp Treatment Oil',
-          nameEn: 'Sakura Scalp Treatment Oil',
-          nameJa: '桜スカルプトリートメントオイル',
-          category: 'Hair Care',
-          price: 999,
-          originalPrice: null,
-          image: '/services-images/head-spa2.jpg',
-          inStock: true,
-          badge: 'New',
-          badgeType: 'New',
-          description: 'Nourishing scalp oil with cherry blossom extract',
-          descriptionEn: 'Nourishing scalp oil with cherry blossom extract',
-          descriptionJa: '桜エキス配合の栄養豊富な頭皮オイル',
-        },
-      ];
-      setProducts(mockProducts);
+      setLoading(true);
+      const res = await fetch(`/api/products?lang=${language}`);
+      if (!res.ok) throw new Error('Failed to load products');
+      const data: { products: Array<{ id: number; name: string; nameEn: string; nameJa: string; category: string; description: string; descEn: string; descJa: string; price: number; originalPrice: number | null; image: string; inStock: boolean; badge: string | null; badgeType: string | null; }> } = await res.json();
+      const mapped: Product[] = data.products.map((p) => ({
+        id: p.id,
+        name: p.name,
+        nameEn: p.nameEn,
+        nameJa: p.nameJa,
+        category: p.category,
+        price: p.price,
+        originalPrice: p.originalPrice,
+        image: p.image,
+        inStock: p.inStock,
+        badge: p.badge,
+        badgeType: p.badgeType,
+        description: p.description,
+        descriptionEn: p.descEn,
+        descriptionJa: p.descJa,
+      }));
+      setProducts(mapped);
     } catch (error) {
       console.error('Error fetching products:', error);
       setProducts([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [language]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const newProduct: Product = {
-        id: editingProduct ? editingProduct.id : Date.now(),
-        name: formData.name,
+      // Basic validations
+      const priceNum = parseInt(formData.price || '0');
+      const origNum = formData.originalPrice ? parseInt(formData.originalPrice) : null;
+      const newErrors: { price?: string; originalPrice?: string } = {};
+      if (!priceNum || priceNum <= 0) {
+        newErrors.price = language === 'ja' ? '価格は0より大きい必要があります。' : 'Price must be greater than 0.';
+      }
+      if (origNum !== null && priceNum > origNum) {
+        newErrors.originalPrice = language === 'ja' ? '価格は元の価格以下である必要があります。' : 'Price must be less than or equal to Original Price.';
+      }
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        setLoading(false);
+        return;
+      } else {
+        setErrors({});
+      }
+
+      // Upload image if file is selected
+      let finalImageUrl = formData.image;
+      if (selectedFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append('image', selectedFile);
+        uploadFormData.append('serviceName', formData.nameEn || formData.name);
+        if (finalImageUrl) uploadFormData.append('oldImageUrl', finalImageUrl);
+        const uploadRes = await fetch('/api/upload/image', {
+          method: 'POST',
+          body: uploadFormData,
+        });
+        if (uploadRes.ok) {
+          const { imageUrl } = await uploadRes.json();
+          finalImageUrl = imageUrl;
+        }
+      }
+
+      const productData = {
         nameEn: formData.nameEn || formData.name,
         nameJa: formData.nameJa,
         category: formData.category,
-        price: parseInt(formData.price),
-        originalPrice: formData.originalPrice ? parseInt(formData.originalPrice) : null,
-        image: formData.image || '/services-images/head-spa.jpg',
+        descEn: formData.descriptionEn || formData.description,
+        descJa: formData.descriptionJa,
+        price: priceNum,
+        originalPrice: origNum,
+        image: finalImageUrl || '/services-images/head-spa.jpg',
         inStock: formData.inStock,
         badge: formData.badge || null,
         badgeType: formData.badgeType || null,
-        description: formData.description,
-        descriptionEn: formData.descriptionEn || formData.description,
-        descriptionJa: formData.descriptionJa,
       };
 
       if (editingProduct) {
-        setProducts(products.map(p => p.id === editingProduct.id ? newProduct : p));
+        // Update existing product
+        const res = await fetch(`/api/admin/products/${editingProduct.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productData),
+        });
+        if (!res.ok) throw new Error('Failed to update product');
       } else {
-        setProducts([...products, newProduct]);
+        // Create new product
+        const res = await fetch('/api/admin/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productData),
+        });
+        if (!res.ok) throw new Error('Failed to create product');
       }
 
+      // Refresh products list from database
+      await fetchProducts();
       setIsModalOpen(false);
       resetForm();
     } catch (error) {
@@ -169,7 +204,13 @@ export default function AdminShopPage() {
     
     setLoading(true);
     try {
-      setProducts(products.filter(p => p.id !== deleteTarget.id));
+      const res = await fetch(`/api/admin/products/${deleteTarget.id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Failed to delete product');
+      
+      // Refresh products list from database
+      await fetchProducts();
       setDeleteConfirmOpen(false);
       setDeleteTarget(null);
     } catch (error) {
@@ -197,6 +238,7 @@ export default function AdminShopPage() {
       descriptionJa: '',
     });
     setEditingProduct(null);
+    setSelectedFile(null);
   };
 
   const filteredProducts = products.filter(product => {
@@ -376,90 +418,23 @@ export default function AdminShopPage() {
           <div className="p-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
             {filteredProducts.map((product) => (
-              <div
+              <ProductCardBase
                 key={product.id}
-                className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100/50 flex flex-col hover:-translate-y-1"
-              >
-                {/* Product Image */}
-                <div className="relative h-40 sm:h-44 lg:h-48 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  
-                  {/* Status Badge - Smaller Pink Style */}
-                  {product.badge && (
-                    <div className="absolute top-2 left-2 bg-gradient-to-r from-primary/95 to-pink-400/95 backdrop-blur-md px-2 py-1 rounded-full shadow-md">
-                      <div className="flex items-center gap-1">
-                        {product.badgeType === 'Bestseller' && (
-                          <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                        )}
-                        {product.badgeType === 'New' && (
-                          <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                          </svg>
-                        )}
-                        {product.badgeType === 'Sale' && (
-                          <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                          </svg>
-                        )}
-                        {product.badgeType === 'Popular' && (
-                          <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                          </svg>
-                        )}
-                        {product.badgeType === 'Out of Stock' && (
-                          <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364L18.364 5.636" />
-                          </svg>
-                        )}
-                        <span className="text-[10px] font-semibold text-white uppercase tracking-wide">
-                          {product.badge}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Product Info - More Compact */}
-                <div className="p-2.5 sm:p-3 flex flex-col">
-                  {/* Category */}
-                  <p className="text-[10px] text-primary/70 font-medium mb-1 uppercase tracking-wide">{product.category}</p>
-                  
-                  {/* Product Name */}
-                  <h3 className="text-xs sm:text-sm font-medium text-secondary mb-1.5 line-clamp-2 leading-tight">
-                    {product.name}
-                  </h3>
-                  
-                  {/* Description - Hidden on mobile, compact on desktop */}
-                  <p className="hidden lg:block text-[11px] text-secondary/60 mb-2 line-clamp-1 leading-tight">
-                    {product.description}
-                  </p>
-
-                  {/* Price - More Compact */}
+                product={product as unknown as ProductCardData}
+                priceNode={
                   <div className="flex flex-wrap items-baseline gap-1 mb-2">
-                    <span className="text-base sm:text-lg font-bold text-primary">
-                      {formatCurrency(product.price)}
-                    </span>
+                    <span className="text-base sm:text-lg font-bold text-primary">{formatCurrency(product.price)}</span>
                     {product.originalPrice && (
                       <>
-                        <span className="text-[10px] text-secondary/40 line-through">
-                          {formatCurrency(product.originalPrice)}
-                        </span>
+                        <span className="text-[10px] text-secondary/40 line-through">{formatCurrency(product.originalPrice)}</span>
                         <span className="text-[9px] bg-red-100 text-red-600 px-1 py-0.5 rounded-full font-semibold">
                           {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
                         </span>
                       </>
                     )}
                   </div>
-
-                  {/* Actions - More Compact */}
+                }
+                actions={
                   <div className="flex flex-col gap-1.5">
                     <button
                       onClick={() => handleEdit(product)}
@@ -474,8 +449,8 @@ export default function AdminShopPage() {
                       {language === 'ja' ? '削除' : 'Delete'}
                     </button>
                   </div>
-                </div>
-              </div>
+                }
+              />
             ))}
           </div>
           </div>
@@ -555,7 +530,7 @@ export default function AdminShopPage() {
                   </label>
                   <select
                     value={formData.badgeType}
-                    onChange={(e) => setFormData({...formData, badgeType: e.target.value, badge: e.target.value})}
+                    onChange={(e) => setFormData({...formData, badgeType: e.target.value})}
                     className="w-full px-3 py-2 rounded-lg border-2 border-pink-100 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                   >
                     {badgeTypes.map(type => (
@@ -563,6 +538,19 @@ export default function AdminShopPage() {
                     ))}
                   </select>
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ja' ? 'バッジラベル' : 'Badge Label'}
+                </label>
+                <input
+                  type="text"
+                  value={formData.badge}
+                  onChange={(e) => setFormData({...formData, badge: e.target.value})}
+                  placeholder={language === 'ja' ? '例: 20%オフ' : 'e.g., 20% OFF'}
+                  className="w-full px-3 py-2 rounded-lg border-2 border-pink-100 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -574,9 +562,12 @@ export default function AdminShopPage() {
                     type="number"
                     required
                     value={formData.price}
-                    onChange={(e) => setFormData({...formData, price: e.target.value})}
-                    className="w-full px-3 py-2 rounded-lg border-2 border-pink-100 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                    onChange={(e) => { setFormData({...formData, price: e.target.value}); if (errors.price) setErrors(prev => ({ ...prev, price: undefined })); }}
+                    className={`w-full px-3 py-2 rounded-lg border-2 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all ${errors.price ? 'border-red-300' : 'border-pink-100'}`}
                   />
+                  {errors.price && (
+                    <p className="mt-1 text-xs text-red-600">{errors.price}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -585,9 +576,12 @@ export default function AdminShopPage() {
                   <input
                     type="number"
                     value={formData.originalPrice}
-                    onChange={(e) => setFormData({...formData, originalPrice: e.target.value})}
-                    className="w-full px-3 py-2 rounded-lg border-2 border-pink-100 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                    onChange={(e) => { setFormData({...formData, originalPrice: e.target.value}); if (errors.originalPrice) setErrors(prev => ({ ...prev, originalPrice: undefined })); }}
+                    className={`w-full px-3 py-2 rounded-lg border-2 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all ${errors.originalPrice ? 'border-red-300' : 'border-pink-100'}`}
                   />
+                  {errors.originalPrice && (
+                    <p className="mt-1 text-xs text-red-600">{errors.originalPrice}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -607,14 +601,13 @@ export default function AdminShopPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {language === 'ja' ? '画像URL' : 'Image URL'}
+                  {language === 'ja' ? '商品画像' : 'Product Image'}
                 </label>
-                <input
-                  type="text"
+                <ImageUpload
                   value={formData.image}
-                  onChange={(e) => setFormData({...formData, image: e.target.value})}
-                  placeholder="/services-images/product.jpg"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  file={selectedFile}
+                  onChange={(imageUrl) => setFormData({...formData, image: imageUrl})}
+                  onFileChange={setSelectedFile}
                 />
               </div>
 

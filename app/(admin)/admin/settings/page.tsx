@@ -1,9 +1,8 @@
-import React from 'react'
+import { getCurrentUser } from '@/app/lib/dal';
+import SettingsClient from './SettingsClient';
 
-function settingsPage() {
-  return (
-    <div>settingsPage</div>
-  )
+export default async function SettingsPage() {
+  const currentUser = await getCurrentUser();
+
+  return <SettingsClient user={{ id: currentUser.id, email: currentUser.email, name: currentUser.name }} />;
 }
-
-export default settingsPage

@@ -7,6 +7,7 @@ async function main() {
 
   // Clear existing data
   console.log('🧹 Cleaning existing data...');
+  await prisma.product.deleteMany();
   await prisma.service.deleteMany();
   await prisma.serviceSubSubCategory.deleteMany();
   await prisma.serviceSubCategory.deleteMany();
@@ -360,12 +361,127 @@ async function main() {
     },
   });
 
+  // Products
+  console.log('🛍️ Creating products...');
+
+  const products = [
+    {
+      nameEn: 'Japanese Hair Serum',
+      nameJa: '日本式ヘアセラム',
+      category: 'Hair Care',
+      descEn: 'Premium Japanese hair serum for silky smooth hair',
+      descJa: 'シルクのように滑らかな髪のためのプレミアム日本式ヘアセラム',
+      price: 1299,
+      originalPrice: 1599,
+      image: '/services-images/head-spa.jpg',
+      inStock: true,
+      badge: 'Bestseller',
+      badgeType: 'Bestseller',
+    },
+    {
+      nameEn: 'Sakura Scalp Treatment Oil',
+      nameJa: '桜スカルプトリートメントオイル',
+      category: 'Hair Care',
+      descEn: 'Nourishing scalp oil with cherry blossom extract',
+      descJa: '桜エキス配合の栄養豊富な頭皮オイル',
+      price: 999,
+      originalPrice: null,
+      image: '/services-images/head-spa2.jpg',
+      inStock: true,
+      badge: 'New',
+      badgeType: 'New',
+    },
+    {
+      nameEn: 'Luxury Nail Care Kit',
+      nameJa: 'ラグジュアリーネイルケアキット',
+      category: 'Nail Care',
+      descEn: 'Complete professional nail care kit',
+      descJa: '完全なプロフェッショナルネイルケアキット',
+      price: 1499,
+      originalPrice: 1899,
+      image: '/services-images/nails.jpg',
+      inStock: true,
+      badge: 'Sale',
+      badgeType: 'Sale',
+    },
+    {
+      nameEn: 'Premium Gel Polish Set',
+      nameJa: 'プレミアムジェルポリッシュセット',
+      category: 'Nail Care',
+      descEn: '12-piece gel polish collection',
+      descJa: '12ピースジェルポリッシュコレクション',
+      price: 1799,
+      originalPrice: null,
+      image: '/services-images/beauty-nails.jpg',
+      inStock: true,
+      badge: null,
+      badgeType: null,
+    },
+    {
+      nameEn: 'Lash Growth Serum',
+      nameJa: 'まつげ育成セラム',
+      category: 'Beauty',
+      descEn: 'Advanced formula for longer, fuller lashes',
+      descJa: 'より長く、より豊かなまつげのための高度な処方',
+      price: 1599,
+      originalPrice: 1999,
+      image: '/services-images/head-spa.jpg',
+      inStock: true,
+      badge: 'Bestseller',
+      badgeType: 'Bestseller',
+    },
+    {
+      nameEn: 'Eyebrow Styling Kit',
+      nameJa: 'アイブロウスタイリングキット',
+      category: 'Beauty',
+      descEn: 'Professional eyebrow grooming essentials',
+      descJa: 'プロフェッショナルな眉毛グルーミングエッセンシャル',
+      price: 899,
+      originalPrice: null,
+      image: '/services-images/nails.jpg',
+      inStock: true,
+      badge: null,
+      badgeType: null,
+    },
+    {
+      nameEn: 'Aromatherapy Essential Oils',
+      nameJa: 'アロマセラピーエッセンシャルオイル',
+      category: 'Wellness',
+      descEn: 'Set of 6 premium essential oils',
+      descJa: 'プレミアムエッセンシャルオイル6本セット',
+      price: 1199,
+      originalPrice: 1499,
+      image: '/services-images/head-spa2.jpg',
+      inStock: true,
+      badge: 'Popular',
+      badgeType: 'Popular',
+    },
+    {
+      nameEn: 'Silk Hair Mask',
+      nameJa: 'シルクヘアマスク',
+      category: 'Hair Care',
+      descEn: 'Deep conditioning silk protein mask',
+      descJa: 'ディープコンディショニングシルクプロテインマスク',
+      price: 799,
+      originalPrice: null,
+      image: '/services-images/beauty-nails.jpg',
+      inStock: false,
+      badge: 'Out of Stock',
+      badgeType: 'Out of Stock',
+    },
+  ];
+
+  for (const p of products) {
+    await prisma.product.create({ data: p });
+  }
+
   console.log('✅ Database seeding completed successfully!');
   console.log('📊 Summary:');
   console.log(`   • ${await prisma.serviceCategory.count()} main categories`);
   console.log(`   • ${await prisma.serviceSubCategory.count()} sub-categories`);
   console.log(`   • ${await prisma.serviceSubSubCategory.count()} sub-sub-categories`);
   console.log(`   • ${await prisma.service.count()} services`);
+  console.log(`   • ${await prisma.product.count()} products`);
 }
 
 main()

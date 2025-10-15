@@ -48,6 +48,9 @@ export default function AdminBookingsPage() {
     pending: 'Pending',
     booked: 'Booked',
     canceled: 'Canceled',
+    confirmed: 'Confirmed',
+    completed: 'Completed',
+    noShow: 'No Show',
     thCustomer: 'Customer',
     thService: 'Service',
     thDateTime: 'Date & Time',
@@ -62,6 +65,29 @@ export default function AdminBookingsPage() {
     confirmMsg: 'Are you sure you want to cancel this booking? The customer will be notified and the booking status will be changed to canceled.',
     keep: 'Keep Booking',
     yesCancel: 'Yes, Cancel Booking',
+    modalTitleCreate: 'Create New Booking',
+    modalTitleEdit: 'Edit Booking',
+    modalSubtitle: 'Fill in the booking details below',
+    sectionServiceInfo: 'Service Information',
+    fieldServiceId: 'Service ID',
+    placeholderServiceId: 'Enter service ID',
+    sectionDateTime: 'Date & Time',
+    fieldDate: 'Date',
+    fieldTime: 'Time',
+    sectionCustomerDetails: 'Customer Details',
+    fieldName: 'Name',
+    placeholderName: 'Customer name',
+    fieldEmail: 'Email',
+    placeholderEmail: 'email@example.com',
+    fieldPhone: 'Phone',
+    placeholderPhone: 'Phone number',
+    fieldStatus: 'Status',
+    fieldNotes: 'Notes (Optional)',
+    placeholderNotes: 'Add any special notes or requirements...',
+    btnCancel: 'Cancel',
+    savingLabel: 'Saving...',
+    btnUpdate: 'Update Booking',
+    btnCreate: 'Create Booking',
   } as const;
   const ja = {
     title: '予約管理',
@@ -71,6 +97,9 @@ export default function AdminBookingsPage() {
     pending: '保留中',
     booked: '予約済み',
     canceled: 'キャンセル済み',
+    confirmed: '確認済み',
+    completed: '完了',
+    noShow: '未来店',
     thCustomer: 'お客様',
     thService: 'サービス',
     thDateTime: '日時',
@@ -85,6 +114,29 @@ export default function AdminBookingsPage() {
     confirmMsg: 'この予約をキャンセルしてもよろしいですか？お客様に通知され、ステータスはキャンセル済みに変更されます。',
     keep: '予約を維持',
     yesCancel: 'はい、キャンセルする',
+    modalTitleCreate: '新規予約の作成',
+    modalTitleEdit: '予約の編集',
+    modalSubtitle: '以下の予約詳細を入力してください',
+    sectionServiceInfo: 'サービス情報',
+    fieldServiceId: 'サービスID',
+    placeholderServiceId: 'サービスIDを入力',
+    sectionDateTime: '日時',
+    fieldDate: '日付',
+    fieldTime: '時間',
+    sectionCustomerDetails: 'お客様情報',
+    fieldName: '氏名',
+    placeholderName: 'お客様の氏名',
+    fieldEmail: 'メール',
+    placeholderEmail: 'email@example.com',
+    fieldPhone: '電話',
+    placeholderPhone: '電話番号',
+    fieldStatus: 'ステータス',
+    fieldNotes: 'メモ（任意）',
+    placeholderNotes: '特別な注意事項や要望があればご記入ください…',
+    btnCancel: 'キャンセル',
+    savingLabel: '保存中…',
+    btnUpdate: '予約を更新',
+    btnCreate: '予約を作成',
   } as const;
   const L = (k: keyof typeof en) => (language === 'ja' ? ja[k] : en[k]);
 
@@ -482,8 +534,8 @@ export default function AdminBookingsPage() {
                 </svg>
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">{form.id ? 'Edit Booking' : 'Create New Booking'}</h2>
-                <p className="text-sm text-gray-500">Fill in the booking details below</p>
+                <h2 className="text-xl font-semibold text-gray-900">{form.id ? L('modalTitleEdit') : L('modalTitleCreate')}</h2>
+                <p className="text-sm text-gray-500">{L('modalSubtitle')}</p>
               </div>
             </div>
             
@@ -493,15 +545,15 @@ export default function AdminBookingsPage() {
                   <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                   </svg>
-                  Service Information
+                  {L('sectionServiceInfo')}
                 </h3>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Service ID</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{L('fieldServiceId')}</label>
                   <input 
                     className="w-full px-4 py-2.5 border-2 border-pink-100 rounded-lg bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" 
                     value={form.serviceId} 
                     onChange={(e) => setForm({ ...form, serviceId: e.target.value })} 
-                    placeholder="Enter service ID"
+                    placeholder={L('placeholderServiceId')}
                     required 
                   />
                 </div>
@@ -512,11 +564,11 @@ export default function AdminBookingsPage() {
                   <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  Date & Time
+                  {L('sectionDateTime')}
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{L('fieldDate')}</label>
                     <input 
                       type="date" 
                       className="w-full px-4 py-2.5 border-2 border-pink-100 rounded-lg bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" 
@@ -526,7 +578,7 @@ export default function AdminBookingsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Time</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{L('fieldTime')}</label>
                     <input 
                       type="time" 
                       className="w-full px-4 py-2.5 border-2 border-pink-100 rounded-lg bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" 
@@ -543,52 +595,52 @@ export default function AdminBookingsPage() {
                   <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                  Customer Details
+                  {L('sectionCustomerDetails')}
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{L('fieldName')}</label>
                     <input 
                       className="w-full px-4 py-2.5 border-2 border-pink-100 rounded-lg bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" 
                       value={form.name} 
                       onChange={(e) => setForm({ ...form, name: e.target.value })} 
-                      placeholder="Customer name"
+                      placeholder={L('placeholderName')}
                       required 
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{L('fieldEmail')}</label>
                     <input 
                       type="email" 
                       className="w-full px-4 py-2.5 border-2 border-pink-100 rounded-lg bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" 
                       value={form.email} 
                       onChange={(e) => setForm({ ...form, email: e.target.value })} 
-                      placeholder="email@example.com"
+                      placeholder={L('placeholderEmail')}
                       required 
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{L('fieldPhone')}</label>
                     <input 
                       className="w-full px-4 py-2.5 border-2 border-pink-100 rounded-lg bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" 
                       value={form.phone} 
                       onChange={(e) => setForm({ ...form, phone: e.target.value })} 
-                      placeholder="Phone number"
+                      placeholder={L('placeholderPhone')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{L('fieldStatus')}</label>
                     <select 
                       className="w-full px-4 py-2.5 border-2 border-pink-100 rounded-lg bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" 
                       value={form.status} 
                       onChange={(e) => setForm({ ...form, status: e.target.value })}
                     >
-                      <option value="pending">Pending</option>
-                      <option value="booked">Booked</option>
-                      <option value="canceled">Canceled</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="completed">Completed</option>
-                      <option value="no-show">No Show</option>
+                      <option value="pending">{L('pending')}</option>
+                      <option value="booked">{L('booked')}</option>
+                      <option value="canceled">{L('canceled')}</option>
+                      <option value="confirmed">{L('confirmed')}</option>
+                      <option value="completed">{L('completed')}</option>
+                      <option value="no-show">{L('noShow')}</option>
                     </select>
                   </div>
                 </div>
@@ -599,14 +651,14 @@ export default function AdminBookingsPage() {
                   <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                   </svg>
-                  Notes (Optional)
+                  {L('fieldNotes')}
                 </label>
                 <textarea 
                   className="w-full px-4 py-2.5 border-2 border-pink-100 rounded-lg bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none" 
                   rows={3} 
                   value={form.notes ?? ''} 
                   onChange={(e) => setForm({ ...form, notes: e.target.value })} 
-                  placeholder="Add any special notes or requirements..."
+                  placeholder={L('placeholderNotes')}
                 />
               </div>
 
@@ -616,7 +668,7 @@ export default function AdminBookingsPage() {
                   onClick={() => setIsModalOpen(false)} 
                   className="px-6 py-2.5 bg-accent/50 text-secondary rounded-lg hover:bg-accent transition-colors font-medium"
                 >
-                  Cancel
+                  {L('btnCancel')}
                 </button>
                 <button 
                   type="submit" 
@@ -629,14 +681,14 @@ export default function AdminBookingsPage() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Saving...
+                      {L('savingLabel')}
                     </>
                   ) : (
                     <>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                       </svg>
-                      {form.id ? 'Update Booking' : 'Create Booking'}
+                      {form.id ? L('btnUpdate') : L('btnCreate')}
                     </>
                   )}
                 </button>

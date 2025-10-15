@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 
 type UserRow = {
@@ -14,11 +15,22 @@ type UserRow = {
 
 export default function UsersClient({ users, currentUserId }: { users: UserRow[]; currentUserId: string }) {
   const { language } = useLanguage();
+  const [list, setList] = useState<UserRow[]>(users);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<UserRow | null>(null);
+  const [form, setForm] = useState<{ id?: string; email: string; name: string; role: 'ADMIN' | 'USER' }>(
+    { email: '', name: '', role: 'USER' }
+  );
+
+  useEffect(() => { setList(users); }, [users]);
 
   const en = {
     title: 'User Management',
     subtitle: 'View and manage all registered users',
     total: 'Total Users',
+    new: '+ New',
     thUser: 'User',
     thEmail: 'Email',
     thRole: 'Role',
@@ -27,15 +39,34 @@ export default function UsersClient({ users, currentUserId }: { users: UserRow[]
     thActions: 'Actions',
     you: '(You)',
     edit: 'Edit',
+    delete: 'Delete',
     noUsers: 'No users found',
     admins: 'Administrators',
     regular: 'Regular Users',
     activeSessions: 'Active Sessions',
+    modalCreate: 'Create User',
+    modalEdit: 'Edit User',
+    fieldEmail: 'Email',
+    fieldName: 'Name',
+    fieldRole: 'Role',
+    fieldPassword: 'Password',
+    placeholderEmail: 'email@example.com',
+    placeholderName: 'Full name',
+    placeholderPassword: 'Set a password',
+    btnCancel: 'Cancel',
+    btnCreate: 'Create',
+    btnUpdate: 'Update',
+    saving: 'Saving...',
+    confirmDeleteTitle: 'Delete User',
+    confirmDeleteText: 'Are you sure you want to delete this user? This action cannot be undone.',
+    btnKeep: 'Keep',
+    btnDelete: 'Delete',
   } as const;
   const ja = {
     title: 'ユーザー管理',
     subtitle: '登録ユーザーの確認と管理',
     total: '総ユーザー数',
+    new: '+ 新規',
     thUser: 'ユーザー',
     thEmail: 'メール',
     thRole: '権限',
@@ -44,16 +75,82 @@ export default function UsersClient({ users, currentUserId }: { users: UserRow[]
     thActions: '操作',
     you: '（あなた）',
     edit: '編集',
+    delete: '削除',
     noUsers: 'ユーザーが見つかりません',
     admins: '管理者',
     regular: '一般ユーザー',
     activeSessions: 'アクティブセッション',
+    modalCreate: 'ユーザーを作成',
+    modalEdit: 'ユーザーを編集',
+    fieldEmail: 'メール',
+    fieldName: '氏名',
+    fieldRole: '権限',
+    fieldPassword: 'パスワード',
+    placeholderEmail: 'email@example.com',
+    placeholderName: '氏名',
+    placeholderPassword: 'パスワードを設定',
+    btnCancel: 'キャンセル',
+    btnCreate: '作成',
+    btnUpdate: '更新',
+    saving: '保存中…',
+    confirmDeleteTitle: 'ユーザー削除',
+    confirmDeleteText: 'このユーザーを削除してもよろしいですか？この操作は取り消せません。',
+    btnKeep: '保持',
+    btnDelete: '削除',
   } as const;
   const L = (k: keyof typeof en) => (language === 'ja' ? ja[k] : en[k]);
 
-  const adminCount = users.filter(u => u.role === 'ADMIN').length;
-  const userCount = users.filter(u => u.role === 'USER').length;
-  const sessionTotal = users.reduce((sum, u) => sum + (u._count?.sessions || 0), 0);
+  const adminCount = list.filter(u => u.role === 'ADMIN').length;
+  const userCount = list.filter(u => u.role === 'USER').length;
+  const sessionTotal = list.reduce((sum, u) => sum + (u._count?.sessions || 0), 0);
+
+  const openCreate = () => {
+    setEditing(null);
+    setForm({ email: '', name: '', role: 'USER' });
+    setIsModalOpen(true);
+  };
+  const openEdit = (u: UserRow) => {
+    setEditing(u);
+    setForm({ id: u.id, email: u.email, name: u.name || '', role: u.role });
+    setIsModalOpen(true);
+  };
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      if (editing) {
+        const res = await fetch(`/api/admin/users/${editing.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: form.email, name: form.name, role: form.role }),
+        });
+        if (!res.ok) throw new Error('update failed');
+        const { user } = await res.json();
+        setList(prev => prev.map(u => (u.id === user.id ? { ...u, ...user, createdAt: u.createdAt } : u)));
+      } else {
+        const res = await fetch('/api/admin/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: form.email, name: form.name, role: form.role }),
+        });
+        if (!res.ok) throw new Error('create failed');
+        const { user } = await res.json();
+        setList(prev => [{ ...user, createdAt: new Date(user.createdAt).toISOString() }, ...prev]);
+      }
+      setIsModalOpen(false);
+    } finally {
+      setSaving(false);
+    }
+  };
+  const handleDelete = async () => {
+    if (!deletingId) return;
+    try {
+      const res = await fetch(`/api/admin/users/${deletingId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('delete failed');
+      setList(prev => prev.filter(u => u.id !== deletingId));
+      setDeletingId(null);
+    } catch {}
+  };
 
   return (
     <div className="space-y-6">
@@ -67,7 +164,8 @@ export default function UsersClient({ users, currentUserId }: { users: UserRow[]
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <span>{users.length} {L('total')}</span>
+          <span>{list.length} {L('total')}</span>
+          <button onClick={openCreate} className="ml-3 px-3 py-1.5 bg-gradient-to-r from-primary to-pink-400 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all">{L('new')}</button>
         </div>
       </div>
 
@@ -86,7 +184,7 @@ export default function UsersClient({ users, currentUserId }: { users: UserRow[]
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {users.map((user) => (
+              {list.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 sm:px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -120,9 +218,12 @@ export default function UsersClient({ users, currentUserId }: { users: UserRow[]
                   <td className="px-4 sm:px-6 py-4 hidden lg:table-cell">
                     <p className="text-sm text-gray-600">{new Date(user.createdAt).toLocaleDateString()}</p>
                   </td>
-                  <td className="px-4 sm:px-6 py-4 text-right">
-                    <button className="text-sm text-primary hover:text-primary/80 hover:bg-primary/10 px-3 py-1.5 rounded-lg font-medium transition-colors" disabled={user.id === currentUserId}>
+                  <td className="px-4 sm:px-6 py-4 text-right space-x-1">
+                    <button onClick={() => openEdit(user)} className="text-sm text-primary hover:text-primary/80 hover:bg-primary/10 px-3 py-1.5 rounded-lg font-medium transition-colors" disabled={user.id === currentUserId}>
                       {L('edit')}
+                    </button>
+                    <button onClick={() => user.id !== currentUserId && setDeletingId(user.id)} className="text-sm text-rose-500 hover:text-rose-600 hover:bg-rose-50 px-3 py-1.5 rounded-lg font-medium transition-colors" disabled={user.id === currentUserId}>
+                      {L('delete')}
                     </button>
                   </td>
                 </tr>
@@ -182,6 +283,96 @@ export default function UsersClient({ users, currentUserId }: { users: UserRow[]
           </div>
         </div>
       </div>
+
+      {/* Create/Edit Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-sm shadow-lg p-6 max-w-lg w-full">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              {editing ? L('modalEdit') : L('modalCreate')}
+            </h2>
+
+            <form onSubmit={handleSave} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-2">{L('fieldEmail')}</label>
+                <input 
+                  type="email" 
+                  required 
+                  value={form.email} 
+                  onChange={(e) => setForm({ ...form, email: e.target.value })} 
+                  placeholder={L('placeholderEmail')}
+                  className="w-full px-3 py-2 rounded-lg border-2 border-pink-100 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-2">{L('fieldName')}</label>
+                <input 
+                  value={form.name} 
+                  onChange={(e) => setForm({ ...form, name: e.target.value })} 
+                  placeholder={L('placeholderName')}
+                  className="w-full px-3 py-2 rounded-lg border-2 border-pink-100 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-2">{L('fieldRole')}</label>
+                <select 
+                  value={form.role} 
+                  onChange={(e) => setForm({ ...form, role: e.target.value as 'ADMIN' | 'USER' })}
+                  className="w-full px-3 py-2 rounded-lg border-2 border-pink-100 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                >
+                  <option value="USER">USER</option>
+                  <option value="ADMIN">ADMIN</option>
+                </select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)} 
+                  className="flex-1 px-4 py-2 text-secondary bg-accent/50 rounded-lg hover:bg-accent transition-colors"
+                >
+                  {L('btnCancel')}
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={saving} 
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white rounded-lg hover:shadow-lg hover:scale-105 disabled:opacity-50 transition-all"
+                >
+                  {saving ? L('saving') : (editing ? L('btnUpdate') : L('btnCreate'))}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirm */}
+      {deletingId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-sm shadow-lg p-6 max-w-md w-full">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">{L('confirmDeleteTitle')}</h2>
+            <p className="text-sm text-gray-600 mb-6">{L('confirmDeleteText')}</p>
+            <div className="flex gap-3 pt-2">
+              <button 
+                type="button"
+                onClick={() => setDeletingId(null)} 
+                className="flex-1 px-4 py-2 text-secondary bg-accent/50 rounded-lg hover:bg-accent transition-colors"
+              >
+                {L('btnKeep')}
+              </button>
+              <button 
+                type="button"
+                onClick={handleDelete} 
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-rose-400 to-rose-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+              >
+                {L('btnDelete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -5,6 +5,27 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Shop Product model
+model Product {
+  id             Int      @id @default(autoincrement())
+  nameEn         String
+  nameJa         String   @default("")
+  category       String
+  descEn         String
+  descJa         String   @default("")
+  price          Int
+  originalPrice  Int?
+  image          String
+  inStock        Boolean  @default(true)
+  badge          String?
+  badgeType      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([category])
+  @@index([inStock])
+}
+
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
