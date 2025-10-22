@@ -295,18 +295,18 @@ export default function ContactSection() {
                 disabled={isSubmitting}
                 className="w-full px-6 py-3 sm:py-4 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-full hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                {isSubmitting ? 'Sending...' : t('contact.form.submit')}
+                {isSubmitting ? t('contact.form.sending') : t('contact.form.submit')}
               </button>
 
               {submitStatus === 'success' && (
                 <div className="p-4 bg-green-100 border border-green-300 rounded-xl text-green-700 text-center">
-                  Thank you! Your message has been sent successfully.
+                  {t('contact.form.success')}
                 </div>
               )}
 
               {submitStatus === 'error' && (
                 <div className="p-4 bg-red-100 border border-red-300 rounded-xl text-red-700 text-center">
-                  Sorry, there was an error sending your message. Please try again.
+                  {t('contact.form.error')}
                 </div>
               )}
 
@@ -315,7 +315,7 @@ export default function ContactSection() {
                   href="/contact"
                   className="text-sm text-primary hover:text-pink-500 transition-colors font-medium"
                 >
-                  View full contact page →
+                  {t('contact.viewFull')}
                 </Link>
               </div>
             </form>

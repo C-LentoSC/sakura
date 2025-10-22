@@ -4,6 +4,7 @@
     "about": "ABOUT US",
     "services": "SERVICES",
     "shop": "SHOP",
+    "cart": "CART",
     "bookings": "BOOKINGS",
     "contact": "CONTACT",
     "login": "LOGIN",
@@ -105,12 +106,18 @@
     "mainTitle": "What Our Clients Say",
     "subtitle": "Hear from our satisfied clients about their experiences",
     "client1": {
+      "name": "Sarah Johnson",
+      "role": "Regular Client",
       "text": "The Japanese Head Spa was absolutely amazing! I felt so relaxed and rejuvenated. The staff is professional and the atmosphere is so peaceful. Highly recommend!"
     },
     "client2": {
+      "name": "Emily Chen",
+      "role": "Spa Enthusiast",
       "text": "Best nail art experience I've ever had! The attention to detail is incredible. My nails look stunning and the service was top-notch. Will definitely come back!"
     },
     "client3": {
+      "name": "Maria Rodriguez",
+      "role": "Beauty Lover",
       "text": "I've been coming here for months and every visit is perfect. The lash extensions are beautiful and last so long. The team really knows what they're doing!"
     }
   },
@@ -137,12 +144,17 @@
       "phonePlaceholder": "Enter your phone",
       "message": "Message",
       "messagePlaceholder": "Tell us how we can help you...",
-      "submit": "Send Message"
-    }
+      "submit": "Send Message",
+      "sending": "Sending...",
+      "success": "Thank you! Your message has been sent successfully.",
+      "error": "Sorry, there was an error sending your message. Please try again."
+    },
+    "viewFull": "View full contact page →"
   },
   "footer": {
     "about": "Experience authentic Japanese relaxation and beauty services in a serene atmosphere. Your journey to wellness begins here.",
     "quickLinks": "Quick Links",
+    "more": "More",
     "links": {
       "home": "Home",
       "services": "Services",

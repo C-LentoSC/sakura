@@ -17,24 +17,24 @@ export default function TestimonialsSection() {
   const testimonials = [
     {
       id: 1,
-      name: 'Sarah Johnson',
-      role: 'Regular Client',
+      nameKey: 'testimonials.client1.name',
+      roleKey: 'testimonials.client1.role',
       image: '/testimonials/client1.jpg',
       rating: 5,
       textKey: 'testimonials.client1.text',
     },
     {
       id: 2,
-      name: 'Emily Chen',
-      role: 'Spa Enthusiast',
+      nameKey: 'testimonials.client2.name',
+      roleKey: 'testimonials.client2.role',
       image: '/testimonials/client2.jpg',
       rating: 5,
       textKey: 'testimonials.client2.text',
     },
     {
       id: 3,
-      name: 'Maria Rodriguez',
-      role: 'Beauty Lover',
+      nameKey: 'testimonials.client3.name',
+      roleKey: 'testimonials.client3.role',
       image: '/testimonials/client3.jpg',
       rating: 5,
       textKey: 'testimonials.client3.text',
@@ -122,16 +122,16 @@ export default function TestimonialsSection() {
                 <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
                   <div className="w-full h-full bg-gradient-to-br from-primary/20 to-pink-200/40 flex items-center justify-center">
                     <span className="text-2xl sm:text-3xl font-sakura text-primary">
-                      {testimonial.name.charAt(0)}
+                      {t(testimonial.nameKey).charAt(0)}
                     </span>
                   </div>
                 </div>
                 <div>
                   <h3 className="text-lg sm:text-xl font-semibold text-secondary">
-                    {testimonial.name}
+                    {t(testimonial.nameKey)}
                   </h3>
                   <p className="text-xs sm:text-sm text-secondary/60">
-                    {testimonial.role}
+                    {t(testimonial.roleKey)}
                   </p>
                 </div>
               </div>
