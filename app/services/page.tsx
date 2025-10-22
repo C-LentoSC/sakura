@@ -336,16 +336,16 @@ export default function ServicesPage() {
               {filteredServices.map((service, index) => (
                 <div
                   key={service.id}
-                  className="service-card bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-primary/10 hover:border-primary/20"
+                  className="service-card bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-primary/10 hover:border-primary/20 group"
                 >
                   <div className="flex flex-col sm:flex-row">
                     {/* Image Section */}
-                    <div className="relative w-full sm:w-44 h-40 sm:h-auto flex-shrink-0 overflow-hidden">
+                    <Link href={`/services/${service.id}`} className="relative w-full sm:w-44 h-40 sm:h-auto flex-shrink-0 overflow-hidden">
                       <Image
                         src={service.image}
                         alt={getServiceName(service)}
                         fill
-                        className="object-cover"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
                         sizes="(max-width: 640px) 100vw, 176px"
                         priority={index === 0}
                       />
@@ -358,14 +358,16 @@ export default function ServicesPage() {
                           {service.duration}
                         </span>
                       </div>
-                    </div>
+                    </Link>
 
                     {/* Content Section */}
                     <div className="flex-1 p-4 flex flex-col justify-between">
                       <div>
-                        <h3 className="text-lg font-sakura text-secondary mb-2">
-                          {getServiceName(service)}
-                        </h3>
+                        <Link href={`/services/${service.id}`}>
+                          <h3 className="text-lg font-sakura text-secondary mb-2 hover:text-primary transition-colors cursor-pointer">
+                            {getServiceName(service)}
+                          </h3>
+                        </Link>
                         <p className="text-secondary/70 text-xs leading-relaxed mb-3 line-clamp-2">
                           {getServiceDesc(service)}
                         </p>
@@ -379,14 +381,17 @@ export default function ServicesPage() {
                         
                         <div className="flex flex-col gap-2">
                           <Link
-                            href={`/book?service=${service.id}`}
+                            href={`/services/${service.id}`}
                             className="w-full px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-full hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300 text-xs text-center"
                           >
-                            {t('services.bookNow')} →
+                            View Details →
                           </Link>
-                          <button className="w-full px-4 py-1.5 bg-white border border-secondary/30 text-secondary font-medium rounded-full hover:bg-secondary/5 hover:border-secondary/50 transition-all duration-300 text-xs">
-                            {t('services.contactInfo')}
-                          </button>
+                          <Link
+                            href={`/book?service=${service.id}`}
+                            className="w-full px-4 py-1.5 bg-white border border-primary/30 text-primary font-medium rounded-full hover:bg-primary/5 hover:border-primary/50 transition-all duration-300 text-xs text-center"
+                          >
+                            {t('services.bookNow')}
+                          </Link>
                         </div>
                       </div>
                     </div>

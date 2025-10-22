@@ -74,37 +74,27 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/bookings" className="text-secondary/60 hover:text-primary text-sm transition-colors duration-300 inline-flex items-center gap-1 group">
-                  <span className="group-hover:translate-x-1 transition-transform duration-300">{t('footer.links.bookings')}</span>
+                <Link href="/contact" className="text-secondary/60 hover:text-primary text-sm transition-colors duration-300 inline-flex items-center gap-1 group">
+                  <span className="group-hover:translate-x-1 transition-transform duration-300">Contact</span>
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Services */}
+          {/* More Links */}
           <div>
             <h4 className="text-base font-semibold text-secondary mb-4 font-sakura">
-              {t('footer.services')}
+              More
             </h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/services/head-spa" className="text-secondary/60 hover:text-primary text-sm transition-colors duration-300">
-                  {t('footer.servicesList.headSpa')}
+                <Link href="/shop" className="text-secondary/60 hover:text-primary text-sm transition-colors duration-300 inline-flex items-center gap-1 group">
+                  <span className="group-hover:translate-x-1 transition-transform duration-300">Shop</span>
                 </Link>
               </li>
               <li>
-                <Link href="/services/nail-art" className="text-secondary/60 hover:text-primary text-sm transition-colors duration-300">
-                  {t('footer.servicesList.nailArt')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/lash-extensions" className="text-secondary/60 hover:text-primary text-sm transition-colors duration-300">
-                  {t('footer.servicesList.lashExtensions')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/eyebrow-styling" className="text-secondary/60 hover:text-primary text-sm transition-colors duration-300">
-                  {t('footer.servicesList.eyebrowStyling')}
+                <Link href="/cart" className="text-secondary/60 hover:text-primary text-sm transition-colors duration-300 inline-flex items-center gap-1 group">
+                  <span className="group-hover:translate-x-1 transition-transform duration-300">Cart</span>
                 </Link>
               </li>
             </ul>
@@ -146,10 +136,10 @@ export default function Footer() {
             © {new Date().getFullYear()} Sakura Saloon. {t('footer.copyright')}
           </p>
           <div className="flex gap-6 text-xs">
-            <Link href="/privacy" className="text-secondary/50 hover:text-primary transition-colors duration-300">
+            <Link href="/privacy-policy" className="text-secondary/50 hover:text-primary transition-colors duration-300">
               {t('footer.privacy')}
             </Link>
-            <Link href="/terms" className="text-secondary/50 hover:text-primary transition-colors duration-300">
+            <Link href="/terms-of-service" className="text-secondary/50 hover:text-primary transition-colors duration-300">
               {t('footer.terms')}
             </Link>
           </div>
