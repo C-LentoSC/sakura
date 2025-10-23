@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Language } from '../locales/config';
 import { logout } from '../(auth)/logout/actions';
@@ -11,6 +12,15 @@ export default function HeaderClient() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<{ name: string | null; email: string; role: string } | null>(null);
   const { language, setLanguage, t, languages } = useLanguage();
+  const pathname = usePathname();
+
+  // Helper function to check if a route is active
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return pathname === '/';
+    }
+    return pathname.startsWith(path);
+  };
 
   // Fetch user data client-side
   useEffect(() => {
@@ -40,22 +50,64 @@ export default function HeaderClient() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 xl:space-x-8">
-          <Link href="/" className="nav-item text-secondary text-xs lg:text-sm font-medium transition-colors border-b-2 border-transparent hover:border-primary hover:text-primary">
+          <Link 
+            href="/" 
+            className={`nav-item text-xs lg:text-sm font-medium transition-colors border-b-2 hover:border-primary hover:text-primary ${
+              isActive('/') 
+                ? 'text-primary border-primary' 
+                : 'text-secondary/70 border-transparent'
+            }`}
+          >
             {t('nav.home')}
           </Link>
-          <Link href="/about" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+          <Link 
+            href="/about" 
+            className={`nav-item text-xs lg:text-sm font-medium transition-colors border-b-2 hover:border-primary hover:text-primary ${
+              isActive('/about') 
+                ? 'text-primary border-primary' 
+                : 'text-secondary/70 border-transparent'
+            }`}
+          >
             {t('nav.about')}
           </Link>
-          <Link href="/services" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+          <Link 
+            href="/services" 
+            className={`nav-item text-xs lg:text-sm font-medium transition-colors border-b-2 hover:border-primary hover:text-primary ${
+              isActive('/services') 
+                ? 'text-primary border-primary' 
+                : 'text-secondary/70 border-transparent'
+            }`}
+          >
             {t('nav.services')}
           </Link>
-          <Link href="/shop" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+          <Link 
+            href="/shop" 
+            className={`nav-item text-xs lg:text-sm font-medium transition-colors border-b-2 hover:border-primary hover:text-primary ${
+              isActive('/shop') 
+                ? 'text-primary border-primary' 
+                : 'text-secondary/70 border-transparent'
+            }`}
+          >
             {t('nav.shop')}
           </Link>
-          <Link href="/bookings" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+          <Link 
+            href="/bookings" 
+            className={`nav-item text-xs lg:text-sm font-medium transition-colors border-b-2 hover:border-primary hover:text-primary ${
+              isActive('/bookings') 
+                ? 'text-primary border-primary' 
+                : 'text-secondary/70 border-transparent'
+            }`}
+          >
             {t('nav.bookings')}
           </Link>
-          <Link href="/contact" className="nav-item text-secondary/70 text-xs lg:text-sm font-medium hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">
+          <Link 
+            href="/contact" 
+            className={`nav-item text-xs lg:text-sm font-medium transition-colors border-b-2 hover:border-primary hover:text-primary ${
+              isActive('/contact') 
+                ? 'text-primary border-primary' 
+                : 'text-secondary/70 border-transparent'
+            }`}
+          >
             {t('nav.contact')}
           </Link>
         </nav>
@@ -127,7 +179,11 @@ export default function HeaderClient() {
           <nav className="flex flex-col px-4 py-4 space-y-0">
             <Link 
               href="/" 
-              className="flex items-center gap-3 text-secondary font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
+              className={`flex items-center gap-3 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group ${
+                isActive('/') 
+                  ? 'text-primary bg-primary/5' 
+                  : 'text-secondary/70'
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,7 +194,11 @@ export default function HeaderClient() {
             
             <Link 
               href="/about" 
-              className="flex items-center gap-3 text-secondary/70 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
+              className={`flex items-center gap-3 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group ${
+                isActive('/about') 
+                  ? 'text-primary bg-primary/5' 
+                  : 'text-secondary/70'
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,7 +209,11 @@ export default function HeaderClient() {
             
             <Link 
               href="/services" 
-              className="flex items-center gap-3 text-secondary/70 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
+              className={`flex items-center gap-3 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group ${
+                isActive('/services') 
+                  ? 'text-primary bg-primary/5' 
+                  : 'text-secondary/70'
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,7 +224,11 @@ export default function HeaderClient() {
             
             <Link 
               href="/shop" 
-              className="flex items-center gap-3 text-secondary/70 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
+              className={`flex items-center gap-3 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group ${
+                isActive('/shop') 
+                  ? 'text-primary bg-primary/5' 
+                  : 'text-secondary/70'
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,7 +239,11 @@ export default function HeaderClient() {
             
             <Link 
               href="/bookings" 
-              className="flex items-center gap-3 text-secondary/70 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
+              className={`flex items-center gap-3 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group ${
+                isActive('/bookings') 
+                  ? 'text-primary bg-primary/5' 
+                  : 'text-secondary/70'
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,7 +254,11 @@ export default function HeaderClient() {
             
             <Link 
               href="/contact" 
-              className="flex items-center gap-3 text-secondary/70 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
+              className={`flex items-center gap-3 font-medium py-3 px-3 rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 group ${
+                isActive('/contact') 
+                  ? 'text-primary bg-primary/5' 
+                  : 'text-secondary/70'
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

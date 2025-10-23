@@ -6,7 +6,7 @@ import { decrypt } from './app/lib/session';
 const protectedRoutes = ['/dashboard', '/profile', '/bookings', '/book', '/booking', '/checkout'];
 const adminRoutes = ['/admin'];
 
-export default async function middleware(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
   
   // Check route type
