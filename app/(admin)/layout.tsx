@@ -26,12 +26,12 @@ export default async function AdminLayout({
   const user = await getCurrentUser();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Admin Sidebar */}
       <AdminSidebar userName={user.name || undefined} userEmail={user.email} />
       
       {/* Main Content Area */}
-      <main className="lg:ml-64 min-h-screen">
+      <main className="flex-1 lg:ml-64">
         <div className="p-6">
           {children}
         </div>

@@ -54,7 +54,7 @@ export default function TermsOfServicePage() {
   }, []);
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
       <BackgroundPattern />
       <CherryBlossomTrees />
       <FallingPetals />
@@ -63,7 +63,7 @@ export default function TermsOfServicePage() {
 
       <div className="absolute inset-0 bg-pink-200/20 backdrop-blur-xs pointer-events-none z-0" />
 
-      <main className="relative z-10 pt-24 sm:pt-28 md:pt-32">
+      <main className="flex-1 relative z-10 pt-20 sm:pt-24 md:pt-32">
         {/* Hero Section */}
         <div ref={heroRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 sm:py-16 md:py-20">
           <div className="text-center max-w-4xl mx-auto">

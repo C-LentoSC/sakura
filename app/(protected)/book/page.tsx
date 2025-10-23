@@ -401,7 +401,7 @@ function BookPageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+      <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
         <BackgroundPattern />
         <CherryBlossomTrees />
         <FallingPetals />
@@ -417,7 +417,7 @@ function BookPageContent() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
       <BackgroundPattern />
       <CherryBlossomTrees />
       <FallingPetals />
@@ -963,7 +963,7 @@ export default function BookPage() {
         <Header />
         <Chatbot />
         <div className="absolute inset-0 bg-pink-100/20 backdrop-blur-xs pointer-events-none z-0" />
-        <main className="relative z-10 pt-16 sm:pt-20">
+        <main className="flex-1 relative z-10 pt-20 sm:pt-24">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-6 sm:py-8">
             <div className="text-center max-w-4xl mx-auto">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sakura text-secondary mb-4">

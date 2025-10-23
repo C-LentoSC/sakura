@@ -40,14 +40,7 @@ export async function GET(request: NextRequest) {
       badgeType: p.badgeType,
     }));
 
-    return NextResponse.json(
-      { products: data },
-      {
-        headers: {
-          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=86400',
-        },
-      }
-    );
+    return NextResponse.json({ products: data });
   } catch (err) {
     console.error('Failed to fetch products', err);
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });

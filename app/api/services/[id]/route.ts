@@ -26,11 +26,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(service, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=86400',
-      },
-    });
+    return NextResponse.json(service);
   } catch (error) {
     console.error('Error fetching service:', error);
     return NextResponse.json(

@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -54,43 +53,35 @@ export default function ServiceDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [activeTab, setActiveTab] = useState<'description' | 'details' | 'benefits'>('description');
 
-  const queryClient = useQueryClient();
-  const initialFromLists = useMemo(() => {
-    const matches = queryClient.getQueriesData<{ services: Service[] }>({ queryKey: ['services'] });
-    for (const [, val] of matches) {
-      const found = val?.services?.find((s) => s.id === serviceId);
-      if (found) return found;
-    }
-    return null;
-  }, [queryClient, serviceId]);
-
-  const { data: fetchedService, isLoading } = useQuery({
-    queryKey: ['service', serviceId, language],
-    queryFn: async () => {
-      const res = await fetch(`/api/services/${serviceId}?lang=${language}`);
-      if (!res.ok) throw new Error('Failed to load service');
-      return res.json() as Promise<Service>;
-    },
-    // Use any service cached from lists as initial data to avoid blank
-    initialData: initialFromLists ?? undefined,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-    placeholderData: (prev) => prev,
-  });
-
   useEffect(() => {
-    setService(fetchedService ?? null);
-    setLoading(isLoading && !fetchedService);
-  }, [fetchedService, isLoading]);
+    const fetchService = async () => {
+      try {
+        const response = await fetch(`/api/services/${serviceId}?lang=${language}`);
+        if (response.ok) {
+          const data = await response.json();
+          setService(data);
+        } else {
+          setService(null);
+        }
+      } catch (error) {
+        console.error('Error fetching service:', error);
+        setService(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchService();
+  }, [serviceId, language]);
 
   if (loading) {
     return (
-      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+      <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
         <BackgroundPattern />
         <CherryBlossomTrees />
         <FallingPetals />
         <Header />
-        <main className="relative z-10 pt-20 sm:pt-24">
+        <main className="flex-1 relative z-10 pt-20 sm:pt-24">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8 sm:py-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               <div className="space-y-4 animate-pulse">
@@ -136,12 +127,12 @@ export default function ServiceDetailPage() {
 
   if (!service) {
     return (
-      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+      <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
         <BackgroundPattern />
         <CherryBlossomTrees />
         <FallingPetals />
         <Header />
-        <main className="relative z-10 pt-20 sm:pt-24">
+        <main className="flex-1 relative z-10 pt-20 sm:pt-24">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl py-16 text-center">
             <h1 className="text-4xl font-sakura text-secondary mb-4">Service Not Found</h1>
             <p className="text-secondary/70 mb-8">The service you are looking for does not exist.</p>
@@ -211,7 +202,7 @@ export default function ServiceDetailPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
       <BackgroundPattern />
       <CherryBlossomTrees />
       <FallingPetals />
@@ -220,7 +211,7 @@ export default function ServiceDetailPage() {
 
       <div className="absolute inset-0 bg-pink-100/20 backdrop-blur-xs pointer-events-none z-0" />
 
-      <main className="relative z-10 pt-20 sm:pt-24">
+      <main className="flex-1 relative z-10 pt-20 sm:pt-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8 sm:py-12">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-secondary/60 mb-8">

@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -100,55 +99,51 @@ export default function ServicesPage() {
   const heroRef = useRef<HTMLDivElement>(null);
   const servicesRef = useRef<HTMLDivElement>(null);
 
-  // Categories
-  const { data: catData } = useQuery({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      const res = await fetch('/api/categories');
-      if (!res.ok) throw new Error('Failed to load categories');
-      return res.json() as Promise<{ categories: Category[] }>;
-    },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-    placeholderData: (prev) => prev,
-  });
-
+  // Fetch categories on mount
   useEffect(() => {
-    if (catData?.categories) {
-      setCategories(catData.categories);
-      if (catData.categories.length > 0 && !selectedMainCategory) {
-        setSelectedMainCategory(catData.categories[0].slug);
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('/api/categories');
+        const data = await res.json();
+        setCategories(data.categories || []);
+        
+        // Set first category as default if available
+        if (data.categories && data.categories.length > 0) {
+          setSelectedMainCategory(data.categories[0].slug);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
       }
-    }
-  }, [catData, selectedMainCategory]);
+    };
 
-  // Services per filter
-  const serviceKey = useMemo(() => [
-    'services', language, selectedMainCategory, selectedSubCategory, selectedSubSubCategory
-  ] as const, [language, selectedMainCategory, selectedSubCategory, selectedSubSubCategory]);
+    fetchCategories();
+  }, []);
 
-  const { data: svcData, isLoading: svcLoading } = useQuery({
-    queryKey: serviceKey,
-    queryFn: async () => {
-      const params = new URLSearchParams({
-        category: selectedMainCategory,
-        ...(selectedSubCategory !== 'all' && { subCategory: selectedSubCategory }),
-        ...(selectedSubSubCategory !== 'all' && { subSubCategory: selectedSubSubCategory }),
-      });
-      const res = await fetch(`/api/services?${params}`);
-      if (!res.ok) throw new Error('Failed to load services');
-      return res.json() as Promise<{ services: Service[]; total: number }>;
-    },
-    enabled: Boolean(selectedMainCategory),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-    placeholderData: (prev) => prev,
-  });
-
+  // Fetch services when category changes
   useEffect(() => {
-    setLoading(svcLoading);
-    if (svcData?.services) setServices(svcData.services);
-  }, [svcLoading, svcData]);
+    const fetchServices = async () => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams({
+          category: selectedMainCategory,
+          ...(selectedSubCategory !== 'all' && { subCategory: selectedSubCategory }),
+          ...(selectedSubSubCategory !== 'all' && { subSubCategory: selectedSubSubCategory }),
+        });
+
+        const res = await fetch(`/api/services?${params}`);
+        const data = await res.json();
+        setServices(data.services || []);
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (selectedMainCategory) {
+      fetchServices();
+    }
+  }, [selectedMainCategory, selectedSubCategory, selectedSubSubCategory]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -235,7 +230,7 @@ export default function ServicesPage() {
   ] : [];
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
       <BackgroundPattern />
       <CherryBlossomTrees />
       <FallingPetals />
@@ -244,7 +239,7 @@ export default function ServicesPage() {
 
       <div className="absolute inset-0 bg-pink-100/20 backdrop-blur-xs pointer-events-none z-0" />
 
-      <main className="relative z-10 pt-20 sm:pt-24">
+      <main className="flex-1 relative z-10 pt-20 sm:pt-24">
         {/* Hero Section */}
         <div ref={heroRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-8 sm:py-10">
           <div className="text-center max-w-3xl mx-auto">

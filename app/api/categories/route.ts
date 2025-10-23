@@ -35,14 +35,7 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(
-      { categories },
-      {
-        headers: {
-          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=86400',
-        },
-      }
-    );
+    return NextResponse.json({ categories });
   } catch (error) {
     console.error('Error fetching categories:', error);
     return NextResponse.json(

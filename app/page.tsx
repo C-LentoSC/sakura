@@ -16,14 +16,14 @@ import ExclusiveServices from './components/ExclusiveServices';
 
 export default function Home() {
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
       <BackgroundPattern />
       <CherryBlossomTrees />
       <FallingPetals />
       <Header />
       <Chatbot />
 
-      <main className="relative z-10 px-0 sm:px-6 lg:mx-8 xl:mx-32 pt-10">
+      <main className="flex-1 relative z-10 px-0 sm:px-6 lg:mx-8 xl:mx-32 pt-10">
         <div className="max-w-7xl mx-auto w-full py-8 sm:py-0 min-h-screen flex items-center">
           <div className="w-full">
             <HeroSection />

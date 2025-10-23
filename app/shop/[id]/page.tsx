@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -29,39 +28,40 @@ type ApiProduct = {
   description: string;
 };
 
-const fetchProducts = async (lang: 'en' | 'ja'): Promise<{ products: ApiProduct[] }> => {
-  const res = await fetch(`/api/products?lang=${lang}`);
-  if (!res.ok) throw new Error('Failed to load products');
-  return res.json();
-};
-
 export default function ProductDetailPage() {
   const { t, language } = useLanguage();
   const params = useParams();
   const router = useRouter();
   const productId = parseInt(params.id as string);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['products', language],
-    queryFn: () => fetchProducts(language),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-    placeholderData: (prev) => prev,
-  });
-  const initialFromList = useMemo(() => {
-    const list = (data?.products ?? []);
-    return list.find((p) => p.id === productId) || null;
-  }, [data, productId]);
-  const [product, setProduct] = useState<ApiProduct | null>(initialFromList);
+  const [product, setProduct] = useState<ApiProduct | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [notification, setNotification] = useState<{message: string; show: boolean}>({message: '', show: false});
 
   useEffect(() => {
-    setProduct(initialFromList);
-  }, [initialFromList]);
+    let active = true;
+    const load = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/products?lang=${language}`);
+        if (!res.ok) throw new Error('Failed to load products');
+        const data: { products: ApiProduct[] } = await res.json();
+        const found = data.products.find((p) => p.id === productId) || null;
+        if (active) setProduct(found);
+      } catch (e) {
+        console.error(e);
+        if (active) setProduct(null);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    load();
+    return () => { active = false; };
+  }, [language, productId]);
 
-  if (isLoading && !product) {
+  if (loading) {
     return (
       <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
         <BackgroundPattern />
@@ -108,7 +108,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  if (!isLoading && !product) {
+  if (!loading && !product) {
     return (
       <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
         <BackgroundPattern />
@@ -132,8 +132,8 @@ export default function ProductDetailPage() {
     );
   }
 
-  // Additional images only when product is available
-  const productImages = product ? [product.image, product.image, product.image] : [];
+  // Mock additional images (use same image as placeholder)
+  const productImages = [product?.image || '', product?.image || '', product?.image || ''];
 
   const addToCart = () => {
     // Persist to localStorage cart
@@ -197,7 +197,6 @@ export default function ProductDetailPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Product Images */}
-            {product && (
             <div className="space-y-4">
               {/* Main Image */}
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-white shadow-lg">
@@ -271,7 +270,6 @@ export default function ProductDetailPage() {
                 ))}
               </div>
             </div>
-            )}
 
             {/* Product Info */}
             <div className="space-y-6">

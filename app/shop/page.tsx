@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
@@ -18,12 +17,6 @@ import {
 
 type Product = ProductCardData & { id: number };
 
-const fetchProducts = async (lang: 'en' | 'ja'): Promise<{ products: Product[] }> => {
-  const res = await fetch(`/api/products?lang=${lang}`);
-  if (!res.ok) throw new Error('Failed to load products');
-  return res.json();
-};
-
 // Categories will be translated dynamically
 
 export default function ShopPage() {
@@ -32,15 +25,31 @@ export default function ShopPage() {
   const [cartQty, setCartQty] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [mounted, setMounted] = useState(false);
-  const queryClient = useQueryClient();
-  const { data, isLoading } = useQuery({
-    queryKey: ['products', language],
-    queryFn: () => fetchProducts(language),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-    placeholderData: (prev) => prev,
-  });
-  const products = useMemo<Product[]>(() => data?.products ?? [], [data]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Fetch products from API based on current language
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/products?lang=${language}`);
+        if (!res.ok) throw new Error('Failed to load products');
+        const data: { products: Product[] } = await res.json();
+        if (active) setProducts(data.products);
+      } catch (e) {
+        console.error(e);
+        if (active) setProducts([]);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    load();
+    return () => {
+      active = false;
+    };
+  }, [language]);
 
   const filteredProducts = products.filter((product: Product) => {
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
@@ -83,7 +92,7 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
       <BackgroundPattern />
       <CherryBlossomTrees />
       <FallingPetals />
@@ -92,7 +101,7 @@ export default function ShopPage() {
 
       <div className="absolute inset-0 bg-pink-100/20 backdrop-blur-xs pointer-events-none z-0" />
 
-      <main className="relative z-10 pt-20 sm:pt-24">
+      <main className="flex-1 relative z-10 pt-20 sm:pt-24">
         {/* Hero Section */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -154,7 +163,7 @@ export default function ShopPage() {
 
           {/* Products Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 mb-12">
-            {isLoading
+            {loading
               ? [...Array(10)].map((_, i) => (
                   <div key={i} className="bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden shadow-md border border-primary/10 animate-pulse">
                     <div className="h-28 sm:h-32 bg-secondary/10" />
@@ -200,14 +209,6 @@ export default function ShopPage() {
                         {product.inStock && (
                           <Link
                             href={`/shop/${product.id}`}
-                            onMouseEnter={() => {
-                              // prefetch detail by scanning cached list later in detail page
-                              queryClient.prefetchQuery({
-                                queryKey: ['products', language],
-                                queryFn: () => fetchProducts(language),
-                                staleTime: 5 * 60 * 1000,
-                              });
-                            }}
                             className="w-full px-2 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-semibold border border-primary/30 text-primary hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 text-center hover:scale-[1.02] active:scale-95"
                           >
                             Buy Now

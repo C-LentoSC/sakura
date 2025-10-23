@@ -25,13 +25,13 @@ export default async function AuthLayout({
   // The middleware will handle clearing cookies on the next request
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
       <BackgroundPattern />
       <CherryBlossomTrees />
       <FallingPetals />
       <Header />
       
-      <main className="relative z-10 flex items-center justify-center min-h-screen px-4 py-20">
+      <main className="flex-1 relative z-10 flex items-center justify-center px-4 py-20">
         <div className="w-full max-w-md">
           {children}
         </div>

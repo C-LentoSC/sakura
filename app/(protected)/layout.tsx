@@ -22,7 +22,7 @@ export default async function ProtectedLayout({
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
       <BackgroundPattern />
       <CherryBlossomTrees />
       <FallingPetals />
@@ -30,7 +30,7 @@ export default async function ProtectedLayout({
       <Chatbot />
       <div className="absolute inset-0 bg-pink-100/20 backdrop-blur-xs pointer-events-none z-0" />
       
-      <main className="relative z-10 px-4 sm:px-6 lg:px-8 pt-20 pb-12">
+      <main className="flex-1 relative z-10 px-4 sm:px-6 lg:px-8 pt-20 pb-12">
         <div className="max-w-7xl mx-auto">
           {children}
         </div>
