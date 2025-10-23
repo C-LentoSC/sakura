@@ -162,11 +162,11 @@ export default function RegisterPage() {
           />
           <label htmlFor="terms" className="ml-2 text-xs text-secondary/70">
             {t('auth.register.terms')}{' '}
-            <Link href="/terms" className="text-primary hover:text-pink-600">
+            <Link href="/terms-of-service" className="text-primary hover:text-pink-600">
               {t('auth.register.termsLink')}
             </Link>{' '}
             {t('auth.register.and')}{' '}
-            <Link href="/privacy" className="text-primary hover:text-pink-600">
+            <Link href="/privacy-policy" className="text-primary hover:text-pink-600">
               {t('auth.register.privacyLink')}
             </Link>
           </label>

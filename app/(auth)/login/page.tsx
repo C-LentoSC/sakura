@@ -73,12 +73,13 @@ export default function LoginPage() {
             <label htmlFor="password" className="block text-sm font-semibold text-secondary">
               {t('auth.login.password')}
             </label>
-            <Link
-              href="/forgot-password"
-              className="text-xs text-primary hover:text-pink-600 transition-colors"
+            <span
+              className="text-xs text-secondary/50 cursor-not-allowed"
+              aria-disabled
+              title="Coming soon"
             >
               {t('auth.login.forgot')}
-            </Link>
+            </span>
           </div>
           <div className="relative">
             <input
