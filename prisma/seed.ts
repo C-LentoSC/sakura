@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -474,6 +475,17 @@ async function main() {
   for (const p of products) {
     await prisma.product.create({ data: p });
   }
+
+  const adminEmail: string = process.env.ADMIN_EMAIL ?? 'admin@sakurasaloon.com';
+  const adminPassword: string = process.env.ADMIN_PASSWORD ?? 'admin123';
+  const adminName: string = process.env.ADMIN_NAME ?? 'Admin';
+  const passwordHash: string = await bcrypt.hash(adminPassword, 12);
+
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: { name: adminName, role: 'ADMIN' },
+    create: { name: adminName, email: adminEmail, password: passwordHash, role: 'ADMIN' },
+  });
 
   console.log('✅ Database seeding completed successfully!');
   console.log('📊 Summary:');
