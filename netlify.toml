@@ -19,4 +19,3 @@
 [template.environment]
   NEXT_PUBLIC_CURRENCY = "LKR"
   NEXT_PUBLIC_CURRENCY_LOCALE = "en-LK"
-
