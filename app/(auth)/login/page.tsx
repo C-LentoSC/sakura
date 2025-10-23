@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useSearchParams } from 'next/navigation';
 import { login } from './actions';
@@ -27,6 +27,7 @@ export default function LoginPage() {
   const from = searchParams.get('from') || '/';
   const [state, formAction] = useActionState(login, {});
   const { t } = useLanguage();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   return (
     <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-primary/10">
@@ -59,7 +60,7 @@ export default function LoginPage() {
                 ? 'border-red-300 focus:border-red-500'
                 : 'border-primary/20 focus:border-primary'
             }`}
-            placeholder="your.email@example.com"
+            placeholder={t('auth.login.emailPlaceholder')}
           />
           {state?.errors?.email && (
             <p className="mt-1 text-sm text-red-600">{state.errors.email[0]}</p>
@@ -79,18 +80,37 @@ export default function LoginPage() {
               {t('auth.login.forgot')}
             </Link>
           </div>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            className={`w-full px-4 py-2.5 rounded-lg border-2 focus:ring-2 focus:ring-primary/20 outline-none transition-colors ${
-              state?.errors?.password
-                ? 'border-red-300 focus:border-red-500'
-                : 'border-primary/20 focus:border-primary'
-            }`}
-            placeholder="••••••••"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              id="password"
+              name="password"
+              required
+              className={`w-full px-4 py-2.5 pr-10 rounded-lg border-2 focus:ring-2 focus:ring-primary/20 outline-none transition-colors ${
+                state?.errors?.password
+                  ? 'border-red-300 focus:border-red-500'
+                  : 'border-primary/20 focus:border-primary'
+              }`}
+              placeholder={t('auth.login.passwordPlaceholder')}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute inset-y-0 right-2 flex items-center text-secondary/50 hover:text-secondary"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.082.172-2.123.491-3.098M6.3 6.3C8.056 5.158 9.98 4.5 12 4.5c5.523 0 10 4.477 10 10 0 1.69-.42 3.283-1.162 4.684M3 3l18 18M9.88 9.88a3 3 0 104.24 4.24" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              )}
+            </button>
+          </div>
           {state?.errors?.password && (
             <p className="mt-1 text-sm text-red-600">{state.errors.password[0]}</p>
           )}

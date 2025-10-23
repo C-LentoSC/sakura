@@ -66,7 +66,7 @@ export default function RegisterPage() {
                 ? 'border-red-300 focus:border-red-500'
                 : 'border-primary/20 focus:border-primary'
             }`}
-            placeholder="Your full name"
+            placeholder={t('auth.register.namePlaceholder')}
           />
           {state?.errors?.name && (
             <p className="mt-1 text-sm text-red-600">{state.errors.name[0]}</p>
@@ -88,7 +88,7 @@ export default function RegisterPage() {
                 ? 'border-red-300 focus:border-red-500'
                 : 'border-primary/20 focus:border-primary'
             }`}
-            placeholder="your.email@example.com"
+            placeholder={t('auth.register.emailPlaceholder')}
           />
           {state?.errors?.email && (
             <p className="mt-1 text-sm text-red-600">{state.errors.email[0]}</p>
@@ -100,20 +100,23 @@ export default function RegisterPage() {
           <label htmlFor="password" className="block text-sm font-semibold text-secondary mb-2">
             {t('auth.register.password')}
           </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={`w-full px-4 py-2.5 rounded-lg border-2 focus:ring-2 focus:ring-primary/20 outline-none transition-colors ${
-              state?.errors?.password
-                ? 'border-red-300 focus:border-red-500'
-                : 'border-primary/20 focus:border-primary'
-            }`}
-            placeholder="••••••••"
-          />
+          <div className="relative">
+            <input
+              type={password ? 'password' : 'password'}
+              id="password"
+              name="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`w-full px-4 py-2.5 pr-10 rounded-lg border-2 focus:ring-2 focus:ring-primary/20 outline-none transition-colors ${
+                state?.errors?.password
+                  ? 'border-red-300 focus:border-red-500'
+                  : 'border-primary/20 focus:border-primary'
+              }`}
+              placeholder={t('auth.register.passwordPlaceholder')}
+            />
+            {/* Simple visibility toggle could be added later if needed */}
+          </div>
           {password && passwordStrength.label && (
             <p className={`mt-1 text-xs ${passwordStrength.color}`}>
               {passwordStrength.label}
@@ -129,18 +132,20 @@ export default function RegisterPage() {
           <label htmlFor="confirmPassword" className="block text-sm font-semibold text-secondary mb-2">
             {t('auth.register.confirmPassword')}
           </label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            required
-            className={`w-full px-4 py-2.5 rounded-lg border-2 focus:ring-2 focus:ring-primary/20 outline-none transition-colors ${
-              state?.errors?.confirmPassword
-                ? 'border-red-300 focus:border-red-500'
-                : 'border-primary/20 focus:border-primary'
-            }`}
-            placeholder="••••••••"
-          />
+          <div className="relative">
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              required
+              className={`w-full px-4 py-2.5 pr-10 rounded-lg border-2 focus:ring-2 focus:ring-primary/20 outline-none transition-colors ${
+                state?.errors?.confirmPassword
+                  ? 'border-red-300 focus:border-red-500'
+                  : 'border-primary/20 focus:border-primary'
+              }`}
+              placeholder={t('auth.register.confirmPasswordPlaceholder')}
+            />
+          </div>
           {state?.errors?.confirmPassword && (
             <p className="mt-1 text-sm text-red-600">{state.errors.confirmPassword[0]}</p>
           )}
