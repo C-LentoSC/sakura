@@ -105,6 +105,7 @@
   "testimonials": {
     "mainTitle": "What Our Clients Say",
     "subtitle": "Hear from our satisfied clients about their experiences",
+    "google": { "role": "Google Reviewer" },
     "client1": {
       "name": "Sarah Johnson",
       "role": "Regular Client",

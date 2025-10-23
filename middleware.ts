@@ -3,9 +3,7 @@ import type { NextRequest } from 'next/server';
 import { decrypt } from './app/lib/session';
 
 // Define route categories
-const publicRoutes = ['/', '/about', '/contact', '/services', '/shop'];
 const protectedRoutes = ['/dashboard', '/profile', '/bookings', '/book', '/booking', '/checkout'];
-const authRoutes = ['/login', '/register'];
 const adminRoutes = ['/admin'];
 
 export default async function middleware(req: NextRequest) {
@@ -13,7 +11,6 @@ export default async function middleware(req: NextRequest) {
   
   // Check route type
   const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
-  const isAuthRoute = authRoutes.includes(path);
   const isAdminRoute = adminRoutes.some(route => path.startsWith(route));
   
   // Decrypt session from cookie (optimistic check, no DB call)

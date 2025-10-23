@@ -54,7 +54,7 @@ async function main() {
     },
   });
 
-  const headSpaTherapy = await prisma.serviceSubCategory.create({
+  await prisma.serviceSubCategory.create({
     data: {
       slug: 'therapy',
       nameKey: 'services.subCategories.therapy',
@@ -64,7 +64,7 @@ async function main() {
   });
 
   // Beauty Sub-Categories
-  const beautyHeadSpa = await prisma.serviceSubCategory.create({
+  await prisma.serviceSubCategory.create({
     data: {
       slug: 'headspa',
       nameKey: 'services.subCategories.headSpa',
@@ -132,7 +132,7 @@ async function main() {
     },
   });
 
-  const pedicure = await prisma.serviceSubSubCategory.create({
+  await prisma.serviceSubSubCategory.create({
     data: {
       slug: 'pedicure',
       nameKey: 'services.subSubCategories.pedicure',
@@ -141,7 +141,7 @@ async function main() {
     },
   });
 
-  const acrylicNails = await prisma.serviceSubSubCategory.create({
+  await prisma.serviceSubSubCategory.create({
     data: {
       slug: 'acrylic',
       nameKey: 'services.subSubCategories.acrylic',

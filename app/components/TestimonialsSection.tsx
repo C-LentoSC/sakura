@@ -13,6 +13,7 @@ export default function TestimonialsSection() {
   const titleRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [googleReviews, setGoogleReviews] = useState<Array<{ id: string; name: string; rating: number; text: string }>>([]);
 
   const testimonials = [
     {
@@ -80,6 +81,33 @@ export default function TestimonialsSection() {
     }, sectionRef);
 
     return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/reviews/google?limit=3', { headers: { 'accept': 'application/json' } });
+        if (!res.ok) return;
+        type ReviewItem = { id: string; name: string; rating: number; text: string };
+        type ApiResponse = { reviews: ReviewItem[] };
+        const data: ApiResponse = await res.json();
+        if (!cancelled && Array.isArray(data.reviews)) {
+          const mapped: ReviewItem[] = data.reviews.map((r: ReviewItem) => ({
+            id: r.id,
+            name: r.name,
+            rating: r.rating,
+            text: r.text,
+          }));
+          setGoogleReviews(mapped);
+        }
+      } catch {
+        // ignore network errors
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -162,6 +190,41 @@ export default function TestimonialsSection() {
                   <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="1" />
                 </svg>
               </div>
+            </div>
+          ))}
+
+          {googleReviews.map((r) => (
+            <div
+              key={r.id}
+              className="testimonial-card group relative bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-md hover:shadow-2xl transition-all duration-500 border border-secondary/5 hover:border-primary/20 hover:-translate-y-2"
+            >
+              <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+                <svg className="w-12 h-12 sm:w-16 sm:h-16 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z" />
+                </svg>
+              </div>
+
+              <div className="flex items-center gap-4 mb-4 sm:mb-6">
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
+                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-pink-200/40 flex items-center justify-center">
+                    <span className="text-2xl sm:text-3xl font-sakura text-primary">{r.name.charAt(0)}</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-secondary">{r.name}</h3>
+                  <p className="text-xs sm:text-sm text-secondary/60">{t('testimonials.google.role')}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-1 mb-4">
+                {[...Array(Math.max(0, Math.min(5, Math.round(r.rating))))].map((_, i) => (
+                  <svg key={i} className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                  </svg>
+                ))}
+              </div>
+
+              <p className="text-secondary/80 text-sm sm:text-base leading-relaxed">&ldquo;{r.text}&rdquo;</p>
             </div>
           ))}
         </div>
