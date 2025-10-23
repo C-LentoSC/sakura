@@ -40,6 +40,7 @@ export default function CherryBlossomTrees() {
             alt="Left Cherry Blossom Tree"
             width={1920}
             height={1000}
+            priority
             className="h-40 w-full sm:h-60 lg:h-120 object-cover transition-transform duration-3000 hover:scale-105"
           />
         </div>

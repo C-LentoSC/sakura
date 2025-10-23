@@ -26,12 +26,14 @@ export default function ShopPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [mounted, setMounted] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Fetch products from API based on current language
   useEffect(() => {
     let active = true;
     const load = async () => {
       try {
+        setLoading(true);
         const res = await fetch(`/api/products?lang=${language}`);
         if (!res.ok) throw new Error('Failed to load products');
         const data: { products: Product[] } = await res.json();
@@ -39,6 +41,8 @@ export default function ShopPage() {
       } catch (e) {
         console.error(e);
         if (active) setProducts([]);
+      } finally {
+        if (active) setLoading(false);
       }
     };
     load();
@@ -159,49 +163,61 @@ export default function ShopPage() {
 
           {/* Products Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 mb-12">
-            {filteredProducts.map((product) => (
-              <ProductCardBase
-                key={product.id}
-                product={product as unknown as ProductCardData}
-                quickViewHref={`/shop/${product.id}`}
-                priceNode={
-                  <div className="flex flex-wrap items-baseline gap-1 mb-2">
-                    <span className="text-base sm:text-lg font-bold text-primary">{formatCurrency(product.price)}</span>
-                    {product.originalPrice && (
-                      <>
-                        <span className="text-[10px] text-secondary/40 line-through">{formatCurrency(product.originalPrice)}</span>
-                        <span className="text-[9px] bg-red-100 text-red-600 px-1 py-0.5 rounded-full font-semibold">
-                          {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
-                        </span>
-                      </>
-                    )}
+            {loading
+              ? [...Array(10)].map((_, i) => (
+                  <div key={i} className="bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden shadow-md border border-primary/10 animate-pulse">
+                    <div className="h-28 sm:h-32 bg-secondary/10" />
+                    <div className="p-2 sm:p-3 space-y-2">
+                      <div className="h-3 bg-secondary/10 rounded w-4/5" />
+                      <div className="h-3 bg-secondary/10 rounded w-2/3" />
+                      <div className="h-6 bg-secondary/10 rounded w-1/2" />
+                      <div className="h-7 bg-secondary/10 rounded w-full" />
+                    </div>
                   </div>
-                }
-                actions={
-                  <div className="flex flex-col gap-1.5">
-                    <button
-                      onClick={() => addToCart(product.id)}
-                      disabled={!product.inStock}
-                      className={`w-full px-2 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition-all duration-300 ${
-                        product.inStock
-                          ? 'bg-gradient-to-r from-primary to-pink-400 text-white hover:shadow-md hover:scale-[1.02] active:scale-95'
-                          : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      }`}
-                    >
-                      {product.inStock ? t('shop.product.addToCart') : t('shop.product.outOfStock')}
-                    </button>
-                    {product.inStock && (
-                      <Link
-                        href={`/shop/${product.id}`}
-                        className="w-full px-2 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-semibold border border-primary/30 text-primary hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 text-center hover:scale-[1.02] active:scale-95"
-                      >
-                        Buy Now
-                      </Link>
-                    )}
-                  </div>
-                }
-              />
-            ))}
+                ))
+              : filteredProducts.map((product) => (
+                  <ProductCardBase
+                    key={product.id}
+                    product={product as unknown as ProductCardData}
+                    quickViewHref={`/shop/${product.id}`}
+                    priceNode={
+                      <div className="flex flex-wrap items-baseline gap-1 mb-2">
+                        <span className="text-base sm:text-lg font-bold text-primary">{formatCurrency(product.price)}</span>
+                        {product.originalPrice && (
+                          <>
+                            <span className="text-[10px] text-secondary/40 line-through">{formatCurrency(product.originalPrice)}</span>
+                            <span className="text-[9px] bg-red-100 text-red-600 px-1 py-0.5 rounded-full font-semibold">
+                              {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    }
+                    actions={
+                      <div className="flex flex-col gap-1.5">
+                        <button
+                          onClick={() => addToCart(product.id)}
+                          disabled={!product.inStock}
+                          className={`w-full px-2 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition-all duration-300 ${
+                            product.inStock
+                              ? 'bg-gradient-to-r from-primary to-pink-400 text-white hover:shadow-md hover:scale-[1.02] active:scale-95'
+                              : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                          }`}
+                        >
+                          {product.inStock ? t('shop.product.addToCart') : t('shop.product.outOfStock')}
+                        </button>
+                        {product.inStock && (
+                          <Link
+                            href={`/shop/${product.id}`}
+                            className="w-full px-2 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-semibold border border-primary/30 text-primary hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 text-center hover:scale-[1.02] active:scale-95"
+                          >
+                            Buy Now
+                          </Link>
+                        )}
+                      </div>
+                    }
+                  />
+                ))}
           </div>
 
           {/* No Results */}

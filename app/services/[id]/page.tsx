@@ -17,29 +17,33 @@ import {
 
 interface Service {
   id: string;
-  nameEn: string;
-  nameJa: string;
-  descEn: string;
-  descJa: string;
+  nameKey: string;
+  descKey: string;
+  nameEn?: string | null;
+  nameJa?: string | null;
+  descEn?: string | null;
+  descJa?: string | null;
   price: number;
   duration: string;
   image: string;
   category: {
     id: string;
     slug: string;
-    nameEn: string;
-    nameJa: string;
+    nameKey: string;
+    nameEn?: string | null;
+    nameJa?: string | null;
   };
   subCategory?: {
     id: string;
     slug: string;
-    nameEn: string;
-    nameJa: string;
+    nameKey: string;
+    nameEn?: string | null;
+    nameJa?: string | null;
   };
 }
 
 export default function ServiceDetailPage() {
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
   const params = useParams();
   const router = useRouter();
   const serviceId = params.id as string;
@@ -78,10 +82,41 @@ export default function ServiceDetailPage() {
         <FallingPetals />
         <Header />
         <main className="relative z-10 pt-20 sm:pt-24">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl py-16 text-center">
-            <div className="animate-pulse">
-              <div className="h-8 bg-primary/20 rounded w-1/2 mx-auto mb-4"></div>
-              <div className="h-4 bg-primary/10 rounded w-3/4 mx-auto"></div>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8 sm:py-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div className="space-y-4 animate-pulse">
+                <div className="relative aspect-square rounded-2xl overflow-hidden bg-secondary/10" />
+                <div className="flex gap-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="w-20 h-20 rounded-lg bg-secondary/10" />
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-6 animate-pulse">
+                <div className="space-y-3">
+                  <div className="h-4 bg-secondary/10 rounded w-32" />
+                  <div className="h-8 bg-secondary/10 rounded w-3/4" />
+                </div>
+                <div className="flex gap-4 items-center">
+                  <div className="h-8 bg-secondary/10 rounded w-40" />
+                  <div className="h-8 bg-secondary/10 rounded w-28" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 bg-secondary/10 rounded w-full" />
+                  <div className="h-3 bg-secondary/10 rounded w-5/6" />
+                  <div className="h-3 bg-secondary/10 rounded w-2/3" />
+                </div>
+                <div className="space-y-3">
+                  <div className="h-12 bg-secondary/10 rounded w-full" />
+                  <div className="h-12 bg-secondary/10 rounded w-full" />
+                </div>
+                <div className="border-b border-primary/10" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="p-4 bg-secondary/10 rounded-2xl h-20" />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </main>
@@ -114,12 +149,43 @@ export default function ServiceDetailPage() {
     );
   }
 
+  // Helpers for i18n fallbacks
+  const getDisplayText = (key: string, translate: (k: string) => string) => {
+    const translated = translate(key);
+    if (translated && translated !== key) return translated;
+    const parts = (key || '').split('.');
+    const last = parts[parts.length - 1] || '';
+    // Prefer the entity segment before the field name when keys end with .name/.description
+    const candidate = (last === 'name' || last === 'description') && parts.length >= 2
+      ? parts[parts.length - 2]
+      : last;
+    return candidate.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
+  const getServiceName = (s: Service) => {
+    const val = language === 'ja' ? s.nameJa || s.nameEn : s.nameEn || s.nameJa;
+    if (val && String(val).trim().length > 0) return String(val);
+    return getDisplayText(s.nameKey, t);
+  };
+
+  const getServiceDesc = (s: Service) => {
+    const val = language === 'ja' ? s.descJa || s.descEn : s.descEn || s.descJa;
+    if (val && String(val).trim().length > 0) return String(val);
+    return getDisplayText(s.descKey, t);
+  };
+
+  const renderName = (r: { nameKey: string; nameEn?: string | null; nameJa?: string | null }) => {
+    const val = language === 'ja' ? r.nameJa || r.nameEn : r.nameEn || r.nameJa;
+    if (val && String(val).trim().length > 0) return String(val);
+    return getDisplayText(r.nameKey, t);
+  };
+
   // Mock additional images (in real app, these would come from the service data)
   const serviceImages = [service.image, service.image, service.image];
 
-  const serviceName = language === 'ja' ? service.nameJa : service.nameEn;
-  const serviceDesc = language === 'ja' ? service.descJa : service.descEn;
-  const categoryName = language === 'ja' ? service.category.nameJa : service.category.nameEn;
+  const serviceName = getServiceName(service);
+  const serviceDesc = getServiceDesc(service);
+  const categoryName = renderName(service.category);
 
   const handleBookNow = () => {
     // Store service data in sessionStorage for booking page

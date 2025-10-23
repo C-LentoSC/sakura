@@ -147,27 +147,34 @@ export default function ServicesPage() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(heroRef.current,
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, ease: "power3.out" }
-      );
+      if (heroRef.current) {
+        gsap.fromTo(
+          heroRef.current,
+          { y: 50, opacity: 0 },
+          { y: 0, opacity: 1, duration: 1, ease: 'power3.out' }
+        );
+      }
 
-      gsap.fromTo(".service-card",
-        { y: 60, opacity: 0, scale: 0.95 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.6,
-          ease: "power3.out",
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: servicesRef.current,
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      );
+      const cards = gsap.utils.toArray<HTMLElement>('.service-card');
+      if (cards.length && servicesRef.current) {
+        gsap.fromTo(
+          cards,
+          { y: 60, opacity: 0, scale: 0.95 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.6,
+            ease: 'power3.out',
+            stagger: 0.1,
+            scrollTrigger: {
+              trigger: servicesRef.current,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
     });
 
     return () => ctx.revert();
@@ -327,9 +334,26 @@ export default function ServicesPage() {
         {/* Services Grid */}
         <div ref={servicesRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pb-12 sm:pb-16">
           {loading ? (
-            <div className="text-center py-16">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              <p className="text-secondary/60 text-base mt-4">Loading services...</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden shadow-md border border-primary/10 animate-pulse">
+                  <div className="flex flex-col sm:flex-row">
+                    {/* Image skeleton */}
+                    <div className="relative w-full sm:w-44 h-40 sm:h-auto flex-shrink-0 bg-secondary/10" />
+                    {/* Content skeleton */}
+                    <div className="flex-1 p-4 space-y-3">
+                      <div className="h-5 bg-secondary/10 rounded w-2/3" />
+                      <div className="h-3 bg-secondary/10 rounded w-full" />
+                      <div className="h-3 bg-secondary/10 rounded w-5/6" />
+                      <div className="h-8 bg-secondary/10 rounded w-24 mt-2" />
+                      <div className="flex gap-2 pt-1">
+                        <div className="h-8 bg-secondary/10 rounded w-32" />
+                        <div className="h-8 bg-secondary/10 rounded w-28" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filteredServices.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
