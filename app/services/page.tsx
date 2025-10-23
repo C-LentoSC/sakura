@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -99,51 +100,55 @@ export default function ServicesPage() {
   const heroRef = useRef<HTMLDivElement>(null);
   const servicesRef = useRef<HTMLDivElement>(null);
 
-  // Fetch categories on mount
+  // Categories
+  const { data: catData } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const res = await fetch('/api/categories');
+      if (!res.ok) throw new Error('Failed to load categories');
+      return res.json() as Promise<{ categories: Category[] }>;
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    placeholderData: (prev) => prev,
+  });
+
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch('/api/categories');
-        const data = await res.json();
-        setCategories(data.categories || []);
-        
-        // Set first category as default if available
-        if (data.categories && data.categories.length > 0) {
-          setSelectedMainCategory(data.categories[0].slug);
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error);
+    if (catData?.categories) {
+      setCategories(catData.categories);
+      if (catData.categories.length > 0 && !selectedMainCategory) {
+        setSelectedMainCategory(catData.categories[0].slug);
       }
-    };
-
-    fetchCategories();
-  }, []);
-
-  // Fetch services when category changes
-  useEffect(() => {
-    const fetchServices = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          category: selectedMainCategory,
-          ...(selectedSubCategory !== 'all' && { subCategory: selectedSubCategory }),
-          ...(selectedSubSubCategory !== 'all' && { subSubCategory: selectedSubSubCategory }),
-        });
-
-        const res = await fetch(`/api/services?${params}`);
-        const data = await res.json();
-        setServices(data.services || []);
-      } catch (error) {
-        console.error('Error fetching services:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (selectedMainCategory) {
-      fetchServices();
     }
-  }, [selectedMainCategory, selectedSubCategory, selectedSubSubCategory]);
+  }, [catData, selectedMainCategory]);
+
+  // Services per filter
+  const serviceKey = useMemo(() => [
+    'services', language, selectedMainCategory, selectedSubCategory, selectedSubSubCategory
+  ] as const, [language, selectedMainCategory, selectedSubCategory, selectedSubSubCategory]);
+
+  const { data: svcData, isLoading: svcLoading } = useQuery({
+    queryKey: serviceKey,
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        category: selectedMainCategory,
+        ...(selectedSubCategory !== 'all' && { subCategory: selectedSubCategory }),
+        ...(selectedSubSubCategory !== 'all' && { subSubCategory: selectedSubSubCategory }),
+      });
+      const res = await fetch(`/api/services?${params}`);
+      if (!res.ok) throw new Error('Failed to load services');
+      return res.json() as Promise<{ services: Service[]; total: number }>;
+    },
+    enabled: Boolean(selectedMainCategory),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    placeholderData: (prev) => prev,
+  });
+
+  useEffect(() => {
+    setLoading(svcLoading);
+    if (svcData?.services) setServices(svcData.services);
+  }, [svcLoading, svcData]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {

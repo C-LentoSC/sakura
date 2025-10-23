@@ -8,6 +8,7 @@ import { LoadingProvider } from "./contexts/LoadingContext";
 import { ErrorBoundary } from "./components";
 import { cookies } from "next/headers";
 import type { Language } from "./locales/config";
+import { QueryProvider } from "./providers/query-client";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -51,7 +52,9 @@ export default async function RootLayout({
           <LanguageProvider initialLanguage={initialLanguage}>
             <Suspense fallback={null}>
               <LoadingProvider>
-                {children}
+                <QueryProvider>
+                  {children}
+                </QueryProvider>
               </LoadingProvider>
             </Suspense>
           </LanguageProvider>

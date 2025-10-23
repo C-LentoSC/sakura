@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -53,26 +54,34 @@ export default function ServiceDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [activeTab, setActiveTab] = useState<'description' | 'details' | 'benefits'>('description');
 
-  useEffect(() => {
-    const fetchService = async () => {
-      try {
-        const response = await fetch(`/api/services/${serviceId}?lang=${language}`);
-        if (response.ok) {
-          const data = await response.json();
-          setService(data);
-        } else {
-          setService(null);
-        }
-      } catch (error) {
-        console.error('Error fetching service:', error);
-        setService(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const queryClient = useQueryClient();
+  const initialFromLists = useMemo(() => {
+    const matches = queryClient.getQueriesData<{ services: Service[] }>({ queryKey: ['services'] });
+    for (const [, val] of matches) {
+      const found = val?.services?.find((s) => s.id === serviceId);
+      if (found) return found;
+    }
+    return null;
+  }, [queryClient, serviceId]);
 
-    fetchService();
-  }, [serviceId, language]);
+  const { data: fetchedService, isLoading } = useQuery({
+    queryKey: ['service', serviceId, language],
+    queryFn: async () => {
+      const res = await fetch(`/api/services/${serviceId}?lang=${language}`);
+      if (!res.ok) throw new Error('Failed to load service');
+      return res.json() as Promise<Service>;
+    },
+    // Use any service cached from lists as initial data to avoid blank
+    initialData: initialFromLists ?? undefined,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    placeholderData: (prev) => prev,
+  });
+
+  useEffect(() => {
+    setService(fetchedService ?? null);
+    setLoading(isLoading && !fetchedService);
+  }, [fetchedService, isLoading]);
 
   if (loading) {
     return (

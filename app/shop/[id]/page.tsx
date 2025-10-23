@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -28,40 +29,39 @@ type ApiProduct = {
   description: string;
 };
 
+const fetchProducts = async (lang: 'en' | 'ja'): Promise<{ products: ApiProduct[] }> => {
+  const res = await fetch(`/api/products?lang=${lang}`);
+  if (!res.ok) throw new Error('Failed to load products');
+  return res.json();
+};
+
 export default function ProductDetailPage() {
   const { t, language } = useLanguage();
   const params = useParams();
   const router = useRouter();
   const productId = parseInt(params.id as string);
 
-  const [product, setProduct] = useState<ApiProduct | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { data, isLoading } = useQuery({
+    queryKey: ['products', language],
+    queryFn: () => fetchProducts(language),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    placeholderData: (prev) => prev,
+  });
+  const initialFromList = useMemo(() => {
+    const list = (data?.products ?? []);
+    return list.find((p) => p.id === productId) || null;
+  }, [data, productId]);
+  const [product, setProduct] = useState<ApiProduct | null>(initialFromList);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [notification, setNotification] = useState<{message: string; show: boolean}>({message: '', show: false});
 
   useEffect(() => {
-    let active = true;
-    const load = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`/api/products?lang=${language}`);
-        if (!res.ok) throw new Error('Failed to load products');
-        const data: { products: ApiProduct[] } = await res.json();
-        const found = data.products.find((p) => p.id === productId) || null;
-        if (active) setProduct(found);
-      } catch (e) {
-        console.error(e);
-        if (active) setProduct(null);
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-    load();
-    return () => { active = false; };
-  }, [language, productId]);
+    setProduct(initialFromList);
+  }, [initialFromList]);
 
-  if (loading) {
+  if (isLoading && !product) {
     return (
       <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
         <BackgroundPattern />
@@ -108,7 +108,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  if (!loading && !product) {
+  if (!isLoading && !product) {
     return (
       <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
         <BackgroundPattern />
