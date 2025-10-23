@@ -132,8 +132,8 @@ export default function ProductDetailPage() {
     );
   }
 
-  // Mock additional images (use same image as placeholder)
-  const productImages = [product?.image || '', product?.image || '', product?.image || ''];
+  // Additional images only when product is available
+  const productImages = product ? [product.image, product.image, product.image] : [];
 
   const addToCart = () => {
     // Persist to localStorage cart
@@ -197,6 +197,7 @@ export default function ProductDetailPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Product Images */}
+            {product && (
             <div className="space-y-4">
               {/* Main Image */}
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-white shadow-lg">
@@ -270,6 +271,7 @@ export default function ProductDetailPage() {
                 ))}
               </div>
             </div>
+            )}
 
             {/* Product Info */}
             <div className="space-y-6">
