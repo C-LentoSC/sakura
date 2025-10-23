@@ -54,7 +54,7 @@ export function LanguageProvider({ children, initialLanguage }: { children: Reac
     let result: unknown = obj;
     
     for (const key of keys) {
-      if (result && typeof result === 'object' && key in result) {
+      if (result && typeof result === 'object' && result !== null && key in result) {
         result = (result as Record<string, unknown>)[key];
       } else {
         return path; // Return the key if translation not found
@@ -65,7 +65,11 @@ export function LanguageProvider({ children, initialLanguage }: { children: Reac
   };
 
   const t = (key: string): string => {
-    const result = getNestedTranslation(translations[language], key);
+    if (typeof key !== 'string') {
+      console.warn(`Invalid translation key: ${key}`);
+      return String(key); // Return the key itself or an empty string
+    }
+    const result = getNestedTranslation(translations[language], key || '');
     
     // Debug logging (remove in production)
     if (typeof window !== 'undefined' && result === key) {
