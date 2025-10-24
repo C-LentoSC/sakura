@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { formatCurrency } from '../../constants/currency';
+import { useService } from '../../hooks/useService';
 import {
   Header,
   BackgroundPattern,
@@ -48,31 +49,11 @@ export default function ServiceDetailPage() {
   const router = useRouter();
   const serviceId = params.id as string;
   
-  const [service, setService] = useState<Service | null>(null);
-  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [activeTab, setActiveTab] = useState<'description' | 'details' | 'benefits'>('description');
 
-  useEffect(() => {
-    const fetchService = async () => {
-      try {
-        const response = await fetch(`/api/services/${serviceId}?lang=${language}`);
-        if (response.ok) {
-          const data = await response.json();
-          setService(data);
-        } else {
-          setService(null);
-        }
-      } catch (error) {
-        console.error('Error fetching service:', error);
-        setService(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchService();
-  }, [serviceId, language]);
+  // SWR hook for instant loading
+  const { service, isLoading: loading } = useService(serviceId);
 
   if (loading) {
     return (

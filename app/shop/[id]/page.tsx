@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { addItem as addCartItem } from '../../utils/cartStorage';
 import { formatCurrency } from '../../constants/currency';
+import { useProduct } from '../../hooks/useProduct';
 import {
   Header,
   BackgroundPattern,
@@ -34,32 +35,12 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const productId = parseInt(params.id as string);
 
-  const [product, setProduct] = useState<ApiProduct | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [notification, setNotification] = useState<{message: string; show: boolean}>({message: '', show: false});
 
-  useEffect(() => {
-    let active = true;
-    const load = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`/api/products?lang=${language}`);
-        if (!res.ok) throw new Error('Failed to load products');
-        const data: { products: ApiProduct[] } = await res.json();
-        const found = data.products.find((p) => p.id === productId) || null;
-        if (active) setProduct(found);
-      } catch (e) {
-        console.error(e);
-        if (active) setProduct(null);
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-    load();
-    return () => { active = false; };
-  }, [language, productId]);
+  // SWR hook for instant loading
+  const { product, isLoading: loading } = useProduct(productId, language);
 
   if (loading) {
     return (

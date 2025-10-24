@@ -18,6 +18,7 @@ import { useLanguage } from '@/app/contexts/LanguageContext';
 import { formatCurrency } from '@/app/constants/currency';
 import { generateTimeSlots, getShopHours, type TimeSlot } from '@/app/utils/timeSlots';
 import { addBooking, getBlockedTimeSlots, getBookedTimeSlots } from '@/app/utils/bookingStorage';
+import { useServices } from '@/app/hooks/useServices';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -46,7 +47,8 @@ function BookPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preSelectedServiceId = searchParams.get('service');
-  
+  const { services, isLoading: servicesLoading } = useServices({});
+
   const [currentStep, setCurrentStep] = useState(2);
   const [bookingsData, setbookingsData] = useState<bookingsData>({
     service: '',
@@ -68,48 +70,39 @@ function BookPageContent() {
   const [clientSecret, setClientSecret] = useState<string>('');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState<string>('');
-  const [loading, setLoading] = useState(true);
 
   const heroRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Load service data from URL parameter
-    const fetchService = async () => {
+    const loadService = () => {
       if (!preSelectedServiceId) {
         // No service selected, redirect to services page
         router.push('/services');
         return;
       }
 
-      try {
-        setLoading(true);
-        const res = await fetch('/api/services');
-        const data = await res.json();
-        const service = data.services?.find((s: Service) => s.id === preSelectedServiceId);
-        
-        if (service) {
-          setbookingsData(prev => ({
-            ...prev,
-            service: t(service.nameKey),
-            serviceId: service.id,
-            duration: service.duration,
-            price: service.price
-          }));
-        } else {
-          // Invalid service ID, redirect to services page
-          router.push('/services');
-        }
-      } catch (error) {
-        console.error('Error fetching service:', error);
+      if (servicesLoading) return; // Wait for services to load
+
+      const service = services.find((s: Service) => s.id === preSelectedServiceId);
+
+      if (service) {
+        setbookingsData(prev => ({
+          ...prev,
+          service: t(service.nameKey),
+          serviceId: service.id,
+          duration: service.duration,
+          price: service.price
+        }));
+      } else {
+        // Invalid service ID, redirect to services page
         router.push('/services');
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchService();
-  }, [preSelectedServiceId, router, t]);
+    loadService();
+  }, [preSelectedServiceId, router, t, services, servicesLoading]);
 
   // Auto-fill from logged-in user (name, email)
   useEffect(() => {

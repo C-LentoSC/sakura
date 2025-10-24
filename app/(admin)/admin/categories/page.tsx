@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { ChevronRight, Plus, Edit2, Trash2, FolderOpen, Folder, Tag } from 'lucide-react';
+import { useAdminCategories } from '@/app/hooks/useAdminCategories';
 
 // Utility function to generate translation keys from user input
 const generateTranslationKey = (text: string, type: 'category' | 'subcategory' | 'subsubcategory'): string => {
@@ -86,8 +87,7 @@ export default function AdminCategoriesPage() {
     const key = (record.nameKey || '').split('.').pop() || record.slug || '';
     return key.replace(/[-_]/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
   };
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { categories, isLoading: loading, mutate } = useAdminCategories();
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [expandedSubCategories, setExpandedSubCategories] = useState<Set<string>>(new Set());
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -108,29 +108,8 @@ export default function AdminCategoriesPage() {
     nameJa: '',
   });
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch('/api/admin/categories');
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      const data = await res.json();
-      setCategories(data.categories || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      setCategories([]); // Ensure categories is always an array
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
       // For new items: auto-generate slug and translation key from user input
@@ -167,13 +146,11 @@ export default function AdminCategoriesPage() {
       });
 
       if (res.ok) {
-        await fetchCategories();
+        await mutate();
         closeModal();
       }
     } catch (error) {
       console.error('Error saving item:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -186,7 +163,7 @@ export default function AdminCategoriesPage() {
 
       const res = await fetch(url, { method: 'DELETE' });
       if (res.ok) {
-        await fetchCategories();
+        await mutate();
       }
     } catch (error) {
       console.error('Error deleting item:', error);

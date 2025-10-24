@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { formatCurrency } from '@/app/constants/currency';
 import ImageUpload from '@/app/components/ImageUpload';
+import { useServices } from '@/app/hooks/useServices';
+import { useAdminCategories } from '@/app/hooks/useAdminCategories';
 
 interface Service {
   id: string;
@@ -104,9 +106,9 @@ export default function AdminServicesPage() {
     if (val && String(val).trim().length > 0) return String(val);
     return getDisplayText(s.descKey, t);
   };
-  const [services, setServices] = useState<Service[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { services, isLoading: servicesLoading, mutate: mutateServices } = useServices({});
+  const { categories, isLoading: categoriesLoading } = useAdminCategories();
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -134,40 +136,7 @@ export default function AdminServicesPage() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
-  useEffect(() => {
-    fetchServices();
-    fetchCategories();
-  }, []);
-
-  const fetchServices = async () => {
-    try {
-      const res = await fetch('/api/admin/services');
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      const data = await res.json();
-      setServices(data.services || []);
-    } catch (error) {
-      console.error('Error fetching services:', error);
-      setServices([]); // Ensure services is always an array
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch('/api/admin/categories');
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      const data = await res.json();
-      setCategories(data.categories || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      setCategories([]); // Ensure categories is always an array
-    }
-  };
+  const isDataLoading = servicesLoading || categoriesLoading;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -230,7 +199,7 @@ export default function AdminServicesPage() {
       });
 
       if (res.ok) {
-        await fetchServices();
+        await mutateServices();
         setIsModalOpen(false);
         resetForm();
       }
@@ -256,7 +225,7 @@ export default function AdminServicesPage() {
       });
 
       if (res.ok) {
-        await fetchServices();
+        await mutateServices();
         setDeleteConfirmOpen(false);
         setDeleteTarget(null);
       }
@@ -467,12 +436,12 @@ export default function AdminServicesPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">{t('admin.services.table.services')}</h2>
             <div className="text-sm text-gray-500">
-              {loading ? 'Loading...' : `${filteredServices.length} of ${services.length} services`}
+              {isDataLoading ? 'Loading...' : `${filteredServices.length} of ${services.length} services`}
             </div>
           </div>
         </div>
 
-        {loading ? (
+        {isDataLoading ? (
           <div className="text-center py-16">
             <div className="w-16 h-16 bg-gray-100 rounded-sm flex items-center justify-center mx-auto mb-4 shadow-sm animate-pulse">
               <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

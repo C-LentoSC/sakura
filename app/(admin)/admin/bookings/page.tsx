@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/app/contexts/LanguageContext';
+import { useAdminBookings } from '@/app/hooks/useAdminBookings';
+import { useServices } from '@/app/hooks/useServices';
 
 interface Booking {
   id: string;
@@ -31,10 +33,9 @@ const initialForm: Omit<Booking, "id" | "createdAt"> & { id?: string } = {
 
 export default function AdminBookingsPage() {
   const { t, language } = useLanguage();
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [services, setServices] = useState<Array<{ id: string; nameKey: string; nameEn?: string | null; nameJa?: string | null; image: string }>>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { bookings, isLoading: loading, error: bookingsError, mutate } = useAdminBookings();
+  const { services } = useServices({});
+  const error = bookingsError ? 'Failed to fetch bookings' : null;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [saving, setSaving] = useState(false);
@@ -140,32 +141,6 @@ export default function AdminBookingsPage() {
   } as const;
   const L = (k: keyof typeof en) => (language === 'ja' ? ja[k] : en[k]);
 
-  const fetchBookings = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [bres, sres] = await Promise.all([
-        fetch("/api/admin/bookings", { cache: "no-store" }),
-        fetch("/api/services", { cache: "no-store" }),
-      ]);
-      if (!bres.ok) throw new Error("Failed to load");
-      const bdata = await bres.json();
-      setBookings(bdata.bookings || []);
-      if (sres.ok) {
-        const sdata = await sres.json();
-        setServices(sdata.services || []);
-      }
-    } catch {
-      setError("Failed to fetch bookings");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBookings();
-  }, []);
-
   const pendingCount = useMemo(
     () => bookings.filter(b => ['pending', 'no-show'].includes(String(b.status).toLowerCase())).length,
     [bookings]
@@ -210,7 +185,7 @@ export default function AdminBookingsPage() {
         body: JSON.stringify({ status: "canceled" }),
       });
       if (!res.ok) throw new Error("Cancel failed");
-      setBookings(prev => prev.map(b => b.id === cancelModalId ? { ...b, status: "canceled" } : b));
+      await mutate();
       setCancelModalId(null);
     } catch {
       alert("Failed to cancel booking");
@@ -255,7 +230,7 @@ export default function AdminBookingsPage() {
         if (!res.ok) throw new Error("Create failed");
       }
       setIsModalOpen(false);
-      await fetchBookings();
+      await mutate();
     } catch {
       alert("Failed to save booking");
     } finally {
@@ -296,7 +271,7 @@ export default function AdminBookingsPage() {
         body: JSON.stringify({ status }),
       });
       if (!res.ok) throw new Error("Status update failed");
-      setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
+      await mutate();
     } catch {
       alert("Failed to update status");
     }
