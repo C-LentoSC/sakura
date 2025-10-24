@@ -250,7 +250,7 @@ export default function AdminShopPage() {
             resetForm();
             setIsModalOpen(true);
           }}
-          className="px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+          className="px-4 py-2 bg-linear-to-r from-primary to-pink-400 text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center gap-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -263,7 +263,7 @@ export default function AdminShopPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-sm shadow-md p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-pink-400 rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 bg-linear-to-br from-primary to-pink-400 rounded-lg flex items-center justify-center shadow-md">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
@@ -277,7 +277,7 @@ export default function AdminShopPage() {
 
         <div className="bg-white rounded-sm shadow-md p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-rose-400 to-pink-500 rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 bg-linear-to-br from-rose-400 to-pink-500 rounded-lg flex items-center justify-center shadow-md">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -291,7 +291,7 @@ export default function AdminShopPage() {
 
         <div className="bg-white rounded-sm shadow-md p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-300 to-rose-300 rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 bg-linear-to-br from-pink-300 to-rose-300 rounded-lg flex items-center justify-center shadow-md">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
@@ -305,7 +305,7 @@ export default function AdminShopPage() {
 
         <div className="bg-white rounded-sm shadow-md p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-200 to-primary rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 bg-linear-to-br from-pink-200 to-primary rounded-lg flex items-center justify-center shadow-md">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
@@ -394,7 +394,7 @@ export default function AdminShopPage() {
                   resetForm();
                   setIsModalOpen(true);
                 }}
-                className="px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white font-medium rounded-lg shadow-md hover:shadow-xl hover:scale-105 transition-all"
+                className="px-4 py-2 bg-linear-to-r from-primary to-pink-400 text-white font-medium rounded-lg shadow-md hover:shadow-xl hover:scale-105 transition-all"
               >
                 + Add Your First Product
               </button>
@@ -424,7 +424,7 @@ export default function AdminShopPage() {
                   <div className="flex flex-col gap-1.5">
                     <button
                       onClick={() => handleEdit(product)}
-                      className="w-full px-2 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition-all duration-300 bg-gradient-to-r from-primary to-pink-400 text-white hover:shadow-md hover:scale-[1.02] active:scale-95"
+                      className="w-full px-2 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition-all duration-300 bg-linear-to-r from-primary to-pink-400 text-white hover:shadow-md hover:scale-[1.02] active:scale-95"
                     >
                       {language === 'ja' ? '編集' : 'Edit'}
                     </button>
@@ -635,8 +635,8 @@ export default function AdminShopPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50"
+                  disabled={loading || submitting}
+                  className="flex-1 px-4 py-2 bg-linear-to-r from-primary to-pink-400 text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50"
                 >
                   {loading ? (language === 'ja' ? '保存中...' : 'Saving...') : (language === 'ja' ? '保存' : 'Save')}
                 </button>
@@ -670,7 +670,7 @@ export default function AdminShopPage() {
               </button>
               <button
                 onClick={handleDelete}
-                disabled={loading}
+                disabled={loading || submitting}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
               >
                 {loading ? (language === 'ja' ? '削除中...' : 'Deleting...') : (language === 'ja' ? '削除' : 'Delete')}

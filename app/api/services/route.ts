@@ -4,6 +4,8 @@ import cacheManager from '@/app/lib/cache';
 
 // ISR: Revalidate every 60 seconds
 export const revalidate = 60;
+// Services listing depends on request query params - render dynamically
+export const dynamic = 'force-dynamic';
 
 // Fetch services from database
 async function fetchServicesFromDB(params: {

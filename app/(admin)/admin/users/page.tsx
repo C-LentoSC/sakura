@@ -1,9 +1,8 @@
-'use client';
+ 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { useAdminUsers } from '@/app/hooks/useAdminUsers';
-import { useSession } from 'next-auth/react';
 
 type UserRow = {
   id: string;
@@ -17,8 +16,22 @@ type UserRow = {
 
 export default function AdminUsersPage() {
   const { language } = useLanguage();
-  const { data: session } = useSession();
-  const currentUserId = session?.user?.id || '';
+  const [currentUserId, setCurrentUserId] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+    fetch('/api/me')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!mounted) return;
+        const id = data?.user?.id;
+        if (id) setCurrentUserId(id);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
   const { users, isLoading, mutate } = useAdminUsers();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);

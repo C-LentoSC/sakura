@@ -10,40 +10,11 @@ import { useAdminCategories } from '@/app/hooks/useAdminCategories';
 
 // Use shared Service type from hooks/useServices (imported as SwrService)
 
-interface SubSubCategory {
-  id: string;
-  slug: string;
-  nameKey: string;
-  nameEn?: string | null;
-  nameJa?: string | null;
-  _count?: {
-    services: number;
-  };
-}
+// SubSubCategory type removed — not used as a type in this module.
 
-interface SubCategory {
-  id: string;
-  slug: string;
-  nameKey: string;
-  nameEn?: string | null;
-  nameJa?: string | null;
-  subSubCategories?: SubSubCategory[];
-  _count?: {
-    services: number;
-  };
-}
+// SubCategory type removed — not used as a type in this module.
 
-interface Category {
-  id: string;
-  slug: string;
-  nameKey: string;
-  nameEn?: string | null;
-  nameJa?: string | null;
-  subCategories: SubCategory[];
-  _count?: {
-    services: number;
-  };
-}
+// Category interface removed as it's unused in this module.
 
 // Utility function to get display text (handles both translation keys and direct text)
 const getDisplayText = (text: string, t: (key: string) => string): string => {
@@ -303,7 +274,7 @@ export default function AdminServicesPage() {
               resetForm();
               setIsModalOpen(true);
             }}
-            className="px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white font-medium rounded-lg shadow-md hover:shadow-xl hover:scale-105 transition-all whitespace-nowrap"
+            className="px-4 py-2 bg-linear-to-r from-primary to-pink-400 text-white font-medium rounded-lg shadow-md hover:shadow-xl hover:scale-105 transition-all whitespace-nowrap"
           >
             {t('admin.services.add')}
           </button>
@@ -314,7 +285,7 @@ export default function AdminServicesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="bg-white rounded-sm shadow-md p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-pink-400 rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 bg-linear-to-br from-primary to-pink-400 rounded-lg flex items-center justify-center shadow-md">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
@@ -328,7 +299,7 @@ export default function AdminServicesPage() {
 
         <div className="bg-white rounded-sm shadow-md p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-rose-400 to-pink-500 rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 bg-linear-to-br from-rose-400 to-pink-500 rounded-lg flex items-center justify-center shadow-md">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -342,7 +313,7 @@ export default function AdminServicesPage() {
 
         <div className="bg-white rounded-sm shadow-md p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-300 to-rose-300 rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 bg-linear-to-br from-pink-300 to-rose-300 rounded-lg flex items-center justify-center shadow-md">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
@@ -356,7 +327,7 @@ export default function AdminServicesPage() {
 
         <div className="bg-white rounded-sm shadow-md p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-200 to-primary rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 bg-linear-to-br from-pink-200 to-primary rounded-lg flex items-center justify-center shadow-md">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
@@ -441,7 +412,7 @@ export default function AdminServicesPage() {
                   resetForm();
                   setIsModalOpen(true);
                 }}
-                className="px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white font-medium rounded-lg shadow-md hover:shadow-xl hover:scale-105 transition-all"
+                className="px-4 py-2 bg-linear-to-r from-primary to-pink-400 text-white font-medium rounded-lg shadow-md hover:shadow-xl hover:scale-105 transition-all"
               >
                 + Add Your First Service
               </button>
@@ -474,7 +445,7 @@ export default function AdminServicesPage() {
                   <tr key={service.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <div className="h-14 w-14 flex-shrink-0 relative rounded-lg overflow-hidden shadow-md border-2 border-pink-100">
+                      <div className="h-14 w-14 shrink-0 relative rounded-lg overflow-hidden shadow-md border-2 border-pink-100">
                           <Image
                             src={service.image}
                             alt={getServiceName(service)}
@@ -520,7 +491,7 @@ export default function AdminServicesPage() {
                       <span
                         className={`inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full shadow-sm ${
                           service.isActive
-                            ? 'bg-gradient-to-r from-rose-100 to-pink-100 text-rose-600'
+                            ? 'bg-linear-to-r from-rose-100 to-pink-100 text-rose-600'
                             : 'bg-gray-100 text-gray-600'
                         }`}
                       >
@@ -827,7 +798,7 @@ export default function AdminServicesPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-linear-to-r from-primary to-pink-400 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50"
                 >
                   {loading ? t('admin.services.form.saving') : editingService ? t('admin.services.form.update') : t('admin.services.form.create')}
                 </button>
@@ -867,7 +838,7 @@ export default function AdminServicesPage() {
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-rose-400 to-rose-500 rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+                className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-rose-400 to-rose-500 rounded-lg hover:shadow-lg hover:scale-105 transition-all"
               >
                 Yes, Delete Service
               </button>

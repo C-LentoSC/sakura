@@ -8,7 +8,7 @@ import { formatCurrency } from '../constants/currency';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useServices, type Service } from '../hooks/useServices';
-import { useCategories, type Category, type SubCategory, type SubSubCategory } from '../hooks/useCategories';
+import { useCategories, type SubSubCategory } from '../hooks/useCategories';
 import {
   Header,
   BackgroundPattern,
@@ -31,7 +31,8 @@ export default function ServicesPage() {
   const servicesRef = useRef<HTMLDivElement>(null);
 
   // Fetch categories with SWR caching
-  const { categories, isLoading: categoriesLoading } = useCategories();
+  // categoriesLoading is intentionally unused here (kept for parity with other pages)
+  const { categories } = useCategories();
 
   // Fetch services with SWR caching
   const { services, isLoading: servicesLoading, error: servicesError } = useServices({
@@ -142,7 +143,7 @@ export default function ServicesPage() {
   ] : [];
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-linear-to-br from-rose-50 via-pink-50 to-amber-50">
       <BackgroundPattern />
       <CherryBlossomTrees />
       <FallingPetals />
@@ -196,7 +197,7 @@ export default function ServicesPage() {
                     }}
                     className={`px-5 py-2 rounded-full font-medium transition-all duration-300 text-sm ${
                       selectedMainCategory === category.slug
-                        ? 'bg-gradient-to-r from-primary to-pink-400 text-white shadow-md'
+                        ? 'bg-linear-to-r from-primary to-pink-400 text-white shadow-md'
                         : 'bg-white/90 backdrop-blur-sm text-secondary/70 hover:text-secondary hover:bg-white hover:shadow-sm'
                     }`}
                   >
@@ -329,7 +330,7 @@ export default function ServicesPage() {
                           <div className="flex flex-col gap-2">
                             <Link
                               href={`/services/${service.id}`}
-                              className="w-full px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-full hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300 text-xs text-center"
+                              className="w-full px-4 py-2 bg-linear-to-r from-primary to-pink-400 text-white font-semibold rounded-full hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300 text-xs text-center"
                             >
                               View Details →
                             </Link>

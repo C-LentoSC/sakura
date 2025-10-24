@@ -392,7 +392,7 @@ function BookPageContent() {
     setSubmitStatus('idle');
   };
 
-  if (loading) {
+  if (servicesLoading) {
     return (
       <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
         <BackgroundPattern />

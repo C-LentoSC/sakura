@@ -3,6 +3,9 @@ import prisma from '@/app/lib/prisma';
 import { verifySession } from '@/app/lib/dal';
 import cacheManager from '@/app/lib/cache';
 
+// This route uses cookies/session and must be rendered dynamically
+export const dynamic = 'force-dynamic';
+
 // ISR: Revalidate every 60 seconds
 export const revalidate = 60;
 

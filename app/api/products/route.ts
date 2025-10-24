@@ -4,6 +4,8 @@ import cacheManager from '@/app/lib/cache';
 
 // ISR: Revalidate every 60 seconds
 export const revalidate = 60;
+// Product listing may vary by request query (lang) - ensure route is dynamic
+export const dynamic = 'force-dynamic';
 
 type DbProduct = {
   id: number;

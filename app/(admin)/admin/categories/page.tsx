@@ -43,7 +43,7 @@ interface SubSubCategory {
   id: string;
   slug: string;
   nameKey: string;
-  order: number;
+  order?: number;
   nameEn?: string | null;
   nameJa?: string | null;
   _count?: {
@@ -55,7 +55,7 @@ interface SubCategory {
   id: string;
   slug: string;
   nameKey: string;
-  order: number;
+  order?: number;
   nameEn?: string | null;
   nameJa?: string | null;
   subSubCategories?: SubSubCategory[];
@@ -68,11 +68,11 @@ interface Category {
   id: string;
   slug: string;
   nameKey: string;
-  order: number;
+  order?: number;
   nameEn?: string | null;
   nameJa?: string | null;
   subCategories: SubCategory[];
-  _count: {
+  _count?: {
     services: number;
   };
 }
@@ -303,7 +303,7 @@ export default function AdminCategoriesPage() {
                         <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded">{category.slug}</span>
                         <span className="flex items-center gap-1">
                           <Tag className="w-3 h-3" />
-                          {category._count.services} services
+                          {(category._count?.services ?? 0)} services
                         </span>
                         <span className="flex items-center gap-1">
                           <Folder className="w-3 h-3" />
