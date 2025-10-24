@@ -30,6 +30,7 @@ export function LoadingProvider({ children, useTopBar = true }: LoadingProviderP
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    setIsLoading(true);
     
     // Simulate loading time for better UX
     const timer = setTimeout(() => {

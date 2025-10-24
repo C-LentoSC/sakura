@@ -7,15 +7,6 @@ export default function NavigationLoader() {
   const [isLoading, setIsLoading] = useState(false);
   const pathname = usePathname();
 
-  const [petalStyles] = useState(() =>
-    [...Array(6)].map(() => ({
-      left: `${20 + Math.random() * 60}%`,
-      top: `${20 + Math.random() * 60}%`,
-      animationDelay: `${Math.random() * 2}s`,
-      animationDuration: `${2 + Math.random() * 1}s`,
-    }))
-  );
-
   useEffect(() => {
     const handleStart = () => setIsLoading(true);
     const handleComplete = () => setIsLoading(false);
@@ -48,11 +39,16 @@ export default function NavigationLoader() {
 
       {/* Floating Sakura Petals */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {petalStyles.map((style, i) => (
+        {[...Array(6)].map((_, i) => (
           <div
             key={i}
             className="absolute animate-bounce opacity-40"
-            style={style}
+            style={{
+              left: `${20 + Math.random() * 60}%`,
+              top: `${20 + Math.random() * 60}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${2 + Math.random() * 1}s`
+            }}
           >
             <svg className="w-3 h-3 sm:w-4 sm:h-4 text-pink-400" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"/>

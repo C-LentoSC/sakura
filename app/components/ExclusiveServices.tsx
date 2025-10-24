@@ -5,79 +5,41 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
+import { SERVICES_DATA } from '../constants/services';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface Service {
-  id: string;
-  nameKey: string;
-  descKey: string;
-  nameEn: string | null;
-  nameJa: string | null;
-  descEn: string | null;
-  descJa: string | null;
-  price: number;
-  duration: string;
-  image: string;
-  categoryId: string;
-  category: {
-    slug: string;
-  };
-}
-
 export default function ExclusiveServices() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'headSpa' | 'beauty'>('headSpa');
-  const [headSpaServices, setHeadSpaServices] = useState<Service[]>([]);
-  const [beautyServices, setBeautyServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
+  // Get top 3 most popular services by category
+  const getPopularServices = (category: 'head-spa' | 'beauty') => {
+    const categoryServices = SERVICES_DATA.filter(service => {
+      if (category === 'head-spa') {
+        return service.mainCategory === 'head-spa';
+      } else {
+        return service.mainCategory === 'nails' || service.mainCategory === 'lashes' || service.mainCategory === 'brows';
+      }
+    });
+    
+    // Sort by price (higher price = more premium/popular) and take top 3
+    return categoryServices
+      .sort((a, b) => b.price - a.price)
+      .slice(0, 3);
+  };
+
+  const headSpaServices = getPopularServices('head-spa');
+  const beautyServices = getPopularServices('beauty');
   const currentServices = activeTab === 'headSpa' ? headSpaServices : beautyServices;
 
-  // Fetch services from database
   useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch head-spa services
-        const headSpaRes = await fetch('/api/services?category=head-spa');
-        const headSpaData = await headSpaRes.json();
-        
-        // Fetch beauty services
-        const beautyRes = await fetch('/api/services?category=beauty');
-        const beautyData = await beautyRes.json();
-        
-        // Sort by price (descending) and take top 3
-        const sortedHeadSpa = (headSpaData.services || [])
-          .sort((a: Service, b: Service) => b.price - a.price)
-          .slice(0, 3);
-        
-        const sortedBeauty = (beautyData.services || [])
-          .sort((a: Service, b: Service) => b.price - a.price)
-          .slice(0, 3);
-        
-        setHeadSpaServices(sortedHeadSpa);
-        setBeautyServices(sortedBeauty);
-      } catch (error) {
-        console.error('Error fetching services:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchServices();
-  }, []);
-
-  useEffect(() => {
-    if (loading || currentServices.length === 0) return;
-    
     const ctx = gsap.context(() => {
       // Title animation
       gsap.fromTo(titleRef.current, 
@@ -131,7 +93,7 @@ export default function ExclusiveServices() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, [loading, currentServices, activeTab]);
+  }, []);
 
   return (
     <section ref={sectionRef} className="py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32 relative overflow-hidden">
@@ -177,48 +139,7 @@ export default function ExclusiveServices() {
 
         {/* Services Container */}
         <div ref={cardsRef} className="space-y-4 sm:space-y-6 md:space-y-8">
-          {loading ? (
-            <>
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="exclusive-service-card bg-white rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col lg:flex-row gap-4 sm:gap-5 md:gap-6 p-4 sm:p-5 md:p-6 shadow-md border border-secondary/5 animate-pulse"
-                >
-                  {/* Image skeleton */}
-                  <div className="relative w-full lg:w-44 xl:w-52 h-52 sm:h-60 md:h-64 lg:h-auto flex-shrink-0 rounded-xl sm:rounded-2xl overflow-hidden bg-secondary/10" />
-                  
-                  {/* Content skeleton */}
-                  <div className="flex-1 flex flex-col justify-between min-h-0">
-                    <div className="flex-1">
-                      <div className="mb-3 sm:mb-4">
-                        <div className="h-6 sm:h-7 md:h-8 w-40 sm:w-56 md:w-64 bg-secondary/10 rounded" />
-                        <div className="mt-2 w-16 h-1 bg-secondary/10 rounded-full" />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="h-3 sm:h-4 bg-secondary/10 rounded w-full" />
-                        <div className="h-3 sm:h-4 bg-secondary/10 rounded w-11/12" />
-                        <div className="h-3 sm:h-4 bg-secondary/10 rounded w-10/12" />
-                      </div>
-                    </div>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-5 mt-auto pt-3 sm:pt-4 md:pt-5 border-t border-secondary/5">
-                      <div className="flex items-center gap-2 order-2 sm:order-1">
-                        <div className="h-7 sm:h-8 w-24 sm:w-28 bg-secondary/10 rounded" />
-                      </div>
-                      <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 w-full sm:w-auto order-1 sm:order-2">
-                        <div className="h-9 sm:h-10 w-full xs:w-40 bg-secondary/10 rounded-full" />
-                        <div className="h-9 sm:h-10 w-full xs:w-40 bg-secondary/10 rounded-full" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </>
-          ) : currentServices.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-secondary/70">No services available in this category.</p>
-            </div>
-          ) : (
-            currentServices.map((service) => (
+          {currentServices.map((service) => (
             <div
               key={service.id}
               className="exclusive-service-card group/card bg-white rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col lg:flex-row gap-4 sm:gap-5 md:gap-6 p-4 sm:p-5 md:p-6 shadow-md hover:shadow-2xl border border-secondary/5 hover:border-primary/20 transition-all duration-500 hover:-translate-y-1"
@@ -268,7 +189,7 @@ export default function ExclusiveServices() {
                   </div>
                   
                   <p className="text-secondary/70 group-hover/card:text-secondary/80 text-xs sm:text-sm md:text-base leading-relaxed mb-3 sm:mb-4 line-clamp-3 sm:line-clamp-none transition-colors duration-300">
-                    {language === 'en' ? (service.descEn || t(service.descKey)) : (service.descJa || t(service.descKey))}
+                    {t(service.descKey)}
                   </p>
                 </div>
 
@@ -278,7 +199,7 @@ export default function ExclusiveServices() {
                   <div className="flex items-center gap-2 order-2 sm:order-1">
                     <div className="flex items-baseline gap-1">
                       <span className="text-xl sm:text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-pink-500">
-                        {formatCurrency(Number(service.price))}
+                        {formatCurrency(service.price)}
                       </span>
                     </div>
                   </div>
@@ -307,8 +228,7 @@ export default function ExclusiveServices() {
                 </div>
               </div>
             </div>
-          )))
-          }
+          ))}
 
           {/* See More Button */}
           <div className="text-center pt-4 sm:pt-6 md:pt-8">
