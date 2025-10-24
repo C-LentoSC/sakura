@@ -14,7 +14,7 @@ export async function GET(
     const cacheKey = `service:${serviceId}`;
 
     // Cache-first: Try to get from cache
-    const cachedData = cacheManager.get<any>(cacheKey, {
+    const cachedData = cacheManager.get<Record<string, unknown> | null>(cacheKey, {
       ttl: 30 * 60 * 1000, // 30 minutes fresh
       staleWhileRevalidate: 60 * 60 * 1000, // 60 minutes stale
     });

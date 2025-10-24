@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { formatCurrency } from '@/app/constants/currency';
 import ProductCardBase, { ProductCardData } from '@/app/components/shop/ProductCardBase';

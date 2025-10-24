@@ -40,6 +40,8 @@ export interface Service {
   price: number;
   duration: string;
   image: string;
+  order?: number;
+  isActive?: boolean;
   category: ServiceCategory;
   subCategory?: ServiceSubCategory;
   subSubCategory?: ServiceSubSubCategory;

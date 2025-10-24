@@ -5,38 +5,10 @@ import Image from 'next/image';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { formatCurrency } from '@/app/constants/currency';
 import ImageUpload from '@/app/components/ImageUpload';
-import { useServices } from '@/app/hooks/useServices';
+import { useServices, type Service as SwrService } from '@/app/hooks/useServices';
 import { useAdminCategories } from '@/app/hooks/useAdminCategories';
 
-interface Service {
-  id: string;
-  nameKey: string;
-  descKey: string;
-  nameEn?: string | null;
-  nameJa?: string | null;
-  descEn?: string | null;
-  descJa?: string | null;
-  price: number;
-  duration: string;
-  image: string;
-  order: number;
-  isActive: boolean;
-  category: {
-    id: string;
-    slug: string;
-    nameKey: string;
-  };
-  subCategory?: {
-    id: string;
-    slug: string;
-    nameKey: string;
-  };
-  subSubCategory?: {
-    id: string;
-    slug: string;
-    nameKey: string;
-  };
-}
+// Use shared Service type from hooks/useServices (imported as SwrService)
 
 interface SubSubCategory {
   id: string;
@@ -95,13 +67,13 @@ export default function AdminServicesPage() {
     const key = (r.nameKey || '').split('.').pop() || r.slug || '';
     return key.replace(/[-_]/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
   };
-  const getServiceName = (s: Service) => {
+  const getServiceName = (s: SwrService) => {
     const val = language === 'ja' ? s.nameJa || s.nameEn : s.nameEn || s.nameJa;
     if (val && String(val).trim().length > 0) return String(val);
     return getDisplayText(s.nameKey, t);
   };
 
-  const getServiceDesc = (s: Service) => {
+  const getServiceDesc = (s: SwrService) => {
     const val = language === 'ja' ? s.descJa || s.descEn : s.descEn || s.descJa;
     if (val && String(val).trim().length > 0) return String(val);
     return getDisplayText(s.descKey, t);
@@ -110,7 +82,7 @@ export default function AdminServicesPage() {
   const { categories, isLoading: categoriesLoading } = useAdminCategories();
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingService, setEditingService] = useState<Service | null>(null);
+  const [editingService, setEditingService] = useState<SwrService | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
 
@@ -234,7 +206,7 @@ export default function AdminServicesPage() {
     }
   };
 
-  const handleEdit = (service: Service) => {
+  const handleEdit = (service: SwrService) => {
     setEditingService(service);
     setFormData({
       name: getServiceName(service),
@@ -248,10 +220,10 @@ export default function AdminServicesPage() {
       price: service.price.toString(),
       duration: service.duration,
       image: service.image,
-      categoryId: service.category.id,
+      categoryId: service.category?.id || '',
       subCategoryId: service.subCategory?.id || '',
       subSubCategoryId: service.subSubCategory?.id || '',
-      isActive: service.isActive,
+      isActive: Boolean(service.isActive),
     });
     setIsModalOpen(true);
   };
@@ -267,9 +239,10 @@ export default function AdminServicesPage() {
       });
 
       if (response.ok) {
-        setServices(services.map(service => 
-          service.id === id ? { ...service, isActive } : service
-        ));
+        // If mutateServices exists, use it to refresh; otherwise fall back to optimistic UI
+        if (typeof mutateServices === 'function') {
+          await mutateServices();
+        }
       } else {
         console.error('Failed to toggle service status');
       }
@@ -303,10 +276,9 @@ export default function AdminServicesPage() {
   const filteredServices = services.filter((service) => {
     const matchesSearch =
       searchQuery === '' ||
-      getDisplayText(service.nameKey, t).toLowerCase().includes(searchQuery.toLowerCase()) ||
-      getDisplayText(service.descKey, t).toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      !filterCategory || service.category.slug === filterCategory;
+      getDisplayText((service.nameKey as string) || '', t).toLowerCase().includes(searchQuery.toLowerCase()) ||
+      getDisplayText((service.descKey as string) || '', t).toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = !filterCategory || (service.category && service.category.slug === filterCategory);
     return matchesSearch && matchesCategory;
   });
 
@@ -522,7 +494,7 @@ export default function AdminServicesPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-gray-900">
                         {renderName(service.category)}
                       </div>
                       {service.subCategory && (

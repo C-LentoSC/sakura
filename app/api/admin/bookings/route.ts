@@ -10,7 +10,7 @@ export async function GET() {
     const cacheKey = 'admin:bookings';
 
     // Cache-first
-    const cachedData = cacheManager.get<any[]>(cacheKey, {
+    const cachedData = cacheManager.get<Record<string, unknown>[]>(cacheKey, {
       ttl: 5 * 60 * 1000, // 5 minutes fresh
       staleWhileRevalidate: 30 * 60 * 1000,
     });

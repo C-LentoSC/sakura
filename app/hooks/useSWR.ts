@@ -21,8 +21,8 @@ interface SWRResponse<T> {
 }
 
 // In-memory cache for client-side
-const cache = new Map<string, { data: any; timestamp: number }>();
-const revalidationPromises = new Map<string, Promise<any>>();
+const cache = new Map<string, { data: unknown; timestamp: number }>();
+const revalidationPromises = new Map<string, Promise<unknown>>();
 
 // Storage helpers
 const getFromStorage = <T>(key: string): T | null => {
@@ -73,7 +73,7 @@ export function useSWR<T>(
     if (!key) return fallbackData;
     // Try memory cache first
     const cached = cache.get(key);
-    if (cached) return cached.data;
+    if (cached) return cached.data as T;
     // Try localStorage
     const stored = getFromStorage<T>(key);
     if (stored) {

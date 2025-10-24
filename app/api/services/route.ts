@@ -76,7 +76,7 @@ export async function GET(request: Request) {
     const cacheKey = `services:${category || 'all'}:${subCategory || 'all'}:${subSubCategory || 'all'}`;
 
     // Cache-first: Try to get from cache
-    const cachedData = cacheManager.get<any[]>(cacheKey, {
+    const cachedData = cacheManager.get<Record<string, unknown>[]>(cacheKey, {
       ttl: 30 * 60 * 1000, // 30 minutes fresh
       staleWhileRevalidate: 60 * 60 * 1000, // 60 minutes stale-while-revalidate
     });
@@ -89,11 +89,11 @@ export async function GET(request: Request) {
       let filteredServices = cachedData;
       if (search) {
         const searchLower = search.toLowerCase();
-        filteredServices = cachedData.filter(
-          (service: any) =>
-            service.nameKey.toLowerCase().includes(searchLower) ||
-            service.descKey.toLowerCase().includes(searchLower)
-        );
+        filteredServices = cachedData.filter((service) => {
+          const nameKey = String((service as Record<string, unknown>).nameKey || '');
+          const descKey = String((service as Record<string, unknown>).descKey || '');
+          return nameKey.toLowerCase().includes(searchLower) || descKey.toLowerCase().includes(searchLower);
+        });
       }
 
       return NextResponse.json({
@@ -128,11 +128,11 @@ export async function GET(request: Request) {
       let filteredServices = cachedData;
       if (search) {
         const searchLower = search.toLowerCase();
-        filteredServices = cachedData.filter(
-          (service: any) =>
-            service.nameKey.toLowerCase().includes(searchLower) ||
-            service.descKey.toLowerCase().includes(searchLower)
-        );
+        filteredServices = cachedData.filter((service) => {
+          const nameKey = String((service as Record<string, unknown>).nameKey || '');
+          const descKey = String((service as Record<string, unknown>).descKey || '');
+          return nameKey.toLowerCase().includes(searchLower) || descKey.toLowerCase().includes(searchLower);
+        });
       }
 
       // Return stale data immediately
@@ -155,11 +155,11 @@ export async function GET(request: Request) {
     let filteredServices = services;
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredServices = services.filter(
-        (service) =>
-          service.nameKey.toLowerCase().includes(searchLower) ||
-          service.descKey.toLowerCase().includes(searchLower)
-      );
+      filteredServices = services.filter((service) => {
+        const nameKey = String((service as unknown as Record<string, unknown>).nameKey || '');
+        const descKey = String((service as unknown as Record<string, unknown>).descKey || '');
+        return nameKey.toLowerCase().includes(searchLower) || descKey.toLowerCase().includes(searchLower);
+      });
     }
 
     return NextResponse.json({

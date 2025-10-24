@@ -17,17 +17,7 @@ import {
   Chatbot
 } from '../../components';
 
-type ApiProduct = {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  originalPrice: number | null;
-  image: string;
-  inStock: boolean;
-  badge: string | null;
-  description: string;
-};
+// ApiProduct type removed (was unused). The `useProduct` hook provides the product shape.
 
 export default function ProductDetailPage() {
   const { t, language } = useLanguage();

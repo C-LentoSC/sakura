@@ -15,7 +15,7 @@ interface CacheOptions {
 }
 
 class CacheManager {
-  private cache: Map<string, CacheEntry<any>> = new Map();
+  private cache: Map<string, CacheEntry<unknown>> = new Map();
   private defaultTTL: number = 30 * 60 * 1000; // 30 minutes default
   private defaultSWR: number = 60 * 60 * 1000; // 60 minutes stale-while-revalidate
 
