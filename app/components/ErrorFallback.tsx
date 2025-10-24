@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 
 interface ErrorFallbackProps {
@@ -16,6 +16,15 @@ export default function ErrorFallback({
   title = "Something went wrong",
   message = "We're sorry, but something unexpected happened. Please try again."
 }: ErrorFallbackProps) {
+  const [petalStyles] = useState(() =>
+    [...Array(6)].map(() => ({
+      left: `${20 + Math.random() * 60}%`,
+      top: `${20 + Math.random() * 60}%`,
+      animationDelay: `${Math.random() * 2}s`,
+      animationDuration: `${2 + Math.random() * 1}s`,
+    }))
+  );
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50 flex items-center justify-center p-4">
       {/* Background Pattern */}
@@ -28,16 +37,11 @@ export default function ErrorFallback({
 
       {/* Floating Sakura Petals */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(6)].map((_, i) => (
+        {petalStyles.map((style, i) => (
           <div
             key={i}
             className="absolute animate-bounce opacity-40"
-            style={{
-              left: `${20 + Math.random() * 60}%`,
-              top: `${20 + Math.random() * 60}%`,
-              animationDelay: `${Math.random() * 2}s`,
-              animationDuration: `${2 + Math.random() * 1}s`
-            }}
+            style={style}
           >
             <svg className="w-3 h-3 sm:w-4 sm:h-4 text-pink-400" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"/>

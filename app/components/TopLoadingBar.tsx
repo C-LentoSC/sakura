@@ -2,41 +2,40 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useLoading } from '../contexts/LoadingContext';
 
 export default function TopLoadingBar() {
-  const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const pathname = usePathname();
+  const { isLoading } = useLoading();
 
   useEffect(() => {
-    setIsLoading(true);
-    setProgress(0);
+    let progressInterval: NodeJS.Timeout;
+    let completeTimer: NodeJS.Timeout;
 
-    // Simulate progress
-    const progressInterval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return 90;
-        }
-        return prev + Math.random() * 30;
-      });
-    }, 100);
-
-    // Complete loading
-    const completeTimer = setTimeout(() => {
-      setProgress(100);
-      setTimeout(() => {
-        setIsLoading(false);
+    if (isLoading) {
+      requestAnimationFrame(() => setProgress(0));
+      progressInterval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + Math.random() * 30;
+        });
+      }, 100);
+    } else {
+      requestAnimationFrame(() => setProgress(100));
+      completeTimer = setTimeout(() => {
         setProgress(0);
       }, 200);
-    }, 500);
+    }
 
     return () => {
       clearInterval(progressInterval);
       clearTimeout(completeTimer);
     };
-  }, [pathname]);
+  }, [isLoading, pathname]);
 
   if (!isLoading && progress === 0) return null;
 

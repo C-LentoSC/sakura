@@ -19,13 +19,17 @@ export function LanguageProvider({ children, initialLanguage }: { children: Reac
 
   // Initialize from localStorage (client only)
   useEffect(() => {
-    setIsHydrated(true);
+    setTimeout(() => {
+      setIsHydrated(true);
+    }, 0);
     try {
       // If server provided an initialLanguage (via cookie), do NOT override it
       if (initialLanguage) return;
       const stored = typeof window !== 'undefined' ? window.localStorage.getItem('sakura-lang') : null;
       if (stored && (['en', 'ja'] as Language[]).includes(stored as Language)) {
-        setLanguage(stored as Language);
+        setTimeout(() => {
+          setLanguage(stored as Language);
+        }, 0);
       }
     } catch {
       // ignore storage errors
