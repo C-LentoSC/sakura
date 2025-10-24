@@ -4,7 +4,11 @@
   functions = "netlify/functions"
 
 [build.environment]
+<<<<<<< HEAD
   NODE_VERSION = "20.9.0"
+=======
+  NODE_VERSION = "18"
+>>>>>>> parent of 3456b89 (fix 77)
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
