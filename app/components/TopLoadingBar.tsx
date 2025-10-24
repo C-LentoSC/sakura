@@ -4,16 +4,13 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 export default function TopLoadingBar() {
-  const [isLoading, setIsLoading] = useState(true); // Initialize as true
+  const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const pathname = usePathname();
 
   useEffect(() => {
-    // setIsLoading(true); // Removed due to set-state-in-effect rule
-    // Defer setProgress(0) to avoid synchronous setState in effect warning
-    setTimeout(() => {
-      setProgress(0);
-    }, 0);
+    setIsLoading(true);
+    setProgress(0);
 
     // Simulate progress
     const progressInterval = setInterval(() => {
@@ -38,7 +35,6 @@ export default function TopLoadingBar() {
     return () => {
       clearInterval(progressInterval);
       clearTimeout(completeTimer);
-      setIsLoading(false); // Ensure loading is false on unmount/pathname change
     };
   }, [pathname]);
 

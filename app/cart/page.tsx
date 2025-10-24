@@ -20,11 +20,11 @@ import {
 export default function CartPage() {
   const { t } = useLanguage();
   const [cartItems, setCartItems] = useState(getCart());
-  // Initialize mounted state directly to true for client-side rendering
-  const mounted = useState(true)[0]; // Removed setMounted as it's not used
+  const [mounted, setMounted] = useState(false);
 
   // Load cart on mount and when storage changes (multi-tab support)
   useEffect(() => {
+    setMounted(true);
     const load = () => setCartItems(getCart());
     load();
     const onStorage = (e: StorageEvent) => {

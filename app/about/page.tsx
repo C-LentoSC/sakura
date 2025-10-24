@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '../contexts/LanguageContext';
 import { gsap } from 'gsap';
@@ -22,13 +22,8 @@ export default function AboutPage() {
   const storyRef = useRef<HTMLDivElement>(null);
   const valuesRef = useRef<HTMLDivElement>(null);
   const teamRef = useRef<HTMLDivElement>(null);
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Defer setIsMounted to avoid synchronous setState in effect warning
-    setTimeout(() => {
-      setIsMounted(true);
-    }, 0);
     const ctx = gsap.context(() => {
       // Hero animation
       gsap.fromTo(heroRef.current,
@@ -176,143 +171,133 @@ export default function AboutPage() {
 
       <main className="flex-1 relative z-10 pt-24 sm:pt-28 md:pt-32">
         {/* Hero Section */}
-        {isMounted && (
-          <div ref={heroRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 sm:py-16 md:py-20">
-            <div className="text-center max-w-4xl mx-auto">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-sakura text-secondary mb-4 sm:mb-6">
-                {t('about.hero.title')}
-              </h1>
-              <p className="text-lg sm:text-xl md:text-2xl text-secondary/70 leading-relaxed">
-                {t('about.hero.subtitle')}
-              </p>
-            </div>
+        <div ref={heroRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 sm:py-16 md:py-20">
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-sakura text-secondary mb-4 sm:mb-6">
+              {t('about.hero.title')}
+            </h1>
+            <p className="text-lg sm:text-xl md:text-2xl text-secondary/70 leading-relaxed">
+              {t('about.hero.subtitle')}
+            </p>
           </div>
-        )}
+        </div>
 
         {/* Our Story Section */}
-        {isMounted && (
-          <div ref={storyRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 sm:py-16 md:py-20">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div className="relative h-[400px] sm:h-[500px] rounded-3xl overflow-hidden shadow-2xl">
-                <Image
-                  src="/aboutus/openday.jpg"
-                  alt="Sakura Saloon Interior"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-secondary/20 to-transparent"></div>
-              </div>
-              <div>
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-sakura text-secondary mb-6">
-                  {t('about.story.title')}
-                </h2>
-                <div className="space-y-4 text-secondary/80 leading-relaxed">
-                  <p>{t('about.story.paragraph1')}</p>
-                  <p>{t('about.story.paragraph2')}</p>
-                  <p>{t('about.story.paragraph3')}</p>
-                </div>
+        <div ref={storyRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 sm:py-16 md:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="relative h-[400px] sm:h-[500px] rounded-3xl overflow-hidden shadow-2xl">
+              <Image
+                src="/aboutus/openday.jpg"
+                alt="Sakura Saloon Interior"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-secondary/20 to-transparent"></div>
+            </div>
+            <div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-sakura text-secondary mb-6">
+                {t('about.story.title')}
+              </h2>
+              <div className="space-y-4 text-secondary/80 leading-relaxed">
+                <p>{t('about.story.paragraph1')}</p>
+                <p>{t('about.story.paragraph2')}</p>
+                <p>{t('about.story.paragraph3')}</p>
               </div>
             </div>
           </div>
-        )}
+        </div>
 
         {/* Our Values Section */}
-        {isMounted && (
-          <div ref={valuesRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 sm:py-16 md:py-20">
-            <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-sakura text-secondary mb-4">
-                {t('about.values.title')}
-              </h2>
-              <p className="text-secondary/70 text-lg max-w-2xl mx-auto">
-                {t('about.values.subtitle')}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-              {values.map((value) => (
-                <div
-                  key={value.id}
-                  className="value-card bg-white/80 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-md hover:shadow-xl transition-all duration-300 border border-primary/10 hover:border-primary/30 hover:-translate-y-2"
-                >
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-pink-100 flex items-center justify-center mb-4">
-                    {value.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold text-secondary mb-3">
-                    {t(value.titleKey)}
-                  </h3>
-                  <p className="text-secondary/70 text-sm leading-relaxed">
-                    {t(value.descKey)}
-                  </p>
-                </div>
-              ))}
-            </div>
+        <div ref={valuesRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 sm:py-16 md:py-20">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-sakura text-secondary mb-4">
+              {t('about.values.title')}
+            </h2>
+            <p className="text-secondary/70 text-lg max-w-2xl mx-auto">
+              {t('about.values.subtitle')}
+            </p>
           </div>
-        )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            {values.map((value) => (
+              <div
+                key={value.id}
+                className="value-card bg-white/80 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-md hover:shadow-xl transition-all duration-300 border border-primary/10 hover:border-primary/30 hover:-translate-y-2"
+              >
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-pink-100 flex items-center justify-center mb-4">
+                  {value.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-secondary mb-3">
+                  {t(value.titleKey)}
+                </h3>
+                <p className="text-secondary/70 text-sm leading-relaxed">
+                  {t(value.descKey)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Our Team Section */}
-        {isMounted && (
-          <div ref={teamRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 sm:py-16 md:py-20">
-            <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-sakura text-secondary mb-4">
-                {t('about.team.title')}
-              </h2>
-              <p className="text-secondary/70 text-lg max-w-2xl mx-auto">
-                {t('about.team.subtitle')}
-              </p>
-            </div>
+        <div ref={teamRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 sm:py-16 md:py-20">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-sakura text-secondary mb-4">
+              {t('about.team.title')}
+            </h2>
+            <p className="text-secondary/70 text-lg max-w-2xl mx-auto">
+              {t('about.team.subtitle')}
+            </p>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {team.map((member) => (
-                <div
-                  key={member.id}
-                  className="team-card bg-white/80 backdrop-blur-sm rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-primary/10 hover:border-primary/30 group"
-                >
-                  <div className="relative h-80 overflow-hidden">
-                    <Image
-                      src={member.image}
-                      alt={t(member.nameKey)}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="text-xl font-semibold text-white mb-1 drop-shadow-lg">
-                        {t(member.nameKey)}
-                      </h3>
-                      <p className="text-white text-sm drop-shadow-md">
-                        {t(member.roleKey)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <p className="text-secondary/70 text-sm leading-relaxed">
-                      {t(member.descKey)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {team.map((member) => (
+              <div
+                key={member.id}
+                className="team-card bg-white/80 backdrop-blur-sm rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-primary/10 hover:border-primary/30 group"
+              >
+                <div className="relative h-80 overflow-hidden">
+                  <Image
+                    src={member.image}
+                    alt={t(member.nameKey)}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h3 className="text-xl font-semibold text-white mb-1 drop-shadow-lg">
+                      {t(member.nameKey)}
+                    </h3>
+                    <p className="text-white text-sm drop-shadow-md">
+                      {t(member.roleKey)}
                     </p>
                   </div>
                 </div>
-              ))}
-            </div>
+                <div className="p-6">
+                  <p className="text-secondary/70 text-sm leading-relaxed">
+                    {t(member.descKey)}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
 
         {/* CTA Section */}
-        {isMounted && (
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 sm:py-16 md:py-20">
-            <div className="bg-gradient-to-br from-primary/10 to-pink-100/50 rounded-3xl p-8 sm:p-12 md:p-16 text-center">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-sakura text-secondary mb-4 sm:mb-6">
-                {t('about.cta.title')}
-              </h2>
-              <p className="text-secondary/70 text-lg mb-6 sm:mb-8 max-w-2xl mx-auto">
-                {t('about.cta.description')}
-              </p>
-              <button className="px-8 py-4 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-full hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300">
-                {t('about.cta.button')}
-              </button>
-            </div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 sm:py-16 md:py-20">
+          <div className="bg-gradient-to-br from-primary/10 to-pink-100/50 rounded-3xl p-8 sm:p-12 md:p-16 text-center">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-sakura text-secondary mb-4 sm:mb-6">
+              {t('about.cta.title')}
+            </h2>
+            <p className="text-secondary/70 text-lg mb-6 sm:mb-8 max-w-2xl mx-auto">
+              {t('about.cta.description')}
+            </p>
+            <button className="px-8 py-4 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-full hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300">
+              {t('about.cta.button')}
+            </button>
           </div>
-        )}
+        </div>
       </main>
 
       <Footer />
