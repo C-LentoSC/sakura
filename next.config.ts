@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    appDir: true,
+    turbopack: false,
+  },
 };
 
 export default nextConfig;
