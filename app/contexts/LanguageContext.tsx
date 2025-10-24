@@ -71,7 +71,15 @@ export function LanguageProvider({ children, initialLanguage }: { children: Reac
       console.warn(`Invalid translation key: ${key}`);
       return String(key); // Return the key itself or an empty string
     }
-    const result = getNestedTranslation(translations[language], key || '');
+
+    const currentTranslations = translations[language];
+    if (!currentTranslations || typeof currentTranslations !== 'object') {
+      // If translations for the current language are missing or malformed, return the key
+      console.warn(`Translations missing or malformed for language: ${language}`);
+      return key;
+    }
+
+    const result = getNestedTranslation(currentTranslations, key || '');
     
     // Debug logging (remove in production)
     if (typeof window !== 'undefined' && result === key) {

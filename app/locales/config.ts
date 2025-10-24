@@ -5,8 +5,8 @@
 // 3. Import the JSON file
 // 4. Add it to the translations object
 
-import en from './en.json';
-import ja from './ja.json';
+import en from './en.json'; // Use static import
+import ja from './ja.json'; // Use static import
 
 export type Language = 'en' | 'ja';
 
