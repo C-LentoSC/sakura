@@ -51,7 +51,11 @@ export function LanguageProvider({ children, initialLanguage }: { children: Reac
   };
 
   // Helper function to get nested translation value
-  const getNestedTranslation = (obj: Record<string, unknown>, path: string): string => {
+  const getNestedTranslation = (obj: Record<string, unknown> | undefined | null, path: string): string => {
+    if (!obj || typeof obj !== 'object') {
+      return path; // If the object is invalid, return the path itself
+    }
+
     const keys = path.split('.');
     let result: unknown = obj;
     
@@ -72,17 +76,21 @@ export function LanguageProvider({ children, initialLanguage }: { children: Reac
       return String(key); // Return the key itself or an empty string
     }
 
-    const currentTranslations = translations[language];
-    if (!currentTranslations || typeof currentTranslations !== 'object') {
-      // If translations for the current language are missing or malformed, return the key
-      console.warn(`Translations missing or malformed for language: ${language}`);
+    const currentTranslations = (translations[language] && typeof translations[language] === 'object') 
+      ? translations[language] as Record<string, unknown>
+      : {}; // Default to empty object if translations are missing or malformed
+
+    if (Object.keys(currentTranslations).length === 0) {
+      if (typeof window === 'undefined' || process.env.NODE_ENV === 'development') {
+        console.warn(`Translations missing or malformed for language: ${language}. Returning key: ${key}`);
+      }
       return key;
     }
 
     const result = getNestedTranslation(currentTranslations, key || '');
     
     // Debug logging (remove in production)
-    if (typeof window !== 'undefined' && result === key) {
+    if ((typeof window !== 'undefined' || process.env.NODE_ENV === 'development') && result === key) {
       console.warn(`Translation missing for key: ${key} in language: ${language}`);
     }
     
