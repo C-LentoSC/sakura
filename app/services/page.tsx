@@ -26,6 +26,7 @@ export default function ServicesPage() {
   const [selectedSubCategory, setSelectedSubCategory] = useState('all');
   const [selectedSubSubCategory, setSelectedSubSubCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [mounted, setMounted] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const servicesRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +39,11 @@ export default function ServicesPage() {
     subCategory: selectedSubCategory !== 'all' ? selectedSubCategory : undefined,
     subSubCategory: selectedSubSubCategory !== 'all' ? selectedSubSubCategory : undefined,
   });
+
+  // Track mount state to prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Set first category as default when categories load
   useEffect(() => {
@@ -176,163 +182,175 @@ export default function ServicesPage() {
 
         {/* Category Filters Section */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl mb-8">
-          {/* Main Category Tabs (Level 1) */}
-          <div className="flex flex-wrap justify-center gap-2 mb-4">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => {
-                  setSelectedMainCategory(category.slug);
-                  setSelectedSubCategory('all');
-                  setSelectedSubSubCategory('all');
-                }}
-                className={`px-5 py-2 rounded-full font-medium transition-all duration-300 text-sm ${
-                  selectedMainCategory === category.slug
-                    ? 'bg-gradient-to-r from-primary to-pink-400 text-white shadow-md'
-                    : 'bg-white/90 backdrop-blur-sm text-secondary/70 hover:text-secondary hover:bg-white hover:shadow-sm'
-                }`}
-              >
-                {renderName(category)}
-              </button>
-            ))}
-          </div>
+          {mounted ? (
+            <>
+              {/* Main Category Tabs (Level 1) */}
+              <div className="flex flex-wrap justify-center gap-2 mb-4">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => {
+                      setSelectedMainCategory(category.slug);
+                      setSelectedSubCategory('all');
+                      setSelectedSubSubCategory('all');
+                    }}
+                    className={`px-5 py-2 rounded-full font-medium transition-all duration-300 text-sm ${
+                      selectedMainCategory === category.slug
+                        ? 'bg-gradient-to-r from-primary to-pink-400 text-white shadow-md'
+                        : 'bg-white/90 backdrop-blur-sm text-secondary/70 hover:text-secondary hover:bg-white hover:shadow-sm'
+                    }`}
+                  >
+                    {renderName(category)}
+                  </button>
+                ))}
+              </div>
 
-          {/* Sub Category Filters (Level 2) */}
-          <div className="flex flex-wrap justify-center gap-2 mb-3">
-            {currentSubCategories.map((subCategory) => (
-              <button
-                key={subCategory.slug}
-                onClick={() => {
-                  setSelectedSubCategory(subCategory.slug);
-                  setSelectedSubSubCategory('all');
-                }}
-                className={`px-4 py-1.5 rounded-full font-medium transition-all duration-300 text-xs ${
-                  selectedSubCategory === subCategory.slug
-                    ? 'bg-secondary text-white shadow-sm'
-                    : 'bg-white/70 backdrop-blur-sm text-secondary/60 hover:text-secondary hover:bg-white hover:shadow-sm'
-                }`}
-              >
-                {renderName(subCategory)}
-              </button>
-            ))}
-          </div>
+              {/* Sub Category Filters (Level 2) */}
+              <div className="flex flex-wrap justify-center gap-2 mb-3">
+                {currentSubCategories.map((subCategory) => (
+                  <button
+                    key={subCategory.slug}
+                    onClick={() => {
+                      setSelectedSubCategory(subCategory.slug);
+                      setSelectedSubSubCategory('all');
+                    }}
+                    className={`px-4 py-1.5 rounded-full font-medium transition-all duration-300 text-xs ${
+                      selectedSubCategory === subCategory.slug
+                        ? 'bg-secondary text-white shadow-sm'
+                        : 'bg-white/70 backdrop-blur-sm text-secondary/60 hover:text-secondary hover:bg-white hover:shadow-sm'
+                    }`}
+                  >
+                    {renderName(subCategory)}
+                  </button>
+                ))}
+              </div>
 
-          {/* Sub-Sub Category Filters (Level 3) */}
-          {currentSubSubCategories.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-2">
-              {currentSubSubCategories.map((subSubCategory) => (
-                <button
-                  key={subSubCategory.slug}
-                  onClick={() => setSelectedSubSubCategory(subSubCategory.slug)}
-                  className={`px-3 py-1 rounded-full font-medium transition-all duration-300 text-xs ${
-                    selectedSubSubCategory === subSubCategory.slug
-                      ? 'bg-amber-600 text-white shadow-sm'
-                      : 'bg-white/60 backdrop-blur-sm text-secondary/50 hover:text-secondary hover:bg-white hover:shadow-sm'
-                  }`}
-                >
-                  {renderName(subSubCategory)}
-                </button>
-              ))}
+              {/* Sub-Sub Category Filters (Level 3) */}
+              {currentSubSubCategories.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-2">
+                  {currentSubSubCategories.map((subSubCategory) => (
+                    <button
+                      key={subSubCategory.slug}
+                      onClick={() => setSelectedSubSubCategory(subSubCategory.slug)}
+                      className={`px-3 py-1 rounded-full font-medium transition-all duration-300 text-xs ${
+                        selectedSubSubCategory === subSubCategory.slug
+                          ? 'bg-amber-600 text-white shadow-sm'
+                          : 'bg-white/60 backdrop-blur-sm text-secondary/50 hover:text-secondary hover:bg-white hover:shadow-sm'
+                      }`}
+                    >
+                      {renderName(subSubCategory)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
+              <div className="px-5 py-2 rounded-full bg-gray-100 animate-pulse h-10 w-32"></div>
+              <div className="px-5 py-2 rounded-full bg-gray-100 animate-pulse h-10 w-32"></div>
+              <div className="px-5 py-2 rounded-full bg-gray-100 animate-pulse h-10 w-32"></div>
             </div>
           )}
         </div>
 
         {/* Services Grid */}
         <div ref={servicesRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pb-12 sm:pb-16">
-          {servicesLoading ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden shadow-md border border-primary/10 animate-pulse">
-                  <div className="flex flex-col sm:flex-row">
-                    {/* Image skeleton */}
-                    <div className="relative w-full sm:w-44 h-40 sm:h-auto flex-shrink-0 bg-secondary/10" />
-                    {/* Content skeleton */}
-                    <div className="flex-1 p-4 space-y-3">
-                      <div className="h-5 bg-secondary/10 rounded w-2/3" />
-                      <div className="h-3 bg-secondary/10 rounded w-full" />
-                      <div className="h-3 bg-secondary/10 rounded w-5/6" />
-                      <div className="h-8 bg-secondary/10 rounded w-24 mt-2" />
-                      <div className="flex gap-2 pt-1">
-                        <div className="h-8 bg-secondary/10 rounded w-32" />
-                        <div className="h-8 bg-secondary/10 rounded w-28" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : filteredServices.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {filteredServices.map((service, index) => (
-                <div
-                  key={service.id}
-                  className="service-card bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-primary/10 hover:border-primary/20 group"
-                >
-                  <div className="flex flex-col sm:flex-row">
-                    {/* Image Section */}
-                    <Link href={`/services/${service.id}`} className="relative w-full sm:w-44 h-40 sm:h-auto flex-shrink-0 overflow-hidden">
-                      <Image
-                        src={service.image}
-                        alt={getServiceName(service)}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-500"
-                        sizes="(max-width: 640px) 100vw, 176px"
-                        priority={index === 0}
-                      />
-                      {/* Duration Badge */}
-                      <div className="absolute top-3 left-3 bg-primary/90 backdrop-blur-sm px-3 py-1.5 rounded-full z-10">
-                        <span className="text-white font-medium text-xs flex items-center gap-1.5">
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          {service.duration}
-                        </span>
-                      </div>
-                    </Link>
-
-                    {/* Content Section */}
-                    <div className="flex-1 p-4 flex flex-col justify-between">
-                      <div>
-                        <Link href={`/services/${service.id}`}>
-                          <h3 className="text-lg font-sakura text-secondary mb-2 hover:text-primary transition-colors cursor-pointer">
-                            {getServiceName(service)}
-                          </h3>
-                        </Link>
-                        <p className="text-secondary/70 text-xs leading-relaxed mb-3 line-clamp-2">
-                          {getServiceDesc(service)}
-                        </p>
-                      </div>
-
-                      {/* Price and Actions */}
-                      <div className="space-y-2">
-                        <div className="text-2xl font-bold text-primary">
-                          {formatCurrency(service.price)}
-                        </div>
-                        
-                        <div className="flex flex-col gap-2">
-                          <Link
-                            href={`/services/${service.id}`}
-                            className="w-full px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-full hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300 text-xs text-center"
-                          >
-                            View Details →
-                          </Link>
-                          <Link
-                            href={`/book?service=${service.id}`}
-                            className="w-full px-4 py-1.5 bg-white border border-primary/30 text-primary font-medium rounded-full hover:bg-primary/5 hover:border-primary/50 transition-all duration-300 text-xs text-center"
-                          >
-                            {t('services.bookNow')}
-                          </Link>
+          {mounted && (
+            servicesLoading ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden shadow-md border border-primary/10 animate-pulse">
+                    <div className="flex flex-col sm:flex-row">
+                      {/* Image skeleton */}
+                      <div className="relative w-full sm:w-44 h-40 sm:h-auto flex-shrink-0 bg-secondary/10" />
+                      {/* Content skeleton */}
+                      <div className="flex-1 p-4 space-y-3">
+                        <div className="h-5 bg-secondary/10 rounded w-2/3" />
+                        <div className="h-3 bg-secondary/10 rounded w-full" />
+                        <div className="h-3 bg-secondary/10 rounded w-5/6" />
+                        <div className="h-8 bg-secondary/10 rounded w-24 mt-2" />
+                        <div className="flex gap-2 pt-1">
+                          <div className="h-8 bg-secondary/10 rounded w-32" />
+                          <div className="h-8 bg-secondary/10 rounded w-28" />
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <p className="text-secondary/60 text-base">{t('services.noResults')}</p>
-            </div>
+                ))}
+              </div>
+            ) : filteredServices.length > 0 ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                {filteredServices.map((service, index) => (
+                  <div
+                    key={service.id}
+                    className="service-card bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-primary/10 hover:border-primary/20 group"
+                  >
+                    <div className="flex flex-col sm:flex-row">
+                      {/* Image Section */}
+                      <Link href={`/services/${service.id}`} className="relative w-full sm:w-44 h-40 sm:h-auto flex-shrink-0 overflow-hidden">
+                        <Image
+                          src={service.image}
+                          alt={getServiceName(service)}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                          sizes="(max-width: 640px) 100vw, 176px"
+                          priority={index === 0}
+                        />
+                        {/* Duration Badge */}
+                        <div className="absolute top-3 left-3 bg-primary/90 backdrop-blur-sm px-3 py-1.5 rounded-full z-10">
+                          <span className="text-white font-medium text-xs flex items-center gap-1.5">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {service.duration}
+                          </span>
+                        </div>
+                      </Link>
+
+                      {/* Content Section */}
+                      <div className="flex-1 p-4 flex flex-col justify-between">
+                        <div>
+                          <Link href={`/services/${service.id}`}>
+                            <h3 className="text-lg font-sakura text-secondary mb-2 hover:text-primary transition-colors cursor-pointer">
+                              {getServiceName(service)}
+                            </h3>
+                          </Link>
+                          <p className="text-secondary/70 text-xs leading-relaxed mb-3 line-clamp-2">
+                            {getServiceDesc(service)}
+                          </p>
+                        </div>
+
+                        {/* Price and Actions */}
+                        <div className="space-y-2">
+                          <div className="text-2xl font-bold text-primary">
+                            {formatCurrency(service.price)}
+                          </div>
+                          
+                          <div className="flex flex-col gap-2">
+                            <Link
+                              href={`/services/${service.id}`}
+                              className="w-full px-4 py-2 bg-gradient-to-r from-primary to-pink-400 text-white font-semibold rounded-full hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300 text-xs text-center"
+                            >
+                              View Details →
+                            </Link>
+                            <Link
+                              href={`/book?service=${service.id}`}
+                              className="w-full px-4 py-1.5 bg-white border border-primary/30 text-primary font-medium rounded-full hover:bg-primary/5 hover:border-primary/50 transition-all duration-300 text-xs text-center"
+                            >
+                              {t('services.bookNow')}
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <p className="text-secondary/60 text-base">{t('services.noResults')}</p>
+              </div>
+            )
           )}
         </div>
       </main>
