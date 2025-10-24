@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { formatCurrency } from '@/app/constants/currency';
 import ProductCardBase, { ProductCardData } from '@/app/components/shop/ProductCardBase';
 import ImageUpload from '@/app/components/ImageUpload';
+import { useProducts, type Product as ProductType } from '@/app/hooks/useProducts';
 
 interface Product {
   id: number;
@@ -25,8 +26,6 @@ interface Product {
 
 export default function AdminShopPage() {
   const { language } = useLanguage();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,6 +34,28 @@ export default function AdminShopPage() {
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<{ price?: string; originalPrice?: string }>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  // Fetch products with SWR caching
+  const { products: productsData, isLoading: loading, mutate } = useProducts({ language });
+
+  // Convert ProductType[] to Product[]
+  const products: Product[] = productsData.map((p: ProductType) => ({
+    id: p.id,
+    name: p.name,
+    nameEn: p.nameEn,
+    nameJa: p.nameJa,
+    category: p.category,
+    price: p.price,
+    originalPrice: p.originalPrice,
+    image: p.image,
+    inStock: p.inStock,
+    badge: p.badge,
+    badgeType: p.badgeType,
+    description: p.description,
+    descriptionEn: p.descEn,
+    descriptionJa: p.descJa,
+  }));
 
   const [formData, setFormData] = useState({
     name: '',
@@ -55,44 +76,9 @@ export default function AdminShopPage() {
   const categories = ['Hair Care', 'Nail Care', 'Beauty', 'Wellness'];
   const badgeTypes = ['', 'Bestseller', 'New', 'Sale', 'Popular', 'Out of Stock'];
 
-  const fetchProducts = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`/api/products?lang=${language}`);
-      if (!res.ok) throw new Error('Failed to load products');
-      const data: { products: Array<{ id: number; name: string; nameEn: string; nameJa: string; category: string; description: string; descEn: string; descJa: string; price: number; originalPrice: number | null; image: string; inStock: boolean; badge: string | null; badgeType: string | null; }> } = await res.json();
-      const mapped: Product[] = data.products.map((p) => ({
-        id: p.id,
-        name: p.name,
-        nameEn: p.nameEn,
-        nameJa: p.nameJa,
-        category: p.category,
-        price: p.price,
-        originalPrice: p.originalPrice,
-        image: p.image,
-        inStock: p.inStock,
-        badge: p.badge,
-        badgeType: p.badgeType,
-        description: p.description,
-        descriptionEn: p.descEn,
-        descriptionJa: p.descJa,
-      }));
-      setProducts(mapped);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [language]);
-
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitting(true);
 
     try {
       // Basic validations
@@ -107,7 +93,7 @@ export default function AdminShopPage() {
       }
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
-        setLoading(false);
+        setSubmitting(false);
         return;
       } else {
         setErrors({});
@@ -162,15 +148,15 @@ export default function AdminShopPage() {
         if (!res.ok) throw new Error('Failed to create product');
       }
 
-      // Refresh products list from database
-      await fetchProducts();
+      // Revalidate SWR cache (will refetch fresh data)
+      await mutate();
       setIsModalOpen(false);
       resetForm();
     } catch (error) {
       console.error('Error saving product:', error);
       alert('Failed to save product');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -201,23 +187,23 @@ export default function AdminShopPage() {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
-    
-    setLoading(true);
+
+    setSubmitting(true);
     try {
       const res = await fetch(`/api/admin/products/${deleteTarget.id}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Failed to delete product');
-      
-      // Refresh products list from database
-      await fetchProducts();
+
+      // Revalidate SWR cache (will refetch fresh data)
+      await mutate();
       setDeleteConfirmOpen(false);
       setDeleteTarget(null);
     } catch (error) {
       console.error('Error deleting product:', error);
       alert('Failed to delete product');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 

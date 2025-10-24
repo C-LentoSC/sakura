@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
+import cacheManager from '@/app/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,6 +61,10 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
       data,
     });
 
+    // Invalidate all product caches (both en and ja)
+    cacheManager.invalidatePattern(/^products:/);
+    console.log('[Cache INVALIDATED] All product caches after UPDATE');
+
     return NextResponse.json({ product });
   } catch (e) {
     console.error('Failed to update product', e);
@@ -77,6 +82,11 @@ export async function DELETE(_req: NextRequest, context: { params: Promise<{ id:
     }
 
     await prisma.product.delete({ where: { id: productId } });
+
+    // Invalidate all product caches (both en and ja)
+    cacheManager.invalidatePattern(/^products:/);
+    console.log('[Cache INVALIDATED] All product caches after DELETE');
+
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error('Failed to delete product', e);

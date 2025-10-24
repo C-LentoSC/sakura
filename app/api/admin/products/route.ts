@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
+import cacheManager from '@/app/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,6 +43,10 @@ export async function POST(req: NextRequest) {
         badgeType: badgeType || null,
       },
     });
+
+    // Invalidate all product caches (both en and ja)
+    cacheManager.invalidatePattern(/^products:/);
+    console.log('[Cache INVALIDATED] All product caches after CREATE');
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (e) {

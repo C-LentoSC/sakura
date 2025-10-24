@@ -6,6 +6,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
 import { addItem as addCartItem, getTotalQuantity } from '../utils/cartStorage';
 import ProductCardBase, { ProductCardData } from '../components/shop/ProductCardBase';
+import { useProducts, type Product } from '../hooks/useProducts';
 import {
   Header,
   BackgroundPattern,
@@ -15,8 +16,6 @@ import {
   Chatbot
 } from '../components';
 
-type Product = ProductCardData & { id: number };
-
 // Categories will be translated dynamically
 
 export default function ShopPage() {
@@ -25,31 +24,14 @@ export default function ShopPage() {
   const [cartQty, setCartQty] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [mounted, setMounted] = useState(false);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetch products from API based on current language
-  useEffect(() => {
-    let active = true;
-    const load = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`/api/products?lang=${language}`);
-        if (!res.ok) throw new Error('Failed to load products');
-        const data: { products: Product[] } = await res.json();
-        if (active) setProducts(data.products);
-      } catch (e) {
-        console.error(e);
-        if (active) setProducts([]);
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-    load();
-    return () => {
-      active = false;
-    };
-  }, [language]);
+  // Fetch products using SWR with cache-first strategy
+  const { products, error, isLoading } = useProducts({ language });
+
+  // Handle error state
+  if (error) {
+    console.error('Error loading products:', error);
+  }
 
   const filteredProducts = products.filter((product: Product) => {
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
@@ -163,7 +145,7 @@ export default function ShopPage() {
 
           {/* Products Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 mb-12">
-            {loading
+            {isLoading
               ? [...Array(10)].map((_, i) => (
                   <div key={i} className="bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden shadow-md border border-primary/10 animate-pulse">
                     <div className="h-28 sm:h-32 bg-secondary/10" />

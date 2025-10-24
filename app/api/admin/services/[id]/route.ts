@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
 import { hasRole } from '@/app/lib/dal';
+import cacheManager from '@/app/lib/cache';
 
 // PUT /api/admin/services/[id] - Update service
 export async function PUT(
@@ -61,6 +62,11 @@ export async function PUT(
       },
     });
 
+    // Invalidate all service and category caches
+    cacheManager.invalidatePattern(/^services:/);
+    cacheManager.invalidatePattern(/^categories:/);
+    console.log('[Cache INVALIDATED] All service and category caches after UPDATE');
+
     return NextResponse.json({ service });
   } catch (error) {
     console.error('Error updating service:', error);
@@ -98,6 +104,11 @@ export async function DELETE(
     await prisma.service.delete({
       where: { id },
     });
+
+    // Invalidate all service and category caches
+    cacheManager.invalidatePattern(/^services:/);
+    cacheManager.invalidatePattern(/^categories:/);
+    console.log('[Cache INVALIDATED] All service and category caches after DELETE');
 
     return NextResponse.json({ message: 'Service deleted successfully' });
   } catch (error) {

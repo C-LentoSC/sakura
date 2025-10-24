@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
 import { hasRole } from '@/app/lib/dal';
+import cacheManager from '@/app/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -133,6 +134,11 @@ export async function POST(request: Request) {
         subSubCategory: true,
       },
     });
+
+    // Invalidate all service and category caches
+    cacheManager.invalidatePattern(/^services:/);
+    cacheManager.invalidatePattern(/^categories:/);
+    console.log('[Cache INVALIDATED] All service and category caches after CREATE');
 
     return NextResponse.json({ service }, { status: 201 });
   } catch (error) {

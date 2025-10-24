@@ -7,6 +7,8 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useServices, type Service } from '../hooks/useServices';
+import { useCategories, type Category, type SubCategory, type SubSubCategory } from '../hooks/useCategories';
 import {
   Header,
   BackgroundPattern,
@@ -18,132 +20,36 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface Service {
-  id: string;
-  nameKey: string;
-  descKey: string;
-  nameEn?: string | null;
-  nameJa?: string | null;
-  descEn?: string | null;
-  descJa?: string | null;
-  price: number;
-  duration: string;
-  image: string;
-  category: {
-    id: string;
-    slug: string;
-    nameKey: string;
-    nameEn?: string | null;
-    nameJa?: string | null;
-  };
-  subCategory?: {
-    id: string;
-    slug: string;
-    nameKey: string;
-    nameEn?: string | null;
-    nameJa?: string | null;
-  };
-  subSubCategory?: {
-    id: string;
-    slug: string;
-    nameKey: string;
-    nameEn?: string | null;
-    nameJa?: string | null;
-  };
-}
-
-interface SubSubCategory {
-  id: string;
-  slug: string;
-  nameKey: string;
-  nameEn?: string | null;
-  nameJa?: string | null;
-  _count?: {
-    services: number;
-  };
-}
-
-interface SubCategory {
-  id: string;
-  slug: string;
-  nameKey: string;
-  nameEn?: string | null;
-  nameJa?: string | null;
-  subSubCategories: SubSubCategory[];
-  _count?: {
-    services: number;
-  };
-}
-
-interface Category {
-  id: string;
-  slug: string;
-  nameKey: string;
-  nameEn?: string | null;
-  nameJa?: string | null;
-  subCategories: SubCategory[];
-  _count?: {
-    services: number;
-  };
-}
-
 export default function ServicesPage() {
   const { t, language } = useLanguage();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
   const [selectedMainCategory, setSelectedMainCategory] = useState('head-spa');
   const [selectedSubCategory, setSelectedSubCategory] = useState('all');
   const [selectedSubSubCategory, setSelectedSubSubCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
   const heroRef = useRef<HTMLDivElement>(null);
   const servicesRef = useRef<HTMLDivElement>(null);
 
-  // Fetch categories on mount
+  // Fetch categories with SWR caching
+  const { categories, isLoading: categoriesLoading } = useCategories();
+
+  // Fetch services with SWR caching
+  const { services, isLoading: servicesLoading, error: servicesError } = useServices({
+    category: selectedMainCategory,
+    subCategory: selectedSubCategory !== 'all' ? selectedSubCategory : undefined,
+    subSubCategory: selectedSubSubCategory !== 'all' ? selectedSubSubCategory : undefined,
+  });
+
+  // Set first category as default when categories load
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch('/api/categories');
-        const data = await res.json();
-        setCategories(data.categories || []);
-        
-        // Set first category as default if available
-        if (data.categories && data.categories.length > 0) {
-          setSelectedMainCategory(data.categories[0].slug);
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  // Fetch services when category changes
-  useEffect(() => {
-    const fetchServices = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          category: selectedMainCategory,
-          ...(selectedSubCategory !== 'all' && { subCategory: selectedSubCategory }),
-          ...(selectedSubSubCategory !== 'all' && { subSubCategory: selectedSubSubCategory }),
-        });
-
-        const res = await fetch(`/api/services?${params}`);
-        const data = await res.json();
-        setServices(data.services || []);
-      } catch (error) {
-        console.error('Error fetching services:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (selectedMainCategory) {
-      fetchServices();
+    if (categories.length > 0 && selectedMainCategory === 'head-spa') {
+      setSelectedMainCategory(categories[0].slug);
     }
-  }, [selectedMainCategory, selectedSubCategory, selectedSubSubCategory]);
+  }, [categories, selectedMainCategory]);
+
+  // Handle errors
+  if (servicesError) {
+    console.error('Error loading services:', servicesError);
+  }
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -333,7 +239,7 @@ export default function ServicesPage() {
 
         {/* Services Grid */}
         <div ref={servicesRef} className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pb-12 sm:pb-16">
-          {loading ? (
+          {servicesLoading ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden shadow-md border border-primary/10 animate-pulse">
