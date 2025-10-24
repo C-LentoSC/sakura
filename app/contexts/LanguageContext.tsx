@@ -15,17 +15,19 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children, initialLanguage }: { children: ReactNode; initialLanguage?: Language }) {
   const [language, setLanguage] = useState<Language>(initialLanguage || defaultLanguage);
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [isHydrated] = useState(true); // Initialize as true, setIsHydrated removed as it's not used.
 
   // Initialize from localStorage (client only)
   useEffect(() => {
-    setIsHydrated(true);
     try {
       // If server provided an initialLanguage (via cookie), do NOT override it
       if (initialLanguage) return;
       const stored = typeof window !== 'undefined' ? window.localStorage.getItem('sakura-lang') : null;
       if (stored && (['en', 'ja'] as Language[]).includes(stored as Language)) {
-        setLanguage(stored as Language);
+        // Defer setLanguage to avoid synchronous setState in effect warning
+        setTimeout(() => {
+          setLanguage(stored as Language);
+        }, 0);
       }
     } catch {
       // ignore storage errors

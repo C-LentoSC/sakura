@@ -16,6 +16,7 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [showQuickReplies, setShowQuickReplies] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageIdCounter = useRef(0);
 
   const quickReplies = [
     { 
@@ -63,7 +64,7 @@ export default function Chatbot() {
       // Welcome message
       setTimeout(() => {
         setMessages([{
-          id: Date.now(),
+          id: messageIdCounter.current++,
           text: t('chatbot.welcome'),
           sender: 'bot',
           timestamp: new Date(),
@@ -75,7 +76,7 @@ export default function Chatbot() {
   const handleQuickReply = (reply: typeof quickReplies[0]) => {
     // Add user message
     const userMessage: Message = {
-      id: Date.now(),
+      id: messageIdCounter.current++,
       text: t(reply.textKey),
       sender: 'user',
       timestamp: new Date(),
@@ -86,7 +87,7 @@ export default function Chatbot() {
     // Add bot response after delay
     setTimeout(() => {
       const botMessage: Message = {
-        id: Date.now() + 1,
+        id: messageIdCounter.current++,
         text: t(reply.responseKey),
         sender: 'bot',
         timestamp: new Date(),

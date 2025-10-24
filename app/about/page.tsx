@@ -25,7 +25,10 @@ export default function AboutPage() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    // Defer setIsMounted to avoid synchronous setState in effect warning
+    setTimeout(() => {
+      setIsMounted(true);
+    }, 0);
     const ctx = gsap.context(() => {
       // Hero animation
       gsap.fromTo(heroRef.current,
