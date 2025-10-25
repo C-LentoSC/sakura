@@ -7,22 +7,63 @@ import { usePathname } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Language } from '../locales/config';
 import { logout } from '../(auth)/logout/actions';
+import { getCachedUser, setCachedUser, clearCachedUser, CachedUser } from '../lib/cache';
 
 export default function HeaderClient() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<{ name: string | null; email: string; role: string } | null>(null);
+  // Start null to match server-rendered HTML and avoid hydration mismatch
+  const [user, setUser] = useState<CachedUser>(null);
   const { language, setLanguage, t, languages } = useLanguage();
   const pathname = usePathname();
 
   // Helper function to check if a link is active
   const isActive = (path: string) => pathname === path;
 
-  // Fetch user data client-side
+  // Revalidate on mount (refresh) and on external triggers (visibility, pageshow, CRUD events)
   useEffect(() => {
-    fetch('/api/auth/user')
-      .then(res => res.json())
-      .then(data => setUser(data.user))
-      .catch(() => setUser(null));
+    let mounted = true;
+
+    async function revalidate() {
+      try {
+        const res = await fetch('/api/auth/user');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!mounted) return;
+        setUser(data.user);
+        setCachedUser(data.user);
+      } catch {
+        // keep existing cached user on failure
+      }
+    }
+
+    // Apply cached user after hydration (avoids hydration mismatch) and then revalidate
+    const cached = getCachedUser();
+    if (cached && cached.user) {
+      setUser(cached.user as CachedUser);
+    }
+
+    // Always revalidate on mount so refresh/initial load triggers a background update
+    revalidate();
+
+    // Revalidate when page becomes visible (tab focus) or when pageshow (bfcache restore) occurs
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') revalidate();
+    };
+    const onPageShow = () => revalidate();
+
+    // Allow other parts of the app to trigger a revalidation after CRUD operations
+    const onExternalRevalidate = () => revalidate();
+
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pageshow', onPageShow);
+    window.addEventListener('sakura:user-revalidate', onExternalRevalidate);
+
+    return () => {
+      mounted = false;
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pageshow', onPageShow);
+      window.removeEventListener('sakura:user-revalidate', onExternalRevalidate);
+    };
   }, []);
 
   return (
@@ -120,6 +161,7 @@ export default function HeaderClient() {
               <form action={logout} className="inline">
                 <button
                   type="submit"
+                  onClick={() => clearCachedUser()}
                   className="text-secondary text-xs md:text-sm font-medium hover:text-primary transition-colors leading-none"
                 >
                   {t('nav.signOut')}
@@ -282,7 +324,7 @@ export default function HeaderClient() {
                   <button
                     type="submit"
                     className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-gradient-to-r from-primary to-pink-400 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-300 text-sm"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={() => { setMobileMenuOpen(false); clearCachedUser(); }}
                   >
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

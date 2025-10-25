@@ -147,4 +147,38 @@ if (typeof setInterval !== 'undefined') {
   setInterval(() => cacheManager.cleanup(), 10 * 60 * 1000);
 }
 
+// User cache helper for client-side cache-first + background revalidation
+export type CachedUser = { id: string; name: string | null; email: string; role: string } | null;
+
+const USER_CACHE_KEY = 'sakura_user_cache';
+
+export function getCachedUser(): { user: CachedUser; ts: number } | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(USER_CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+export function setCachedUser(user: CachedUser) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(USER_CACHE_KEY, JSON.stringify({ user, ts: Date.now() }));
+  } catch {
+    // ignore
+  }
+}
+
+export function clearCachedUser() {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(USER_CACHE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 export default cacheManager;
