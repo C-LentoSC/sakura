@@ -19,7 +19,7 @@ export default async function AdminLayout({
 
   if (!isAdmin) {
     // Redirect non-admins to dashboard
-    redirect('/dashboard');
+    redirect('/');
   }
 
   // Get current user info for sidebar
