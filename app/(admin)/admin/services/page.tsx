@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { formatCurrency } from '@/app/constants/currency';
@@ -29,6 +29,8 @@ const getDisplayText = (text: string, t: (key: string) => string): string => {
 };
 
 export default function AdminServicesPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const { t, language } = useLanguage();
   const renderName = (r: { nameKey: string; slug?: string; nameEn?: string | null; nameJa?: string | null }) => {
     const val = language === 'ja' ? r.nameJa || r.nameEn : r.nameEn || r.nameJa;
@@ -291,7 +293,7 @@ export default function AdminServicesPage() {
               </svg>
             </div>
             <div>
-              <p className="text-xl font-semibold text-gray-900">{services.length}</p>
+              <p className="text-xl font-semibold text-gray-900">{mounted ? services.length : <span className="inline-block h-6 w-12 bg-gray-100 rounded animate-pulse" />}</p>
               <p className="text-xs text-gray-500">Total Services</p>
             </div>
           </div>
@@ -305,7 +307,7 @@ export default function AdminServicesPage() {
               </svg>
             </div>
             <div>
-              <p className="text-xl font-semibold text-gray-900">{services.filter(s => s.isActive).length}</p>
+              <p className="text-xl font-semibold text-gray-900">{mounted ? services.filter(s => s.isActive).length : <span className="inline-block h-6 w-12 bg-gray-100 rounded animate-pulse" />}</p>
               <p className="text-xs text-gray-500">Active Services</p>
             </div>
           </div>
@@ -319,7 +321,7 @@ export default function AdminServicesPage() {
               </svg>
             </div>
             <div>
-              <p className="text-xl font-semibold text-gray-900">{categories.length}</p>
+              <p className="text-xl font-semibold text-gray-900">{mounted ? categories.length : <span className="inline-block h-6 w-12 bg-gray-100 rounded animate-pulse" />}</p>
               <p className="text-xs text-gray-500">Categories</p>
             </div>
           </div>
@@ -334,7 +336,7 @@ export default function AdminServicesPage() {
             </div>
             <div>
               <p className="text-xl font-semibold text-gray-900">
-                {formatCurrency(services.reduce((avg, service) => avg + service.price, 0) / services.length || 0)}
+                {mounted ? formatCurrency(services.reduce((avg, service) => avg + service.price, 0) / services.length || 0) : <span className="inline-block h-6 w-20 bg-gray-100 rounded animate-pulse" />}
               </p>
               <p className="text-xs text-gray-500">Avg. Price</p>
             </div>
@@ -363,11 +365,12 @@ export default function AdminServicesPage() {
               className="w-full px-3 py-2 rounded-lg border-2 border-pink-100 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm transition-all"
             >
               <option value="">{t('admin.services.allCategories')}</option>
-                    {(categories || []).map((cat) => (
-                      <option key={cat.id} value={cat.slug}>
-                        {renderName(cat)}
-                      </option>
-                    ))}
+                    {mounted &&
+                      (categories || []).map((cat) => (
+                        <option key={cat.id} value={cat.slug}>
+                          {renderName(cat)}
+                        </option>
+                      ))}
             </select>
           </div>
         </div>
@@ -379,46 +382,12 @@ export default function AdminServicesPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">{t('admin.services.table.services')}</h2>
             <div className="text-sm text-gray-500">
-              {isDataLoading ? 'Loading...' : `${filteredServices.length} of ${services.length} services`}
+              {mounted && !isDataLoading ? `${filteredServices.length} of ${services.length} services` : 'Loading...'}
             </div>
           </div>
         </div>
 
-        {isDataLoading ? (
-          <div className="text-center py-16">
-            <div className="w-16 h-16 bg-gray-100 rounded-sm flex items-center justify-center mx-auto mb-4 shadow-sm animate-pulse">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-            </div>
-            <p className="text-gray-500">Loading services...</p>
-          </div>
-        ) : filteredServices.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-16 h-16 bg-gray-100 rounded-sm flex items-center justify-center mx-auto mb-4 shadow-sm">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No services found</h3>
-            <p className="text-gray-500 mb-6">
-              {searchQuery || filterCategory
-                ? 'Try adjusting your search or filter criteria.'
-                : 'Get started by creating your first service.'}
-            </p>
-            {!searchQuery && !filterCategory && (
-              <button
-                onClick={() => {
-                  resetForm();
-                  setIsModalOpen(true);
-                }}
-                className="px-4 py-2 bg-linear-to-r from-primary to-pink-400 text-white font-medium rounded-lg shadow-md hover:shadow-xl hover:scale-105 transition-all"
-              >
-                + Add Your First Service
-              </button>
-            )}
-          </div>
-        ) : (
+        {mounted && !isDataLoading && filteredServices.length > 0 && (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
@@ -546,6 +515,42 @@ export default function AdminServicesPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+        {mounted && !isDataLoading && filteredServices.length === 0 && (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 bg-gray-100 rounded-sm flex items-center justify-center mx-auto mb-4 shadow-sm">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No services found</h3>
+            <p className="text-gray-500 mb-6">
+              {searchQuery || filterCategory
+                ? 'Try adjusting your search or filter criteria.'
+                : 'Get started by creating your first service.'}
+            </p>
+            {!searchQuery && !filterCategory && (
+              <button
+                onClick={() => {
+                  resetForm();
+                  setIsModalOpen(true);
+                }}
+                className="px-4 py-2 bg-linear-to-r from-primary to-pink-400 text-white font-medium rounded-lg shadow-md hover:shadow-xl hover:scale-105 transition-all"
+              >
+                + Add Your First Service
+              </button>
+            )}
+          </div>
+        )}
+        {!mounted || isDataLoading && (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 bg-gray-100 rounded-sm flex items-center justify-center mx-auto mb-4 shadow-sm animate-pulse">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            </div>
+            <p className="text-gray-500">Loading services...</p>
           </div>
         )}
       </div>
