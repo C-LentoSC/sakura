@@ -1,13 +1,10 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
 import { verifySession } from '@/app/lib/dal';
-import cacheManager from '@/app/lib/cache';
 
-// This route uses cookies/session and must be rendered dynamically
+// Force dynamic - no caching
 export const dynamic = 'force-dynamic';
-
-// ISR: Revalidate every 60 seconds
-export const revalidate = 60;
+export const revalidate = 0;
 
 export async function GET() {
   try {
@@ -16,57 +13,12 @@ export async function GET() {
       return NextResponse.json({ bookings: [] }, { status: 200 });
     }
 
-    const cacheKey = `my-bookings:${user.email}`;
-
-    // Cache-first: Try to get from cache
-    const cachedData = cacheManager.get<Record<string, unknown>[]>(cacheKey, {
-      ttl: 5 * 60 * 1000, // 5 minutes fresh (bookings change frequently)
-      staleWhileRevalidate: 30 * 60 * 1000, // 30 minutes stale
-    });
-
-    // If cache hit and not stale, return immediately
-    if (cachedData && !cacheManager.isStale(cacheKey)) {
-      console.log(`[Cache HIT] ${cacheKey} - serving fresh data`);
-      return NextResponse.json({ bookings: cachedData, cached: true });
-    }
-
-    // If cache hit but stale, return stale data and revalidate in background
-    if (cachedData && cacheManager.isStale(cacheKey)) {
-      console.log(`[Cache STALE] ${cacheKey} - serving stale data, revalidating...`);
-
-      // Start background revalidation
-      if (!cacheManager.isRevalidating(cacheKey)) {
-        cacheManager.setRevalidating(cacheKey, true);
-
-        prisma.booking.findMany({
-          where: { email: user.email },
-          orderBy: { createdAt: 'desc' },
-        })
-          .then((freshBookings) => {
-            cacheManager.set(cacheKey, freshBookings);
-            console.log(`[Cache REVALIDATED] ${cacheKey}`);
-            cacheManager.setRevalidating(cacheKey, false);
-          })
-          .catch((err) => {
-            console.error('Background revalidation failed:', err);
-            cacheManager.setRevalidating(cacheKey, false);
-          });
-      }
-
-      return NextResponse.json({ bookings: cachedData, cached: true, stale: true });
-    }
-
-    // Cache miss: Fetch from database
-    console.log(`[Cache MISS] ${cacheKey} - fetching from database`);
     const bookings = await prisma.booking.findMany({
       where: { email: user.email },
       orderBy: { createdAt: 'desc' },
     });
 
-    // Store in cache
-    cacheManager.set(cacheKey, bookings);
-
-    return NextResponse.json({ bookings, cached: false });
+    return NextResponse.json({ bookings });
   } catch (error) {
     console.error('Error fetching my bookings:', error);
     return NextResponse.json({ bookings: [] }, { status: 200 });

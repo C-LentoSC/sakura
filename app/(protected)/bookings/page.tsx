@@ -77,8 +77,11 @@ export default function MybookingsPage() {
         // Read local first
         let local = loadBookings();
 
-        // Fetch server bookings for logged-in user
-        const res = await fetch('/api/my-bookings', { cache: 'no-store' });
+        // Fetch server bookings for logged-in user - add timestamp to bust cache
+        const res = await fetch(`/api/my-bookings?t=${Date.now()}`, { 
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' }
+        });
         let merged = local;
         if (res.ok) {
           const data = await res.json();
@@ -87,7 +90,7 @@ export default function MybookingsPage() {
           // Try to enrich with service details in one call
           let services: ServiceLite[] = [];
           try {
-            const sres = await fetch('/api/services');
+            const sres = await fetch('/api/services', { cache: 'no-store' });
             if (sres.ok) {
               const sdata = await sres.json();
               services = Array.isArray(sdata.services) ? sdata.services : [];
@@ -96,6 +99,8 @@ export default function MybookingsPage() {
 
           const serverAsLocal = server.map((b: { serviceId: string; date: string; time: string; status?: string; createdAt?: string }) => {
             const svc = services.find((s) => s.id === b.serviceId);
+            // Use actual status from server, don't default to CONFIRMED
+            const actualStatus = b.status ? b.status.toUpperCase() : 'PENDING';
             return {
               id: Number.MAX_SAFE_INTEGER - Math.floor(Math.random() * 1e6), // prevent collision with local ids
               service: svc ? renderName(svc) : 'Service',
@@ -104,7 +109,7 @@ export default function MybookingsPage() {
               time: b.time,
               duration: svc?.duration || '60 min',
               price: svc?.price ?? 0,
-              status: (b.status || 'CONFIRMED').toUpperCase(),
+              status: actualStatus,
               createdAt: new Date(b.createdAt || Date.now()).toISOString().split('T')[0],
             } as bookings;
           });
@@ -123,10 +128,11 @@ export default function MybookingsPage() {
             });
           }
 
-          // Merge by (date+time) uniqueness to avoid duplicates
+          // Merge by (date+time) uniqueness - SERVER DATA TAKES PRIORITY
           const key = (x: bookings) => `${x.date}|${x.time}|${x.service}`;
           const map = new Map<string, bookings>();
-          [...serverAsLocal, ...local].forEach((b) => map.set(key(b), b));
+          // Add local first, then server overwrites with fresh data
+          [...local, ...serverAsLocal].forEach((b) => map.set(key(b), b));
           merged = Array.from(map.values());
         }
 
@@ -384,7 +390,7 @@ export default function MybookingsPage() {
 
                       {/* Action Buttons */}
                       <div className="flex flex-col sm:flex-row gap-2">
-                        {bookings.status === 'CONFIRMED' && (
+                        {['BOOKED', 'CONFIRMED', 'PENDING'].includes(bookings.status) && (
                           <button 
                             onClick={() => setShowCancelModal(bookings.id)}
                             disabled={isLoading}

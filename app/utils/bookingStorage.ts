@@ -8,7 +8,7 @@ export interface BookingData {
   time: string;
   duration: string;
   price: number;
-  status: 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NO-SHOW';
+  status: string; // Allow any status from server: PENDING, BOOKED, CONFIRMED, COMPLETED, CANCELLED, CANCELED, NO-SHOW
   createdAt: string;
 }
 
@@ -57,7 +57,7 @@ export const addBooking = (newBooking: Omit<BookingData, 'id' | 'createdAt' | 's
 };
 
 // Update booking status
-export const updateBookingStatus = (bookingId: number, status: BookingData['status']): void => {
+export const updateBookingStatus = (bookingId: number, status: string): void => {
   const bookings = loadBookings();
   const updatedBookings = bookings.map(booking =>
     booking.id === bookingId ? { ...booking, status } : booking
@@ -73,7 +73,7 @@ export const deleteBooking = (bookingId: number): void => {
 };
 
 // Get bookings by status
-export const getBookingsByStatus = (status?: BookingData['status']): BookingData[] => {
+export const getBookingsByStatus = (status?: string): BookingData[] => {
   const bookings = loadBookings();
   return status ? bookings.filter(booking => booking.status === status) : bookings;
 };

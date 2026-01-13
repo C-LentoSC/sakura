@@ -33,7 +33,8 @@ export function useBookings() {
 
   const fetchBookings = useCallback(async () => {
     try {
-      const res = await fetch('/api/my-bookings');
+      setIsLoading(true);
+      const res = await fetch('/api/my-bookings', { cache: 'no-store' });
       if (!res.ok) throw new Error('Failed to load bookings');
       const data = await res.json();
       setBookings(data.bookings || []);
