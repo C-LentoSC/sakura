@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { formatCurrency } from '@/app/constants/currency';
 import ImageUpload from '@/app/components/ImageUpload';
-import { useServices, type Service as SwrService } from '@/app/hooks/useServices';
+import { type Service as SwrService } from '@/app/hooks/useServices';
 import { useAdminCategories } from '@/app/hooks/useAdminCategories';
 
 // Use shared Service type from hooks/useServices (imported as SwrService)
@@ -51,7 +51,29 @@ export default function AdminServicesPage() {
     if (val && String(val).trim().length > 0) return String(val);
     return getDisplayText(s.descKey, t);
   };
-  const { services, isLoading: servicesLoading, mutate: mutateServices } = useServices({});
+  
+  // Direct fetch for services (no caching)
+  const [services, setServices] = useState<SwrService[]>([]);
+  const [servicesLoading, setServicesLoading] = useState(true);
+  
+  const fetchServices = useCallback(async () => {
+    try {
+      const res = await fetch('/api/services');
+      if (!res.ok) throw new Error('Failed to load services');
+      const data = await res.json();
+      setServices(data.services || []);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      setServices([]);
+    } finally {
+      setServicesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
+
   const { categories, isLoading: categoriesLoading } = useAdminCategories();
   const [saving, setSaving] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -141,45 +163,19 @@ export default function AdminServicesPage() {
       setIsModalOpen(false);
       resetForm();
 
-      // Optimistic update - add/update service immediately in UI
-      const optimisticService = {
-        id: editingService?.id || `temp-${Date.now()}`,
-        ...payload,
-        price: parseFloat(payload.price as string) || 0,
-        category: categories.find(c => c.id === payload.categoryId) || { id: payload.categoryId, slug: '', nameKey: '' },
-        subCategory: payload.subCategoryId ? { id: payload.subCategoryId, slug: '', nameKey: '' } : undefined,
-        subSubCategory: payload.subSubCategoryId ? { id: payload.subSubCategoryId, slug: '', nameKey: '' } : undefined,
-      } as SwrService;
-
-      if (editingService) {
-        // Update existing
-        mutateServices((current) => 
-          (current || []).map(s => s.id === editingService.id ? { ...s, ...optimisticService } : s),
-          false
-        );
-      } else {
-        // Add new
-        mutateServices((current) => [...(current || []), optimisticService], false);
-      }
-
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      if (res.ok) {
-        // Background revalidation to get real data
-        mutateServices(undefined, true);
-      } else {
-        // Revalidate to rollback on error
-        mutateServices(undefined, true);
-      }
+      if (!res.ok) throw new Error('Failed to save service');
+      
+      // Refetch to get fresh data
+      await fetchServices();
     } catch (error) {
       console.error('Error saving service:', error);
       alert(error instanceof Error ? error.message : 'Failed to save service');
-      // Revalidate to rollback
-      mutateServices(undefined, true);
     } finally {
       setSaving(false);
     }
@@ -198,22 +194,18 @@ export default function AdminServicesPage() {
     const targetId = deleteTarget.id;
     setDeleteTarget(null);
 
-    // Optimistic delete - remove from UI immediately
-    mutateServices((current) => (current || []).filter(s => s.id !== targetId), false);
-
     try {
       const res = await fetch(`/api/admin/services?id=${targetId}`, {
         method: 'DELETE',
       });
 
-      if (!res.ok) {
-        // Revalidate to rollback on error
-        mutateServices(undefined, true);
-      }
+      if (!res.ok) throw new Error('Failed to delete service');
+      
+      // Refetch to get fresh data
+      await fetchServices();
     } catch (error) {
       console.error('Error deleting service:', error);
-      // Revalidate to rollback
-      mutateServices(undefined, true);
+      alert('Failed to delete service');
     }
   };
 
@@ -240,12 +232,6 @@ export default function AdminServicesPage() {
   };
 
   const handleToggleActive = async (id: string, isActive: boolean) => {
-    // Optimistic update - toggle immediately in UI
-    mutateServices((current) => 
-      (current || []).map(s => s.id === id ? { ...s, isActive } : s),
-      false
-    );
-
     try {
       const response = await fetch(`/api/admin/services/${id}`, {
         method: 'PUT',
@@ -256,14 +242,14 @@ export default function AdminServicesPage() {
       });
 
       if (!response.ok) {
-        // Revalidate to rollback on error
-        mutateServices(undefined, true);
-        console.error('Failed to toggle service status');
+        throw new Error('Failed to toggle service status');
       }
+      
+      // Refetch to get fresh data
+      await fetchServices();
     } catch (error) {
       console.error('Error toggling service status:', error);
-      // Revalidate to rollback
-      mutateServices(undefined, true);
+      alert('Failed to toggle service status');
     }
   };
 
@@ -459,7 +445,7 @@ export default function AdminServicesPage() {
                       <div className="flex items-center gap-4">
                       <div className="h-14 w-14 shrink-0 relative rounded-lg overflow-hidden shadow-md border-2 border-pink-100">
                           <Image
-                            src={service.image}
+                            src={service.image || '/services-images/head-spa.jpg'}
                             alt={getServiceName(service)}
                             fill
                             sizes="56px"

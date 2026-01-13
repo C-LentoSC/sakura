@@ -1,9 +1,8 @@
 /**
- * Custom hook for fetching user bookings with SWR caching
+ * Custom hook for fetching user bookings with direct fetch (no caching)
  */
 
-import { useCallback } from 'react';
-import { useSWR } from './useSWR';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface Booking {
   id: string;
@@ -28,29 +27,35 @@ export interface Booking {
 }
 
 export function useBookings() {
-  const fetcher = useCallback(async () => {
-    const res = await fetch('/api/my-bookings');
-    if (!res.ok) throw new Error('Failed to load bookings');
-    const data = await res.json();
-    return data.bookings || [];
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [error, setError] = useState<Error | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchBookings = useCallback(async () => {
+    try {
+      const res = await fetch('/api/my-bookings');
+      if (!res.ok) throw new Error('Failed to load bookings');
+      const data = await res.json();
+      setBookings(data.bookings || []);
+      setError(undefined);
+    } catch (err) {
+      console.error('Error fetching bookings:', err);
+      setError(err instanceof Error ? err : new Error(String(err)));
+      setBookings([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<Booking[]>(
-    'swr:my-bookings',
-    fetcher,
-    {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      dedupingInterval: 2000,
-      fallbackData: [],
-    }
-  );
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
 
   return {
-    bookings: data || [],
+    bookings,
     error,
     isLoading,
-    isValidating,
-    mutate,
+    isValidating: false,
+    refetch: fetchBookings,
   };
 }

@@ -1,9 +1,8 @@
 /**
- * Custom hook for fetching products with SWR caching
+ * Custom hook for fetching products with direct fetch (no caching)
  */
 
-import { useCallback } from 'react';
-import { useSWR } from './useSWR';
+import { useState, useEffect, useCallback } from 'react';
 
 export type Product = {
   id: number;
@@ -27,31 +26,35 @@ interface UseProductsOptions {
 }
 
 export function useProducts({ language }: UseProductsOptions) {
-  const fetcher = useCallback(async () => {
-    const res = await fetch(`/api/products?lang=${language}`);
-    if (!res.ok) throw new Error('Failed to load products');
-    const data: { products: Product[] } = await res.json();
-    return data.products;
+  const [products, setProducts] = useState<Product[]>([]);
+  const [error, setError] = useState<Error | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchProducts = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/products?lang=${language}`);
+      if (!res.ok) throw new Error('Failed to load products');
+      const data: { products: Product[] } = await res.json();
+      setProducts(data.products || []);
+      setError(undefined);
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError(err instanceof Error ? err : new Error(String(err)));
+      setProducts([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, [language]);
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<Product[]>(
-    `swr:products:${language}`,
-    fetcher,
-    {
-      revalidateOnFocus: false, // Reduce flicker
-      revalidateOnReconnect: true,
-      revalidateOnMount: true, // Always get fresh data
-      dedupingInterval: 1000,
-      cacheTime: 60 * 1000, // 1 minute cache
-      fallbackData: [],
-    }
-  );
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   return {
-    products: data || [],
+    products,
     error,
     isLoading,
-    isValidating,
-    mutate,
+    isValidating: false,
+    refetch: fetchProducts,
   };
 }

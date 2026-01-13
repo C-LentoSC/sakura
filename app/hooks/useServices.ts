@@ -1,9 +1,8 @@
 /**
- * Custom hook for fetching services with SWR caching
+ * Custom hook for fetching services with direct fetch (no caching)
  */
 
-import { useCallback } from 'react';
-import { useSWR } from './useSWR';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface ServiceCategory {
   id: string;
@@ -56,42 +55,42 @@ interface UseServicesOptions {
 
 export function useServices(options: UseServicesOptions = {}) {
   const { category, subCategory, subSubCategory, search } = options;
+  const [services, setServices] = useState<Service[]>([]);
+  const [error, setError] = useState<Error | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const fetcher = useCallback(async () => {
-    const params = new URLSearchParams();
-    if (category) params.set('category', category);
-    if (subCategory && subCategory !== 'all') params.set('subCategory', subCategory);
-    if (subSubCategory && subSubCategory !== 'all') params.set('subSubCategory', subSubCategory);
-    if (search) params.set('search', search);
+  const fetchServices = useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+      if (category) params.set('category', category);
+      if (subCategory && subCategory !== 'all') params.set('subCategory', subCategory);
+      if (subSubCategory && subSubCategory !== 'all') params.set('subSubCategory', subSubCategory);
+      if (search) params.set('search', search);
 
-    const url = `/api/services${params.toString() ? `?${params.toString()}` : ''}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Failed to load services');
-    const data: { services: Service[]; total: number } = await res.json();
-    return data.services;
+      const url = `/api/services${params.toString() ? `?${params.toString()}` : ''}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Failed to load services');
+      const data: { services: Service[]; total: number } = await res.json();
+      setServices(data.services || []);
+      setError(undefined);
+    } catch (err) {
+      console.error('Error fetching services:', err);
+      setError(err instanceof Error ? err : new Error(String(err)));
+      setServices([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, [category, subCategory, subSubCategory, search]);
 
-  // Create cache key based on params (exclude search for caching)
-  const cacheKey = `swr:services:${category || 'all'}:${subCategory || 'all'}:${subSubCategory || 'all'}`;
-
-  const { data, error, isLoading, isValidating, mutate } = useSWR<Service[]>(
-    cacheKey,
-    fetcher,
-    {
-      revalidateOnFocus: false, // Reduce flicker
-      revalidateOnReconnect: true,
-      revalidateOnMount: true, // Always get fresh data
-      dedupingInterval: 1000,
-      cacheTime: 60 * 1000, // 1 minute cache
-      fallbackData: [],
-    }
-  );
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
 
   return {
-    services: data || [],
+    services,
     error,
     isLoading,
-    isValidating,
-    mutate,
+    isValidating: false,
+    refetch: fetchServices,
   };
 }

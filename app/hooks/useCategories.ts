@@ -1,9 +1,8 @@
 /**
- * Custom hook for fetching service categories with SWR caching
+ * Custom hook for fetching service categories with direct fetch (no caching)
  */
 
-import { useCallback } from 'react';
-import { useSWR } from './useSWR';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface SubSubCategory {
   id: string;
@@ -41,31 +40,35 @@ export interface Category {
 }
 
 export function useCategories() {
-  const fetcher = useCallback(async () => {
-    const res = await fetch('/api/categories');
-    if (!res.ok) throw new Error('Failed to load categories');
-    const data: { categories: Category[] } = await res.json();
-    return data.categories;
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [error, setError] = useState<Error | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      const res = await fetch('/api/categories');
+      if (!res.ok) throw new Error('Failed to load categories');
+      const data: { categories: Category[] } = await res.json();
+      setCategories(data.categories || []);
+      setError(undefined);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      setError(err instanceof Error ? err : new Error(String(err)));
+      setCategories([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<Category[]>(
-    'swr:categories:all',
-    fetcher,
-    {
-      revalidateOnFocus: false, // Reduce flicker
-      revalidateOnReconnect: true,
-      revalidateOnMount: true,
-      dedupingInterval: 2000,
-      cacheTime: 60 * 1000, // 1 minute cache
-      fallbackData: [],
-    }
-  );
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   return {
-    categories: data || [],
+    categories,
     error,
     isLoading,
-    isValidating,
-    mutate,
+    isValidating: false,
+    refetch: fetchCategories,
   };
 }

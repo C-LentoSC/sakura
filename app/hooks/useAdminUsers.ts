@@ -1,10 +1,8 @@
 /**
- * Custom hook for admin users management with SWR caching
- * Includes optimistic CRUD operations for instant UI updates
+ * Custom hook for admin users management with direct fetch (no caching)
  */
 
-import { useCallback } from 'react';
-import { useSWR } from './useSWR';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface AdminUser {
   id: string;
@@ -18,37 +16,33 @@ export interface AdminUser {
   };
 }
 
-const CACHE_KEY = 'swr:admin-users';
-
 export function useAdminUsers() {
-  const fetcher = useCallback(async () => {
-    const res = await fetch('/api/admin/users');
-    if (!res.ok) throw new Error('Failed to load users');
-    const data = await res.json();
-    return data.users || [];
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [error, setError] = useState<Error | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/users');
+      if (!res.ok) throw new Error('Failed to load users');
+      const data = await res.json();
+      setUsers(data.users || []);
+      setError(undefined);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      setError(err instanceof Error ? err : new Error(String(err)));
+      setUsers([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<AdminUser[]>(
-    CACHE_KEY,
-    fetcher,
-    {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      dedupingInterval: 5000,
-      fallbackData: [],
-    }
-  );
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
-  // Optimistic update user role
+  // Update user role
   const updateUserRole = useCallback(async (id: string, role: string) => {
-    const previousData = data;
-    
-    // Instant UI update
-    mutate((current) => 
-      (current || []).map(u => u.id === id ? { ...u, role } : u), 
-      false
-    );
-    
     try {
       const res = await fetch(`/api/admin/users/${id}`, {
         method: 'PUT',
@@ -58,47 +52,35 @@ export function useAdminUsers() {
       
       if (!res.ok) throw new Error('Failed to update user');
       
-      // Background sync
-      mutate(undefined, true);
+      // Refetch to get fresh data
+      await fetchUsers();
       return true;
     } catch (error) {
-      // Rollback on error
-      mutate(previousData, false);
+      console.error('Error updating user role:', error);
       throw error;
     }
-  }, [data, mutate]);
+  }, [fetchUsers]);
 
-  // Optimistic delete user
+  // Delete user
   const deleteUser = useCallback(async (id: string) => {
-    const previousData = data;
-    
-    // Instant UI update
-    mutate((current) => (current || []).filter(u => u.id !== id), false);
-    
     try {
       const res = await fetch(`/api/admin/users/${id}`, {
         method: 'DELETE',
       });
       
       if (!res.ok) throw new Error('Failed to delete user');
+      
+      // Refetch to get fresh data
+      await fetchUsers();
       return true;
     } catch (error) {
-      // Rollback on error
-      mutate(previousData, false);
+      console.error('Error deleting user:', error);
       throw error;
     }
-  }, [data, mutate]);
+  }, [fetchUsers]);
 
-  // Optimistic update user
+  // Update user
   const updateUser = useCallback(async (id: string, userData: Partial<AdminUser>) => {
-    const previousData = data;
-    
-    // Instant UI update
-    mutate((current) => 
-      (current || []).map(u => u.id === id ? { ...u, ...userData } : u), 
-      false
-    );
-    
     try {
       const res = await fetch(`/api/admin/users/${id}`, {
         method: 'PUT',
@@ -108,21 +90,22 @@ export function useAdminUsers() {
       
       if (!res.ok) throw new Error('Failed to update user');
       
-      mutate(undefined, true);
+      // Refetch to get fresh data
+      await fetchUsers();
       return true;
     } catch (error) {
-      mutate(previousData, false);
+      console.error('Error updating user:', error);
       throw error;
     }
-  }, [data, mutate]);
+  }, [fetchUsers]);
 
   return {
-    users: data || [],
+    users,
     error,
     isLoading,
-    isValidating,
-    mutate,
-    // Optimistic CRUD helpers
+    isValidating: false,
+    refetch: fetchUsers,
+    // CRUD helpers
     updateUserRole,
     deleteUser,
     updateUser,

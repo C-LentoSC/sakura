@@ -1,10 +1,8 @@
 /**
- * Custom hook for admin bookings management with SWR caching
- * Includes optimistic CRUD operations for instant UI updates
+ * Custom hook for admin bookings management with direct fetch (no caching)
  */
 
-import { useCallback } from 'react';
-import { useSWR } from './useSWR';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface AdminBooking {
   id: string;
@@ -19,37 +17,33 @@ export interface AdminBooking {
   createdAt: string;
 }
 
-const CACHE_KEY = 'swr:admin-bookings';
-
 export function useAdminBookings() {
-  const fetcher = useCallback(async () => {
-    const res = await fetch('/api/admin/bookings');
-    if (!res.ok) throw new Error('Failed to load bookings');
-    const data = await res.json();
-    return data.bookings || [];
+  const [bookings, setBookings] = useState<AdminBooking[]>([]);
+  const [error, setError] = useState<Error | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchBookings = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/bookings');
+      if (!res.ok) throw new Error('Failed to load bookings');
+      const data = await res.json();
+      setBookings(data.bookings || []);
+      setError(undefined);
+    } catch (err) {
+      console.error('Error fetching bookings:', err);
+      setError(err instanceof Error ? err : new Error(String(err)));
+      setBookings([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<AdminBooking[]>(
-    CACHE_KEY,
-    fetcher,
-    {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      dedupingInterval: 2000,
-      fallbackData: [],
-    }
-  );
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
 
-  // Optimistic update booking status
+  // Update booking status
   const updateBookingStatus = useCallback(async (id: string, status: string) => {
-    const previousData = data;
-    
-    // Instant UI update
-    mutate((current) => 
-      (current || []).map(b => b.id === id ? { ...b, status } : b), 
-      false
-    );
-    
     try {
       const res = await fetch(`/api/admin/bookings/${id}`, {
         method: 'PUT',
@@ -59,49 +53,35 @@ export function useAdminBookings() {
       
       if (!res.ok) throw new Error('Failed to update booking');
       
-      // Background sync
-      mutate(undefined, true);
+      // Refetch to get fresh data
+      await fetchBookings();
       return true;
     } catch (error) {
-      // Rollback on error
-      mutate(previousData, false);
+      console.error('Error updating booking status:', error);
       throw error;
     }
-  }, [data, mutate]);
+  }, [fetchBookings]);
 
-  // Optimistic delete booking
+  // Delete booking
   const deleteBooking = useCallback(async (id: string) => {
-    const previousData = data;
-    
-    // Instant UI update
-    mutate((current) => (current || []).filter(b => b.id !== id), false);
-    
     try {
       const res = await fetch(`/api/admin/bookings/${id}`, {
         method: 'DELETE',
       });
       
       if (!res.ok) throw new Error('Failed to delete booking');
+      
+      // Refetch to get fresh data
+      await fetchBookings();
       return true;
     } catch (error) {
-      // Rollback on error
-      mutate(previousData, false);
+      console.error('Error deleting booking:', error);
       throw error;
     }
-  }, [data, mutate]);
+  }, [fetchBookings]);
 
-  // Optimistic create booking
+  // Create booking
   const createBooking = useCallback(async (bookingData: Omit<AdminBooking, 'id' | 'createdAt'>) => {
-    const tempId = `temp-${Date.now()}`;
-    const optimisticBooking: AdminBooking = {
-      id: tempId,
-      ...bookingData,
-      createdAt: new Date().toISOString(),
-    };
-    
-    // Instant UI update
-    mutate((current) => [optimisticBooking, ...(current || [])], false);
-    
     try {
       const res = await fetch('/api/admin/bookings', {
         method: 'POST',
@@ -111,23 +91,22 @@ export function useAdminBookings() {
       
       if (!res.ok) throw new Error('Failed to create booking');
       
-      // Background revalidation to get real ID
-      mutate(undefined, true);
+      // Refetch to get fresh data
+      await fetchBookings();
       return true;
     } catch (error) {
-      // Rollback on error
-      mutate((current) => (current || []).filter(b => b.id !== tempId), false);
+      console.error('Error creating booking:', error);
       throw error;
     }
-  }, [mutate]);
+  }, [fetchBookings]);
 
   return {
-    bookings: data || [],
+    bookings,
     error,
     isLoading,
-    isValidating,
-    mutate,
-    // Optimistic CRUD helpers
+    isValidating: false,
+    refetch: fetchBookings,
+    // CRUD helpers
     updateBookingStatus,
     deleteBooking,
     createBooking,

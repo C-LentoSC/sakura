@@ -1,47 +1,37 @@
 /**
- * Custom hook for admin categories management with SWR caching
- * Includes optimistic CRUD operations for instant UI updates
+ * Custom hook for admin categories management with direct fetch (no caching)
  */
 
-import { useCallback } from 'react';
-import { useSWR, invalidateCacheByPrefix } from './useSWR';
+import { useState, useEffect, useCallback } from 'react';
 import type { Category } from './useCategories';
 
-const CACHE_KEY = 'swr:admin-categories';
-
 export function useAdminCategories() {
-  const fetcher = useCallback(async () => {
-    const res = await fetch('/api/admin/categories');
-    if (!res.ok) throw new Error('Failed to load categories');
-    const data = await res.json();
-    return data.categories || [];
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [error, setError] = useState<Error | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/categories');
+      if (!res.ok) throw new Error('Failed to load categories');
+      const data = await res.json();
+      setCategories(data.categories || []);
+      setError(undefined);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      setError(err instanceof Error ? err : new Error(String(err)));
+      setCategories([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<Category[]>(
-    CACHE_KEY,
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: true,
-      revalidateOnMount: true,
-      dedupingInterval: 1000,
-      fallbackData: [],
-    }
-  );
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
-  // Helper to invalidate all category caches
-  const invalidateCategoryCaches = () => {
-    invalidateCacheByPrefix('swr:categories');
-  };
-
-  // Optimistic create category
+  // Create category
   const createCategory = useCallback(async (categoryData: Record<string, unknown>) => {
-    const tempId = `temp-${Date.now()}`;
-    const optimisticCategory = { id: tempId, ...categoryData, subCategories: [] } as Category;
-    
-    // Instant UI update
-    mutate((current) => [...(current || []), optimisticCategory], false);
-    
     try {
       const res = await fetch('/api/admin/categories', {
         method: 'POST',
@@ -51,29 +41,17 @@ export function useAdminCategories() {
       
       if (!res.ok) throw new Error('Failed to create category');
       
-      // Invalidate client caches
-      invalidateCategoryCaches();
-      
-      // Background revalidation to get real ID
-      mutate(undefined, true);
+      // Refetch to get fresh data
+      await fetchCategories();
       return true;
     } catch (error) {
-      // Rollback on error
-      mutate((current) => (current || []).filter(c => c.id !== tempId), false);
+      console.error('Error creating category:', error);
       throw error;
     }
-  }, [mutate]);
+  }, [fetchCategories]);
 
-  // Optimistic update category
+  // Update category
   const updateCategory = useCallback(async (id: string, categoryData: Record<string, unknown>) => {
-    const previousData = data;
-    
-    // Instant UI update
-    mutate((current) => 
-      (current || []).map(c => c.id === id ? { ...c, ...categoryData } : c), 
-      false
-    );
-    
     try {
       const res = await fetch('/api/admin/categories', {
         method: 'PUT',
@@ -83,26 +61,17 @@ export function useAdminCategories() {
       
       if (!res.ok) throw new Error('Failed to update category');
       
-      // Invalidate client caches
-      invalidateCategoryCaches();
-      
-      // Background sync
-      mutate(undefined, true);
+      // Refetch to get fresh data
+      await fetchCategories();
       return true;
     } catch (error) {
-      // Rollback on error
-      mutate(previousData, false);
+      console.error('Error updating category:', error);
       throw error;
     }
-  }, [data, mutate]);
+  }, [fetchCategories]);
 
-  // Optimistic delete category
+  // Delete category
   const deleteCategory = useCallback(async (id: string) => {
-    const previousData = data;
-    
-    // Instant UI update
-    mutate((current) => (current || []).filter(c => c.id !== id), false);
-    
     try {
       const res = await fetch(`/api/admin/categories?id=${encodeURIComponent(id)}`, {
         method: 'DELETE',
@@ -110,32 +79,17 @@ export function useAdminCategories() {
       
       if (!res.ok) throw new Error('Failed to delete category');
       
-      // Invalidate client caches
-      invalidateCategoryCaches();
-      
+      // Refetch to get fresh data
+      await fetchCategories();
       return true;
     } catch (error) {
-      // Rollback on error
-      mutate(previousData, false);
+      console.error('Error deleting category:', error);
       throw error;
     }
-  }, [data, mutate]);
+  }, [fetchCategories]);
 
-  // Optimistic create subcategory
+  // Create subcategory
   const createSubCategory = useCallback(async (categoryId: string, subCategoryData: Record<string, unknown>) => {
-    const tempId = `temp-${Date.now()}`;
-    const optimisticSubCategory = { id: tempId, ...subCategoryData, subSubCategories: [] };
-    
-    // Instant UI update
-    mutate((current) => 
-      (current || []).map(c => 
-        c.id === categoryId 
-          ? { ...c, subCategories: [...(c.subCategories || []), optimisticSubCategory] }
-          : c
-      ), 
-      false
-    );
-    
     try {
       const res = await fetch('/api/admin/subcategories', {
         method: 'POST',
@@ -145,30 +99,17 @@ export function useAdminCategories() {
       
       if (!res.ok) throw new Error('Failed to create subcategory');
       
-      // Invalidate client caches
-      invalidateCategoryCaches();
-      
-      mutate(undefined, true);
+      // Refetch to get fresh data
+      await fetchCategories();
       return true;
     } catch (error) {
-      mutate(undefined, true); // Revalidate to rollback
+      console.error('Error creating subcategory:', error);
       throw error;
     }
-  }, [mutate]);
+  }, [fetchCategories]);
 
-  // Optimistic delete subcategory
+  // Delete subcategory
   const deleteSubCategory = useCallback(async (id: string) => {
-    const previousData = data;
-    
-    // Instant UI update
-    mutate((current) => 
-      (current || []).map(c => ({
-        ...c,
-        subCategories: (c.subCategories || []).filter(s => s.id !== id)
-      })), 
-      false
-    );
-    
     try {
       const res = await fetch(`/api/admin/subcategories?id=${encodeURIComponent(id)}`, {
         method: 'DELETE',
@@ -176,32 +117,17 @@ export function useAdminCategories() {
       
       if (!res.ok) throw new Error('Failed to delete subcategory');
       
-      // Invalidate client caches
-      invalidateCategoryCaches();
-      
+      // Refetch to get fresh data
+      await fetchCategories();
       return true;
     } catch (error) {
-      mutate(previousData, false);
+      console.error('Error deleting subcategory:', error);
       throw error;
     }
-  }, [data, mutate]);
+  }, [fetchCategories]);
 
-  // Optimistic delete sub-subcategory
+  // Delete sub-subcategory
   const deleteSubSubCategory = useCallback(async (id: string) => {
-    const previousData = data;
-    
-    // Instant UI update
-    mutate((current) => 
-      (current || []).map(c => ({
-        ...c,
-        subCategories: (c.subCategories || []).map(s => ({
-          ...s,
-          subSubCategories: (s.subSubCategories || []).filter(ss => ss.id !== id)
-        }))
-      })), 
-      false
-    );
-    
     try {
       const res = await fetch(`/api/admin/subsubcategories?id=${encodeURIComponent(id)}`, {
         method: 'DELETE',
@@ -209,23 +135,22 @@ export function useAdminCategories() {
       
       if (!res.ok) throw new Error('Failed to delete sub-subcategory');
       
-      // Invalidate client caches
-      invalidateCategoryCaches();
-      
+      // Refetch to get fresh data
+      await fetchCategories();
       return true;
     } catch (error) {
-      mutate(previousData, false);
+      console.error('Error deleting sub-subcategory:', error);
       throw error;
     }
-  }, [data, mutate]);
+  }, [fetchCategories]);
 
   return {
-    categories: data || [],
+    categories,
     error,
     isLoading,
-    isValidating,
-    mutate,
-    // Optimistic CRUD helpers
+    isValidating: false,
+    refetch: fetchCategories,
+    // CRUD helpers
     createCategory,
     updateCategory,
     deleteCategory,

@@ -1,12 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { formatCurrency } from '@/app/constants/currency';
 import ProductCardBase, { ProductCardData } from '@/app/components/shop/ProductCardBase';
 import ImageUpload from '@/app/components/ImageUpload';
-import { useProducts, type Product as ProductType } from '@/app/hooks/useProducts';
-import { invalidateCacheByPrefix } from '@/app/hooks/useSWR';
 
 interface Product {
   id: number;
@@ -37,26 +35,44 @@ export default function AdminShopPage() {
   const [errors, setErrors] = useState<{ price?: string; originalPrice?: string }>({});
   const [submitting, setSubmitting] = useState(false);
 
-  // Fetch products with SWR caching
-  const { products: productsData, isLoading: loading, mutate } = useProducts({ language });
+  // Direct state for products
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Convert ProductType[] to Product[]
-  const products: Product[] = productsData.map((p: ProductType) => ({
-    id: p.id,
-    name: p.name,
-    nameEn: p.nameEn,
-    nameJa: p.nameJa,
-    category: p.category,
-    price: p.price,
-    originalPrice: p.originalPrice,
-    image: p.image,
-    inStock: p.inStock,
-    badge: p.badge,
-    badgeType: p.badgeType,
-    description: p.description,
-    descriptionEn: p.descEn,
-    descriptionJa: p.descJa,
-  }));
+  // Fetch products directly
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/products?lang=${language}`);
+      if (!res.ok) throw new Error('Failed to load products');
+      const data = await res.json();
+      const fetchedProducts = (data.products || []).map((p: Record<string, unknown>) => ({
+        id: p.id as number,
+        name: p.name as string,
+        nameEn: p.nameEn as string,
+        nameJa: p.nameJa as string,
+        category: p.category as string,
+        price: p.price as number,
+        originalPrice: p.originalPrice as number | null,
+        image: p.image as string,
+        inStock: p.inStock as boolean,
+        badge: p.badge as string | null,
+        badgeType: p.badgeType as string | null,
+        description: p.description as string,
+        descriptionEn: p.descEn as string,
+        descriptionJa: p.descJa as string,
+      }));
+      setProducts(fetchedProducts);
+    } catch (err) {
+      console.error('Error loading products:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [language]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -97,7 +113,6 @@ export default function AdminShopPage() {
       setErrors({});
     }
 
-    const previousProducts = [...products];
     const currentFormData = { ...formData };
     const isEditing = !!editingProduct;
     const editingId = editingProduct?.id;
@@ -105,66 +120,6 @@ export default function AdminShopPage() {
     // Close modal immediately for instant feedback
     setIsModalOpen(false);
     setSubmitting(true);
-
-    // Optimistic update - will be replaced with real data after API call
-    const tempProduct: Product = {
-      id: isEditing && editingId ? editingId : Date.now(),
-      name: currentFormData.nameEn || currentFormData.name,
-      nameEn: currentFormData.nameEn,
-      nameJa: currentFormData.nameJa,
-      category: currentFormData.category,
-      price: priceNum,
-      originalPrice: origNum,
-      image: currentFormData.image || '/services-images/head-spa.jpg',
-      inStock: currentFormData.inStock,
-      badge: currentFormData.badge || null,
-      badgeType: currentFormData.badgeType || null,
-      description: currentFormData.descriptionEn || currentFormData.description,
-      descriptionEn: currentFormData.descriptionEn,
-      descriptionJa: currentFormData.descriptionJa,
-    };
-    
-    if (isEditing && editingId) {
-      mutate(
-        (current) => current?.map(p => p.id === editingId ? {
-          ...p,
-          name: tempProduct.name,
-          nameEn: tempProduct.nameEn,
-          nameJa: tempProduct.nameJa,
-          category: tempProduct.category,
-          price: tempProduct.price,
-          originalPrice: tempProduct.originalPrice,
-          image: tempProduct.image,
-          inStock: tempProduct.inStock,
-          badge: tempProduct.badge,
-          badgeType: tempProduct.badgeType,
-          description: tempProduct.description,
-          descEn: tempProduct.descriptionEn,
-          descJa: tempProduct.descriptionJa,
-        } : p),
-        false
-      );
-    } else {
-      mutate(
-        (current) => [...(current || []), {
-          id: tempProduct.id,
-          name: tempProduct.name,
-          nameEn: tempProduct.nameEn,
-          nameJa: tempProduct.nameJa,
-          category: tempProduct.category,
-          price: tempProduct.price,
-          originalPrice: tempProduct.originalPrice,
-          image: tempProduct.image,
-          inStock: tempProduct.inStock,
-          badge: tempProduct.badge,
-          badgeType: tempProduct.badgeType,
-          description: tempProduct.description,
-          descEn: tempProduct.descriptionEn,
-          descJa: tempProduct.descriptionJa,
-        }],
-        false
-      );
-    }
 
     try {
       // Upload image if file is selected
@@ -216,31 +171,11 @@ export default function AdminShopPage() {
         if (!res.ok) throw new Error('Failed to create product');
       }
 
-      // Invalidate client-side product caches
-      invalidateCacheByPrefix('swr:products');
-      
-      // Background revalidation
-      mutate();
+      // Refetch products to get fresh data
+      await fetchProducts();
       resetForm();
     } catch (error) {
       console.error('Error saving product:', error);
-      // Rollback on error
-      mutate(previousProducts.map(p => ({
-        id: p.id,
-        name: p.name,
-        nameEn: p.nameEn,
-        nameJa: p.nameJa,
-        category: p.category,
-        price: p.price,
-        originalPrice: p.originalPrice,
-        image: p.image,
-        inStock: p.inStock,
-        badge: p.badge,
-        badgeType: p.badgeType,
-        description: p.description,
-        descEn: p.descriptionEn,
-        descJa: p.descriptionJa,
-      })), false);
       alert('Failed to save product');
     } finally {
       setSubmitting(false);
@@ -276,18 +211,11 @@ export default function AdminShopPage() {
     if (!deleteTarget) return;
 
     const idToDelete = deleteTarget.id;
-    const previousProducts = [...products];
     
     // Close modal immediately for instant feedback
     setDeleteConfirmOpen(false);
     setDeleteTarget(null);
     setSubmitting(true);
-    
-    // Optimistic update - remove from list instantly
-    mutate(
-      (current) => current?.filter(p => p.id !== idToDelete),
-      false
-    );
 
     try {
       const res = await fetch(`/api/admin/products/${idToDelete}`, {
@@ -295,30 +223,10 @@ export default function AdminShopPage() {
       });
       if (!res.ok) throw new Error('Failed to delete product');
 
-      // Invalidate client-side product caches
-      invalidateCacheByPrefix('swr:products');
-      
-      // Background revalidation
-      mutate();
+      // Refetch products to get fresh data
+      await fetchProducts();
     } catch (error) {
       console.error('Error deleting product:', error);
-      // Rollback on error
-      mutate(previousProducts.map(p => ({
-        id: p.id,
-        name: p.name,
-        nameEn: p.nameEn,
-        nameJa: p.nameJa,
-        category: p.category,
-        price: p.price,
-        originalPrice: p.originalPrice,
-        image: p.image,
-        inStock: p.inStock,
-        badge: p.badge,
-        badgeType: p.badgeType,
-        description: p.description,
-        descEn: p.descriptionEn,
-        descJa: p.descriptionJa,
-      })), false);
       alert('Failed to delete product');
     } finally {
       setSubmitting(false);

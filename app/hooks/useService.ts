@@ -1,40 +1,53 @@
 /**
- * Custom hook for fetching a single service by ID with SWR caching
+ * Custom hook for fetching a single service by ID with direct fetch (no caching)
  */
 
-import { useCallback } from 'react';
-import { useSWR } from './useSWR';
+import { useState, useEffect, useCallback } from 'react';
 import type { Service } from './useServices';
 
 export function useService(serviceId: string | null) {
-  const fetcher = useCallback(async () => {
-    if (!serviceId) return null;
+  const [service, setService] = useState<Service | null>(null);
+  const [error, setError] = useState<Error | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
 
-    const res = await fetch(`/api/services/${serviceId}`);
-    if (!res.ok) {
-      if (res.status === 404) return null;
-      throw new Error('Failed to load service');
+  const fetchService = useCallback(async () => {
+    if (!serviceId) {
+      setService(null);
+      setIsLoading(false);
+      return;
     }
-    const data: Service = await res.json();
-    return data;
+
+    try {
+      const res = await fetch(`/api/services/${serviceId}`);
+      if (!res.ok) {
+        if (res.status === 404) {
+          setService(null);
+          setError(undefined);
+          return;
+        }
+        throw new Error('Failed to load service');
+      }
+      const data: Service = await res.json();
+      setService(data);
+      setError(undefined);
+    } catch (err) {
+      console.error('Error fetching service:', err);
+      setError(err instanceof Error ? err : new Error(String(err)));
+      setService(null);
+    } finally {
+      setIsLoading(false);
+    }
   }, [serviceId]);
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<Service | null>(
-    serviceId ? `swr:service:${serviceId}` : null,
-    fetcher,
-    {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      dedupingInterval: 5000,
-      fallbackData: null,
-    }
-  );
+  useEffect(() => {
+    fetchService();
+  }, [fetchService]);
 
   return {
-    service: data,
+    service,
     error,
     isLoading,
-    isValidating,
-    mutate,
+    isValidating: false,
+    refetch: fetchService,
   };
 }
