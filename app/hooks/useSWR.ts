@@ -254,6 +254,7 @@ export function useSWR<T>(
     if (revalidateOnMount || !data) {
       revalidate(!!data);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]); // Only depend on key, not data or fetcher to prevent re-runs
 
   // Revalidate on focus

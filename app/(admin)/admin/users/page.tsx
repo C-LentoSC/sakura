@@ -32,7 +32,7 @@ export default function AdminUsersPage() {
       mounted = false;
     };
   }, []);
-  const { users, isLoading, mutate } = useAdminUsers();
+  const { users, isLoading, refetch } = useAdminUsers();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -132,7 +132,6 @@ export default function AdminUsersPage() {
   };
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const previousUsers = [...list];
     const formData = { ...form };
     const isEditing = !!editing;
     const editingUser = editing;
@@ -140,36 +139,6 @@ export default function AdminUsersPage() {
     // Close modal immediately for instant feedback
     setIsModalOpen(false);
     setSaving(true);
-    
-    // Optimistic update
-    if (isEditing && editingUser) {
-      mutate(
-        (current) => current?.map(u => 
-          u.id === editingUser.id 
-            ? { ...u, email: formData.email, name: formData.name, role: formData.role } 
-            : u
-        ),
-        false
-      );
-    } else {
-      // For create, add a temporary item with a temp ID
-      const tempId = `temp-${Date.now()}`;
-      mutate(
-        (current) => [
-          ...(current || []),
-          {
-            id: tempId,
-            email: formData.email,
-            name: formData.name,
-            role: formData.role,
-            emailVerified: null,
-            createdAt: new Date().toISOString(),
-            _count: { sessions: 0 },
-          },
-        ],
-        false
-      );
-    }
     
     try {
       if (isEditing && editingUser) {
@@ -187,11 +156,9 @@ export default function AdminUsersPage() {
         });
         if (!res.ok) throw new Error('create failed');
       }
-      // Background revalidation
-      mutate();
+      // Refetch to get fresh data
+      await refetch();
     } catch {
-      // Rollback on error
-      mutate(previousUsers, false);
       alert('Failed to save user');
     } finally {
       setSaving(false);
@@ -200,25 +167,16 @@ export default function AdminUsersPage() {
   const handleDelete = async () => {
     if (!deletingId) return;
     const idToDelete = deletingId;
-    const previousUsers = [...list];
     
     // Close modal immediately for instant feedback
     setDeletingId(null);
     
-    // Optimistic update - remove from list instantly
-    mutate(
-      (current) => current?.filter(u => u.id !== idToDelete),
-      false
-    );
-    
     try {
       const res = await fetch(`/api/admin/users/${idToDelete}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('delete failed');
-      // Background revalidation
-      mutate();
+      // Refetch to get fresh data
+      await refetch();
     } catch {
-      // Rollback on error
-      mutate(previousUsers, false);
       alert('Failed to delete user');
     }
   };

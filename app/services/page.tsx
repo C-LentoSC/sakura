@@ -85,6 +85,7 @@ export default function ServicesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [servicesLoading, setServicesLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [servicesError, setServicesError] = useState<Error | null>(null);
 
   // Fetch categories on mount

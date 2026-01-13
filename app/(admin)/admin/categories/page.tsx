@@ -87,7 +87,7 @@ export default function AdminCategoriesPage() {
     const key = (record.nameKey || '').split('.').pop() || record.slug || '';
     return key.replace(/[-_]/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
   };
-  const { categories, isLoading: loading, mutate, deleteCategory, deleteSubCategory, deleteSubSubCategory } = useAdminCategories();
+  const { categories, isLoading: loading, refetch, deleteCategory, deleteSubCategory, deleteSubSubCategory } = useAdminCategories();
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [expandedSubCategories, setExpandedSubCategories] = useState<Set<string>>(new Set());
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -150,13 +150,13 @@ export default function AdminCategoriesPage() {
       });
 
       if (res.ok) {
-        // Background revalidation - non-blocking
-        mutate(undefined, true);
+        // Refetch to get fresh data
+        await refetch();
       }
     } catch (error) {
       console.error('Error saving item:', error);
-      // Revalidate to show current state
-      mutate(undefined, true);
+      // Refetch to show current state
+      await refetch();
     }
   };
 
