@@ -539,10 +539,24 @@ export default function AdminShopPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {language === 'ja' ? 'バッジタイプ' : 'Badge Type'}
+                    <span className="text-xs text-gray-400 ml-2">
+                      {language === 'ja' ? '(アイコンスタイル)' : '(Icon style)'}
+                    </span>
                   </label>
                   <select
                     value={formData.badgeType}
-                    onChange={(e) => setFormData({...formData, badgeType: e.target.value})}
+                    onChange={(e) => {
+                      const newType = e.target.value;
+                      // Auto-fill badge label when type is selected (if badge is empty or matches old type)
+                      const shouldAutoFill = !formData.badge || 
+                        formData.badge.toUpperCase() === formData.badgeType?.toUpperCase() ||
+                        badgeTypes.map(t => t.toUpperCase()).includes(formData.badge.toUpperCase());
+                      setFormData({
+                        ...formData, 
+                        badgeType: newType,
+                        badge: shouldAutoFill ? (newType || '') : formData.badge
+                      });
+                    }}
                     className="w-full px-3 py-2 rounded-lg border-2 border-pink-100 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                   >
                     {badgeTypes.map(type => (
@@ -555,6 +569,9 @@ export default function AdminShopPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {language === 'ja' ? 'バッジラベル' : 'Badge Label'}
+                  <span className="text-xs text-gray-400 ml-2">
+                    {language === 'ja' ? '(バッジに表示されるテキスト)' : '(Text shown on badge)'}
+                  </span>
                 </label>
                 <input
                   type="text"
