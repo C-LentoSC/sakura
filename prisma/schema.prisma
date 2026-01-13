@@ -27,9 +27,9 @@ model Product {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
-  // directUrl = env("DIRECT_DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 // User model with role-based access
