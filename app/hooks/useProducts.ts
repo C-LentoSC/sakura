@@ -38,9 +38,11 @@ export function useProducts({ language }: UseProductsOptions) {
     `swr:products:${language}`,
     fetcher,
     {
-      revalidateOnFocus: true,
+      revalidateOnFocus: false, // Reduce flicker
       revalidateOnReconnect: true,
-      dedupingInterval: 2000,
+      revalidateOnMount: true, // Always get fresh data
+      dedupingInterval: 1000,
+      cacheTime: 60 * 1000, // 1 minute cache
       fallbackData: [],
     }
   );

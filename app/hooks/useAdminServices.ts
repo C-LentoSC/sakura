@@ -4,10 +4,10 @@
  */
 
 import { useCallback } from 'react';
-import { useSWR } from './useSWR';
+import { useSWR, invalidateCacheByPrefix } from './useSWR';
 import type { Service } from './useServices';
 
-const CACHE_KEY = 'swr:services:all:all:all';
+const CACHE_KEY = 'swr:admin:services';
 
 export function useAdminServices() {
   const fetcher = useCallback(async () => {
@@ -21,9 +21,10 @@ export function useAdminServices() {
     CACHE_KEY,
     fetcher,
     {
-      revalidateOnFocus: true,
+      revalidateOnFocus: false,
       revalidateOnReconnect: true,
-      dedupingInterval: 2000,
+      revalidateOnMount: true,
+      dedupingInterval: 1000,
       fallbackData: [],
     }
   );
@@ -52,11 +53,11 @@ export function useAdminServices() {
         throw new Error(error.error || 'Failed to create service');
       }
       
+      // Invalidate client-side caches to show fresh data
+      invalidateCacheByPrefix('swr:services');
+      
       // Background revalidation to get real ID
       mutate(undefined, true);
-      
-      // Also invalidate other service cache keys
-      invalidateRelatedCaches();
       
       return true;
     } catch (error) {
@@ -88,9 +89,11 @@ export function useAdminServices() {
         throw new Error(error.error || 'Failed to update service');
       }
       
+      // Invalidate client-side caches
+      invalidateCacheByPrefix('swr:services');
+      
       // Background sync
       mutate(undefined, true);
-      invalidateRelatedCaches();
       
       return true;
     } catch (error) {
@@ -119,9 +122,11 @@ export function useAdminServices() {
       
       if (!res.ok) throw new Error('Failed to toggle service status');
       
+      // Invalidate client-side caches
+      invalidateCacheByPrefix('swr:services');
+      
       // Background sync
       mutate(undefined, true);
-      invalidateRelatedCaches();
       
       return true;
     } catch (error) {
@@ -145,7 +150,9 @@ export function useAdminServices() {
       
       if (!res.ok) throw new Error('Failed to delete service');
       
-      invalidateRelatedCaches();
+      // Invalidate client-side caches
+      invalidateCacheByPrefix('swr:services');
+      
       return true;
     } catch (error) {
       // Rollback on error
@@ -166,31 +173,4 @@ export function useAdminServices() {
     toggleServiceActive,
     deleteService,
   };
-}
-
-// Helper to invalidate related cache keys
-function invalidateRelatedCaches() {
-  // Update all possible service cache variations
-  const patterns = [
-    'swr:services:',
-  ];
-  
-  if (typeof window !== 'undefined') {
-    const keys = Object.keys(localStorage);
-    keys.forEach((key) => {
-      if (patterns.some(p => key.startsWith(p))) {
-        // Trigger revalidation by updating timestamp
-        try {
-          const item = localStorage.getItem(key);
-          if (item) {
-            const parsed = JSON.parse(item);
-            parsed.timestamp = 0; // Force stale
-            localStorage.setItem(key, JSON.stringify(parsed));
-          }
-        } catch {
-          // Ignore
-        }
-      }
-    });
-  }
 }

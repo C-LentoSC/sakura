@@ -52,9 +52,11 @@ export function useCategories() {
     'swr:categories:all',
     fetcher,
     {
-      revalidateOnFocus: true,
+      revalidateOnFocus: false, // Reduce flicker
       revalidateOnReconnect: true,
-      dedupingInterval: 5000, // 5 seconds (categories change less frequently)
+      revalidateOnMount: true,
+      dedupingInterval: 2000,
+      cacheTime: 60 * 1000, // 1 minute cache
       fallbackData: [],
     }
   );

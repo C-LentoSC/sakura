@@ -6,7 +6,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { formatCurrency } from '../constants/currency';
 import { addItem as addCartItem, getTotalQuantity } from '../utils/cartStorage';
 import ProductCardBase, { ProductCardData } from '../components/shop/ProductCardBase';
-import { useProducts, type Product } from '../hooks/useProducts';
 import {
   Header,
   BackgroundPattern,
@@ -16,7 +15,23 @@ import {
   Chatbot
 } from '../components';
 
-// Categories will be translated dynamically
+// Product type
+interface Product {
+  id: number;
+  name: string;
+  nameEn: string;
+  nameJa: string;
+  category: string;
+  description: string;
+  descEn: string;
+  descJa: string;
+  price: number;
+  originalPrice: number | null;
+  image: string;
+  inStock: boolean;
+  badge: string | null;
+  badgeType: string | null;
+}
 
 export default function ShopPage() {
   const { t, language } = useLanguage();
@@ -25,8 +40,33 @@ export default function ShopPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [mounted, setMounted] = useState(false);
 
-  // Fetch products using SWR with cache-first strategy
-  const { products, error, isLoading } = useProducts({ language });
+  // Direct state for products
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  // Fetch products directly
+  useEffect(() => {
+    setMounted(true);
+    setIsLoading(true);
+    
+    fetch(`/api/products?lang=${language}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch products');
+        return res.json();
+      })
+      .then(data => {
+        setProducts(data.products || []);
+        setError(null);
+      })
+      .catch(err => {
+        console.error('Error loading products:', err);
+        setError(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [language]);
 
   // Handle error state
   if (error) {

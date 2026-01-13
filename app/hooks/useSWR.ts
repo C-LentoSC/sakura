@@ -8,8 +8,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 interface SWRConfig<T> {
   revalidateOnFocus?: boolean;
   revalidateOnReconnect?: boolean;
+  revalidateOnMount?: boolean; // Always revalidate on mount
   dedupingInterval?: number; // Deduplication interval in ms
   fallbackData?: T;
+  cacheTime?: number; // Cache validity time in ms (default 2 min)
 }
 
 interface SWRResponse<T> {
@@ -27,15 +29,23 @@ const revalidationPromises = new Map<string, Promise<unknown>>();
 // Global mutate function for cross-component updates
 const subscribers = new Map<string, Set<(data: unknown) => void>>();
 
-// Storage helpers
+// Track if initial fetch has been done per key
+const initialFetchDone = new Map<string, boolean>();
+
+// Track revalidation callbacks for each key (for cache invalidation)
+const revalidationCallbacks = new Map<string, () => void>();
+
+// Storage helpers - shorter cache time for freshness
+const STORAGE_CACHE_TIME = 2 * 60 * 1000; // 2 minutes
+
 const getFromStorage = <T>(key: string): T | null => {
   if (typeof window === 'undefined') return null;
   try {
     const item = localStorage.getItem(key);
     if (!item) return null;
     const parsed = JSON.parse(item);
-    // Cache for 30 minutes
-    if (Date.now() - parsed.timestamp < 30 * 60 * 1000) {
+    // Cache for 2 minutes only
+    if (Date.now() - parsed.timestamp < STORAGE_CACHE_TIME) {
       return parsed.data;
     }
     localStorage.removeItem(key);
@@ -66,17 +76,22 @@ export function useSWR<T>(
   config?: SWRConfig<T>
 ): SWRResponse<T> {
   const {
-    revalidateOnFocus = true,
+    revalidateOnFocus = false, // Changed: disable by default to reduce flicker
     revalidateOnReconnect = true,
+    revalidateOnMount = true, // Always fetch fresh on mount
     dedupingInterval = 2000,
     fallbackData,
+    cacheTime = 2 * 60 * 1000, // 2 minutes default
   } = config || {};
 
+  // Initialize state from cache (sync, no flicker)
   const [data, setData] = useState<T | undefined>(() => {
     if (!key) return fallbackData;
     // Try memory cache first
     const cached = cache.get(key);
-    if (cached) return cached.data as T;
+    if (cached && Date.now() - cached.timestamp < cacheTime) {
+      return cached.data as T;
+    }
     // Try localStorage
     const stored = getFromStorage<T>(key);
     if (stored) {
@@ -87,16 +102,28 @@ export function useSWR<T>(
   });
 
   const [error, setError] = useState<Error | undefined>();
-  const [isLoading, setIsLoading] = useState<boolean>(!data);
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    if (!key) return false;
+    // Only show loading if we don't have any cached data
+    const cached = cache.get(key);
+    const stored = getFromStorage<T>(key);
+    return !cached && !stored && !fallbackData;
+  });
   const [isValidating, setIsValidating] = useState<boolean>(false);
 
   const fetcherRef = useRef(fetcher);
   const keyRef = useRef(key);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
     fetcherRef.current = fetcher;
     keyRef.current = key;
   }, [fetcher, key]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   // Subscribe to global updates for this key
   useEffect(() => {
@@ -135,8 +162,8 @@ export function useSWR<T>(
       try {
         const freshData = await currentFetcher();
 
-        // Only update if key hasn't changed
-        if (keyRef.current === currentKey) {
+        // Only update if component is still mounted and key hasn't changed
+        if (mountedRef.current && keyRef.current === currentKey) {
           setData(freshData);
           cache.set(currentKey, { data: freshData, timestamp: Date.now() });
           setToStorage(currentKey, freshData);
@@ -148,12 +175,12 @@ export function useSWR<T>(
 
         return freshData;
       } catch (err) {
-        if (keyRef.current === currentKey) {
+        if (mountedRef.current && keyRef.current === currentKey) {
           setError(err instanceof Error ? err : new Error(String(err)));
         }
         throw err;
       } finally {
-        if (keyRef.current === currentKey) {
+        if (mountedRef.current && keyRef.current === currentKey) {
           setIsLoading(false);
           setIsValidating(false);
         }
@@ -164,6 +191,19 @@ export function useSWR<T>(
     revalidationPromises.set(currentKey, promise);
     return promise;
   }, []);
+
+  // Register revalidation callback for cache invalidation (after revalidate is defined)
+  useEffect(() => {
+    if (!key) return;
+    
+    revalidationCallbacks.set(key, () => {
+      revalidate(false);
+    });
+    
+    return () => {
+      revalidationCallbacks.delete(key);
+    };
+  }, [key, revalidate]);
 
   // Optimistic update (mutate) - INSTANT UI update
   const mutate = useCallback(
@@ -192,27 +232,29 @@ export function useSWR<T>(
     [data, revalidate]
   );
 
-  // Initial fetch and revalidation
+  // Initial fetch and revalidation - SIMPLIFIED to prevent double fetch
   useEffect(() => {
     if (!key || !fetcher) return;
 
-    // If we have cached data, revalidate in background
-    if (data) {
-      const cached = cache.get(key);
-      const age = cached ? Date.now() - cached.timestamp : Infinity;
+    // Check if we should fetch
+    const cached = cache.get(key);
+    const cacheAge = cached ? Date.now() - cached.timestamp : Infinity;
+    const hasFreshCache = cacheAge < dedupingInterval;
 
-      // If cache is stale (> 5 minutes), revalidate
-      if (age > 5 * 60 * 1000) {
-        revalidate(true);
-      } else if (age > dedupingInterval) {
-        // If cache is older than deduping interval, revalidate silently
-        setTimeout(() => revalidate(true), 0);
-      }
-    } else {
-      // No cached data, fetch immediately
-      revalidate(false);
+    // If we already have fresh cache, skip initial fetch
+    if (hasFreshCache && initialFetchDone.get(key)) {
+      return;
     }
-  }, [key, fetcher, dedupingInterval, data, revalidate]);
+
+    // Mark as done to prevent duplicate fetches
+    initialFetchDone.set(key, true);
+
+    // If we have cached data, revalidate silently in background
+    // If no cached data, show loading state
+    if (revalidateOnMount || !data) {
+      revalidate(!!data);
+    }
+  }, [key]); // Only depend on key, not data or fetcher to prevent re-runs
 
   // Revalidate on focus
   useEffect(() => {
@@ -272,6 +314,7 @@ export function useSWR<T>(
 // Helper: Clear all cache
 export function clearCache() {
   cache.clear();
+  initialFetchDone.clear();
   if (typeof window !== 'undefined') {
     const keys = Object.keys(localStorage);
     keys.forEach((key) => {
@@ -285,9 +328,49 @@ export function clearCache() {
 // Helper: Invalidate specific cache key
 export function invalidateCache(key: string) {
   cache.delete(key);
+  initialFetchDone.delete(key);
   if (typeof window !== 'undefined') {
     localStorage.removeItem(key);
   }
+  // Trigger revalidation
+  const revalidateCallback = revalidationCallbacks.get(key);
+  if (revalidateCallback) {
+    revalidateCallback();
+  }
+}
+
+// Helper: Invalidate cache by prefix (e.g., 'swr:services' to clear all services cache)
+export function invalidateCacheByPrefix(prefix: string) {
+  const keysToInvalidate: string[] = [];
+  
+  // Clear memory cache
+  for (const key of cache.keys()) {
+    if (key.startsWith(prefix)) {
+      cache.delete(key);
+      initialFetchDone.delete(key);
+      keysToInvalidate.push(key);
+    }
+  }
+  // Clear localStorage
+  if (typeof window !== 'undefined') {
+    const keys = Object.keys(localStorage);
+    keys.forEach((key) => {
+      if (key.startsWith(prefix)) {
+        localStorage.removeItem(key);
+        if (!keysToInvalidate.includes(key)) {
+          keysToInvalidate.push(key);
+        }
+      }
+    });
+  }
+  
+  // Trigger revalidation for all affected keys
+  keysToInvalidate.forEach(key => {
+    const revalidateCallback = revalidationCallbacks.get(key);
+    if (revalidateCallback) {
+      revalidateCallback();
+    }
+  });
 }
 
 // Helper: Global mutate for optimistic updates from anywhere

@@ -6,6 +6,7 @@ import { formatCurrency } from '@/app/constants/currency';
 import ProductCardBase, { ProductCardData } from '@/app/components/shop/ProductCardBase';
 import ImageUpload from '@/app/components/ImageUpload';
 import { useProducts, type Product as ProductType } from '@/app/hooks/useProducts';
+import { invalidateCacheByPrefix } from '@/app/hooks/useSWR';
 
 interface Product {
   id: number;
@@ -215,6 +216,9 @@ export default function AdminShopPage() {
         if (!res.ok) throw new Error('Failed to create product');
       }
 
+      // Invalidate client-side product caches
+      invalidateCacheByPrefix('swr:products');
+      
       // Background revalidation
       mutate();
       resetForm();
@@ -291,6 +295,9 @@ export default function AdminShopPage() {
       });
       if (!res.ok) throw new Error('Failed to delete product');
 
+      // Invalidate client-side product caches
+      invalidateCacheByPrefix('swr:products');
+      
       // Background revalidation
       mutate();
     } catch (error) {

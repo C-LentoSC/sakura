@@ -4,7 +4,7 @@
  */
 
 import { useCallback } from 'react';
-import { useSWR } from './useSWR';
+import { useSWR, invalidateCacheByPrefix } from './useSWR';
 import type { Category } from './useCategories';
 
 const CACHE_KEY = 'swr:admin-categories';
@@ -21,12 +21,18 @@ export function useAdminCategories() {
     CACHE_KEY,
     fetcher,
     {
-      revalidateOnFocus: true,
+      revalidateOnFocus: false,
       revalidateOnReconnect: true,
-      dedupingInterval: 5000,
+      revalidateOnMount: true,
+      dedupingInterval: 1000,
       fallbackData: [],
     }
   );
+
+  // Helper to invalidate all category caches
+  const invalidateCategoryCaches = () => {
+    invalidateCacheByPrefix('swr:categories');
+  };
 
   // Optimistic create category
   const createCategory = useCallback(async (categoryData: Record<string, unknown>) => {
@@ -44,6 +50,9 @@ export function useAdminCategories() {
       });
       
       if (!res.ok) throw new Error('Failed to create category');
+      
+      // Invalidate client caches
+      invalidateCategoryCaches();
       
       // Background revalidation to get real ID
       mutate(undefined, true);
@@ -74,6 +83,9 @@ export function useAdminCategories() {
       
       if (!res.ok) throw new Error('Failed to update category');
       
+      // Invalidate client caches
+      invalidateCategoryCaches();
+      
       // Background sync
       mutate(undefined, true);
       return true;
@@ -97,6 +109,10 @@ export function useAdminCategories() {
       });
       
       if (!res.ok) throw new Error('Failed to delete category');
+      
+      // Invalidate client caches
+      invalidateCategoryCaches();
+      
       return true;
     } catch (error) {
       // Rollback on error
@@ -129,6 +145,9 @@ export function useAdminCategories() {
       
       if (!res.ok) throw new Error('Failed to create subcategory');
       
+      // Invalidate client caches
+      invalidateCategoryCaches();
+      
       mutate(undefined, true);
       return true;
     } catch (error) {
@@ -156,6 +175,10 @@ export function useAdminCategories() {
       });
       
       if (!res.ok) throw new Error('Failed to delete subcategory');
+      
+      // Invalidate client caches
+      invalidateCategoryCaches();
+      
       return true;
     } catch (error) {
       mutate(previousData, false);
@@ -185,6 +208,10 @@ export function useAdminCategories() {
       });
       
       if (!res.ok) throw new Error('Failed to delete sub-subcategory');
+      
+      // Invalidate client caches
+      invalidateCategoryCaches();
+      
       return true;
     } catch (error) {
       mutate(previousData, false);
