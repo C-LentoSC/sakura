@@ -83,12 +83,14 @@ public/           - Static assets
 ## Key Features
 
 ### Service Booking
+
 - Browse available services
 - View time slot availability
 - Book appointments
 - Cancel or reschedule bookings
 
 ### Admin Panel
+
 - Create and manage services
 - Manage product inventory
 - View and handle booking requests
@@ -96,6 +98,7 @@ public/           - Static assets
 - Business settings
 
 ### Shopping
+
 - Product catalog with categories
 - Shopping cart functionality
 - Secure checkout with Stripe
@@ -104,6 +107,7 @@ public/           - Static assets
 ## Development
 
 ### Build
+
 ```bash
 npm run build
 ```
@@ -111,11 +115,13 @@ npm run build
 ### Database Management
 
 View data in Prisma Studio:
+
 ```bash
 npx prisma studio
 ```
 
 Reset database:
+
 ```bash
 npx prisma migrate reset
 ```
