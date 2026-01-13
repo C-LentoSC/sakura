@@ -58,7 +58,8 @@ export default function AdminServicesPage() {
   
   const fetchServices = useCallback(async () => {
     try {
-      const res = await fetch('/api/services');
+      setServicesLoading(true);
+      const res = await fetch('/api/admin/services', { cache: 'no-store' });
       if (!res.ok) throw new Error('Failed to load services');
       const data = await res.json();
       setServices(data.services || []);
@@ -232,6 +233,9 @@ export default function AdminServicesPage() {
   };
 
   const handleToggleActive = async (id: string, isActive: boolean) => {
+    // Optimistic update - update local state immediately
+    setServices(prev => prev.map(s => s.id === id ? { ...s, isActive } : s));
+    
     try {
       const response = await fetch(`/api/admin/services/${id}`, {
         method: 'PUT',
@@ -244,11 +248,11 @@ export default function AdminServicesPage() {
       if (!response.ok) {
         throw new Error('Failed to toggle service status');
       }
-      
-      // Refetch to get fresh data
-      await fetchServices();
+      // No need to refetch - optimistic update already done
     } catch (error) {
       console.error('Error toggling service status:', error);
+      // Revert optimistic update on error
+      setServices(prev => prev.map(s => s.id === id ? { ...s, isActive: !isActive } : s));
       alert('Failed to toggle service status');
     }
   };
@@ -572,7 +576,7 @@ export default function AdminServicesPage() {
             )}
           </div>
         )}
-        {!mounted || isDataLoading && (
+        {(!mounted || isDataLoading) && (
           <div className="text-center py-16">
             <div className="w-16 h-16 bg-gray-100 rounded-sm flex items-center justify-center mx-auto mb-4 shadow-sm animate-pulse">
               <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -586,11 +590,22 @@ export default function AdminServicesPage() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-sm shadow-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              {editingService ? t('admin.services.modal.editTitle') : t('admin.services.modal.addTitle')}
-            </h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => { setIsModalOpen(false); resetForm(); }}>
+          <div className="bg-white rounded-sm shadow-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {editingService ? t('admin.services.modal.editTitle') : t('admin.services.modal.addTitle')}
+              </h2>
+              <button
+                type="button"
+                onClick={() => { setIsModalOpen(false); resetForm(); }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -844,8 +859,8 @@ export default function AdminServicesPage() {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmOpen && deleteTarget && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => { setDeleteConfirmOpen(false); setDeleteTarget(null); }}>
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center">
                 <svg className="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

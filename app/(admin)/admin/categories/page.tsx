@@ -458,11 +458,22 @@ export default function AdminCategoriesPage() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-sm shadow-lg p-6 max-w-md w-full">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              {getModalTitle()}
-            </h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => { setIsModalOpen(false); setEditingItem(null); }}>
+          <div className="bg-white rounded-sm shadow-lg p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {getModalTitle()}
+              </h2>
+              <button
+                type="button"
+                onClick={() => { setIsModalOpen(false); setEditingItem(null); }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -529,8 +540,8 @@ export default function AdminCategoriesPage() {
       )}
 
       {confirmOpen && confirmTarget && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-sm shadow-lg p-6 max-w-md w-full">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => { setConfirmOpen(false); setConfirmTarget(null); }}>
+          <div className="bg-white rounded-sm shadow-lg p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Confirm Deletion</h2>
             <p className="text-sm text-gray-600 mb-6">This action cannot be undone. Do you want to delete {confirmTarget.name || 'this item'}?</p>
             <div className="flex gap-3 pt-2">

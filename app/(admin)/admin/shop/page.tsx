@@ -470,8 +470,8 @@ export default function AdminShopPage() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-lg max-w-3xl w-full my-8">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto" onClick={() => { setIsModalOpen(false); resetForm(); }}>
+          <div className="bg-white rounded-lg max-w-3xl w-full my-8" onClick={(e) => e.stopPropagation()}>
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-lg">
               <h2 className="text-xl font-bold text-gray-900">
                 {editingProduct 
@@ -690,8 +690,8 @@ export default function AdminShopPage() {
       )}
 
       {deleteConfirmOpen && deleteTarget && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => { setDeleteConfirmOpen(false); setDeleteTarget(null); }}>
+          <div className="bg-white rounded-lg max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-bold text-gray-900 mb-2">
               {language === 'ja' ? '製品を削除' : 'Delete Product'}
             </h3>
