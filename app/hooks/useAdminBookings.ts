@@ -24,7 +24,8 @@ export function useAdminBookings() {
 
   const fetchBookings = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/bookings');
+      setIsLoading(true);
+      const res = await fetch('/api/admin/bookings', { cache: 'no-store' });
       if (!res.ok) throw new Error('Failed to load bookings');
       const data = await res.json();
       setBookings(data.bookings || []);
