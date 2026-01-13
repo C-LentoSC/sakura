@@ -78,33 +78,100 @@ export default function AdminShopPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Basic validations
+    const priceNum = parseInt(formData.price || '0');
+    const origNum = formData.originalPrice ? parseInt(formData.originalPrice) : null;
+    const newErrors: { price?: string; originalPrice?: string } = {};
+    if (!priceNum || priceNum <= 0) {
+      newErrors.price = language === 'ja' ? '価格は0より大きい必要があります。' : 'Price must be greater than 0.';
+    }
+    if (origNum !== null && priceNum > origNum) {
+      newErrors.originalPrice = language === 'ja' ? '価格は元の価格以下である必要があります。' : 'Price must be less than or equal to Original Price.';
+    }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    } else {
+      setErrors({});
+    }
+
+    const previousProducts = [...products];
+    const currentFormData = { ...formData };
+    const isEditing = !!editingProduct;
+    const editingId = editingProduct?.id;
+    
+    // Close modal immediately for instant feedback
+    setIsModalOpen(false);
     setSubmitting(true);
 
-    try {
-      // Basic validations
-      const priceNum = parseInt(formData.price || '0');
-      const origNum = formData.originalPrice ? parseInt(formData.originalPrice) : null;
-      const newErrors: { price?: string; originalPrice?: string } = {};
-      if (!priceNum || priceNum <= 0) {
-        newErrors.price = language === 'ja' ? '価格は0より大きい必要があります。' : 'Price must be greater than 0.';
-      }
-      if (origNum !== null && priceNum > origNum) {
-        newErrors.originalPrice = language === 'ja' ? '価格は元の価格以下である必要があります。' : 'Price must be less than or equal to Original Price.';
-      }
-      if (Object.keys(newErrors).length > 0) {
-        setErrors(newErrors);
-        setSubmitting(false);
-        return;
-      } else {
-        setErrors({});
-      }
+    // Optimistic update - will be replaced with real data after API call
+    const tempProduct: Product = {
+      id: isEditing && editingId ? editingId : Date.now(),
+      name: currentFormData.nameEn || currentFormData.name,
+      nameEn: currentFormData.nameEn,
+      nameJa: currentFormData.nameJa,
+      category: currentFormData.category,
+      price: priceNum,
+      originalPrice: origNum,
+      image: currentFormData.image || '/services-images/head-spa.jpg',
+      inStock: currentFormData.inStock,
+      badge: currentFormData.badge || null,
+      badgeType: currentFormData.badgeType || null,
+      description: currentFormData.descriptionEn || currentFormData.description,
+      descriptionEn: currentFormData.descriptionEn,
+      descriptionJa: currentFormData.descriptionJa,
+    };
+    
+    if (isEditing && editingId) {
+      mutate(
+        (current) => current?.map(p => p.id === editingId ? {
+          ...p,
+          name: tempProduct.name,
+          nameEn: tempProduct.nameEn,
+          nameJa: tempProduct.nameJa,
+          category: tempProduct.category,
+          price: tempProduct.price,
+          originalPrice: tempProduct.originalPrice,
+          image: tempProduct.image,
+          inStock: tempProduct.inStock,
+          badge: tempProduct.badge,
+          badgeType: tempProduct.badgeType,
+          description: tempProduct.description,
+          descEn: tempProduct.descriptionEn,
+          descJa: tempProduct.descriptionJa,
+        } : p),
+        false
+      );
+    } else {
+      mutate(
+        (current) => [...(current || []), {
+          id: tempProduct.id,
+          name: tempProduct.name,
+          nameEn: tempProduct.nameEn,
+          nameJa: tempProduct.nameJa,
+          category: tempProduct.category,
+          price: tempProduct.price,
+          originalPrice: tempProduct.originalPrice,
+          image: tempProduct.image,
+          inStock: tempProduct.inStock,
+          badge: tempProduct.badge,
+          badgeType: tempProduct.badgeType,
+          description: tempProduct.description,
+          descEn: tempProduct.descriptionEn,
+          descJa: tempProduct.descriptionJa,
+        }],
+        false
+      );
+    }
 
+    try {
       // Upload image if file is selected
-      let finalImageUrl = formData.image;
+      let finalImageUrl = currentFormData.image;
       if (selectedFile) {
         const uploadFormData = new FormData();
         uploadFormData.append('image', selectedFile);
-        uploadFormData.append('serviceName', formData.nameEn || formData.name);
+        uploadFormData.append('serviceName', currentFormData.nameEn || currentFormData.name);
         if (finalImageUrl) uploadFormData.append('oldImageUrl', finalImageUrl);
         const uploadRes = await fetch('/api/upload/image', {
           method: 'POST',
@@ -117,22 +184,22 @@ export default function AdminShopPage() {
       }
 
       const productData = {
-        nameEn: formData.nameEn || formData.name,
-        nameJa: formData.nameJa,
-        category: formData.category,
-        descEn: formData.descriptionEn || formData.description,
-        descJa: formData.descriptionJa,
+        nameEn: currentFormData.nameEn || currentFormData.name,
+        nameJa: currentFormData.nameJa,
+        category: currentFormData.category,
+        descEn: currentFormData.descriptionEn || currentFormData.description,
+        descJa: currentFormData.descriptionJa,
         price: priceNum,
         originalPrice: origNum,
         image: finalImageUrl || '/services-images/head-spa.jpg',
-        inStock: formData.inStock,
-        badge: formData.badge || null,
-        badgeType: formData.badgeType || null,
+        inStock: currentFormData.inStock,
+        badge: currentFormData.badge || null,
+        badgeType: currentFormData.badgeType || null,
       };
 
-      if (editingProduct) {
+      if (isEditing && editingId) {
         // Update existing product
-        const res = await fetch(`/api/admin/products/${editingProduct.id}`, {
+        const res = await fetch(`/api/admin/products/${editingId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(productData),
@@ -148,12 +215,28 @@ export default function AdminShopPage() {
         if (!res.ok) throw new Error('Failed to create product');
       }
 
-      // Revalidate SWR cache (will refetch fresh data)
-      await mutate();
-      setIsModalOpen(false);
+      // Background revalidation
+      mutate();
       resetForm();
     } catch (error) {
       console.error('Error saving product:', error);
+      // Rollback on error
+      mutate(previousProducts.map(p => ({
+        id: p.id,
+        name: p.name,
+        nameEn: p.nameEn,
+        nameJa: p.nameJa,
+        category: p.category,
+        price: p.price,
+        originalPrice: p.originalPrice,
+        image: p.image,
+        inStock: p.inStock,
+        badge: p.badge,
+        badgeType: p.badgeType,
+        description: p.description,
+        descEn: p.descriptionEn,
+        descJa: p.descriptionJa,
+      })), false);
       alert('Failed to save product');
     } finally {
       setSubmitting(false);
@@ -188,19 +271,47 @@ export default function AdminShopPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
 
+    const idToDelete = deleteTarget.id;
+    const previousProducts = [...products];
+    
+    // Close modal immediately for instant feedback
+    setDeleteConfirmOpen(false);
+    setDeleteTarget(null);
     setSubmitting(true);
+    
+    // Optimistic update - remove from list instantly
+    mutate(
+      (current) => current?.filter(p => p.id !== idToDelete),
+      false
+    );
+
     try {
-      const res = await fetch(`/api/admin/products/${deleteTarget.id}`, {
+      const res = await fetch(`/api/admin/products/${idToDelete}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Failed to delete product');
 
-      // Revalidate SWR cache (will refetch fresh data)
-      await mutate();
-      setDeleteConfirmOpen(false);
-      setDeleteTarget(null);
+      // Background revalidation
+      mutate();
     } catch (error) {
       console.error('Error deleting product:', error);
+      // Rollback on error
+      mutate(previousProducts.map(p => ({
+        id: p.id,
+        name: p.name,
+        nameEn: p.nameEn,
+        nameJa: p.nameJa,
+        category: p.category,
+        price: p.price,
+        originalPrice: p.originalPrice,
+        image: p.image,
+        inStock: p.inStock,
+        badge: p.badge,
+        badgeType: p.badgeType,
+        description: p.description,
+        descEn: p.descriptionEn,
+        descJa: p.descriptionJa,
+      })), false);
       alert('Failed to delete product');
     } finally {
       setSubmitting(false);

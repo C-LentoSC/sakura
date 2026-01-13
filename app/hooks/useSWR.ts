@@ -1,6 +1,6 @@
 /**
  * Custom SWR (Stale-While-Revalidate) Hook
- * Cache-first with background revalidation
+ * Cache-first with background revalidation and optimistic updates
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -23,6 +23,9 @@ interface SWRResponse<T> {
 // In-memory cache for client-side
 const cache = new Map<string, { data: unknown; timestamp: number }>();
 const revalidationPromises = new Map<string, Promise<unknown>>();
+
+// Global mutate function for cross-component updates
+const subscribers = new Map<string, Set<(data: unknown) => void>>();
 
 // Storage helpers
 const getFromStorage = <T>(key: string): T | null => {
@@ -95,6 +98,24 @@ export function useSWR<T>(
     keyRef.current = key;
   }, [fetcher, key]);
 
+  // Subscribe to global updates for this key
+  useEffect(() => {
+    if (!key) return;
+    
+    const handleUpdate = (newData: unknown) => {
+      setData(newData as T);
+    };
+    
+    if (!subscribers.has(key)) {
+      subscribers.set(key, new Set());
+    }
+    subscribers.get(key)!.add(handleUpdate);
+    
+    return () => {
+      subscribers.get(key)?.delete(handleUpdate);
+    };
+  }, [key]);
+
   // Revalidation function
   const revalidate = useCallback(async (silently = false) => {
     if (!keyRef.current || !fetcherRef.current) return;
@@ -120,6 +141,9 @@ export function useSWR<T>(
           cache.set(currentKey, { data: freshData, timestamp: Date.now() });
           setToStorage(currentKey, freshData);
           setError(undefined);
+          
+          // Notify all subscribers
+          subscribers.get(currentKey)?.forEach(cb => cb(freshData));
         }
 
         return freshData;
@@ -141,12 +165,12 @@ export function useSWR<T>(
     return promise;
   }, []);
 
-  // Optimistic update (mutate)
+  // Optimistic update (mutate) - INSTANT UI update
   const mutate = useCallback(
-    async (newData?: T | ((current: T | undefined) => T), shouldRevalidate = false) => {
+    async (newData?: T | ((current: T | undefined) => T), shouldRevalidate = true) => {
       if (!keyRef.current) return;
 
-      // Optimistic update
+      // Optimistic update - INSTANT
       if (newData !== undefined) {
         const updatedData = typeof newData === 'function'
           ? (newData as (current: T | undefined) => T)(data)
@@ -154,11 +178,15 @@ export function useSWR<T>(
         setData(updatedData);
         cache.set(keyRef.current, { data: updatedData, timestamp: Date.now() });
         setToStorage(keyRef.current, updatedData);
+        
+        // Notify all subscribers for cross-component sync
+        subscribers.get(keyRef.current)?.forEach(cb => cb(updatedData));
       }
 
-      // Revalidate if needed
+      // Background revalidation - NON-BLOCKING
       if (shouldRevalidate) {
-        await revalidate(true);
+        // Don't await - let it run in background
+        revalidate(true).catch(console.error);
       }
     },
     [data, revalidate]
@@ -173,8 +201,8 @@ export function useSWR<T>(
       const cached = cache.get(key);
       const age = cached ? Date.now() - cached.timestamp : Infinity;
 
-      // If cache is stale (> 30 minutes), revalidate
-      if (age > 30 * 60 * 1000) {
+      // If cache is stale (> 5 minutes), revalidate
+      if (age > 5 * 60 * 1000) {
         revalidate(true);
       } else if (age > dedupingInterval) {
         // If cache is older than deduping interval, revalidate silently
@@ -260,4 +288,22 @@ export function invalidateCache(key: string) {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(key);
   }
+}
+
+// Helper: Global mutate for optimistic updates from anywhere
+export function globalMutate<T>(key: string, data: T | ((current: T | undefined) => T)) {
+  const cached = cache.get(key);
+  const currentData = cached?.data as T | undefined;
+  const newData = typeof data === 'function' ? (data as (current: T | undefined) => T)(currentData) : data;
+  
+  cache.set(key, { data: newData, timestamp: Date.now() });
+  setToStorage(key, newData);
+  
+  // Notify subscribers
+  subscribers.get(key)?.forEach(cb => cb(newData));
+}
+
+// Helper: Get current cache value
+export function getCacheValue<T>(key: string): T | undefined {
+  return cache.get(key)?.data as T | undefined;
 }

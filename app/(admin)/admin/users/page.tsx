@@ -132,37 +132,94 @@ export default function AdminUsersPage() {
   };
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const previousUsers = [...list];
+    const formData = { ...form };
+    const isEditing = !!editing;
+    const editingUser = editing;
+    
+    // Close modal immediately for instant feedback
+    setIsModalOpen(false);
     setSaving(true);
+    
+    // Optimistic update
+    if (isEditing && editingUser) {
+      mutate(
+        (current) => current?.map(u => 
+          u.id === editingUser.id 
+            ? { ...u, email: formData.email, name: formData.name, role: formData.role } 
+            : u
+        ),
+        false
+      );
+    } else {
+      // For create, add a temporary item with a temp ID
+      const tempId = `temp-${Date.now()}`;
+      mutate(
+        (current) => [
+          ...(current || []),
+          {
+            id: tempId,
+            email: formData.email,
+            name: formData.name,
+            role: formData.role,
+            emailVerified: null,
+            createdAt: new Date().toISOString(),
+            _count: { sessions: 0 },
+          },
+        ],
+        false
+      );
+    }
+    
     try {
-      if (editing) {
-        const res = await fetch(`/api/admin/users/${editing.id}`, {
+      if (isEditing && editingUser) {
+        const res = await fetch(`/api/admin/users/${editingUser.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: form.email, name: form.name, role: form.role }),
+          body: JSON.stringify({ email: formData.email, name: formData.name, role: formData.role }),
         });
         if (!res.ok) throw new Error('update failed');
       } else {
         const res = await fetch('/api/admin/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: form.email, name: form.name, role: form.role }),
+          body: JSON.stringify({ email: formData.email, name: formData.name, role: formData.role }),
         });
         if (!res.ok) throw new Error('create failed');
       }
-      await mutate();
-      setIsModalOpen(false);
+      // Background revalidation
+      mutate();
+    } catch {
+      // Rollback on error
+      mutate(previousUsers, false);
+      alert('Failed to save user');
     } finally {
       setSaving(false);
     }
   };
   const handleDelete = async () => {
     if (!deletingId) return;
+    const idToDelete = deletingId;
+    const previousUsers = [...list];
+    
+    // Close modal immediately for instant feedback
+    setDeletingId(null);
+    
+    // Optimistic update - remove from list instantly
+    mutate(
+      (current) => current?.filter(u => u.id !== idToDelete),
+      false
+    );
+    
     try {
-      const res = await fetch(`/api/admin/users/${deletingId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/users/${idToDelete}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('delete failed');
-      await mutate();
-    } finally {
-      setDeletingId(null);
+      // Background revalidation
+      mutate();
+    } catch {
+      // Rollback on error
+      mutate(previousUsers, false);
+      alert('Failed to delete user');
     }
   };
 

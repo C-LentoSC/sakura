@@ -103,64 +103,64 @@ export default function ProfileClient() {
   };
 
   return (
-    <div>
-      <h3 className="text-lg font-sakura text-secondary mb-4">{L('sectionPassword')}</h3>
-      <p className="text-sm text-secondary/70 mb-4">{L('sectionPasswordDesc')}</p>
+    <div className="pt-4 border-t border-primary/10">
+      <h3 className="text-base font-sakura text-secondary mb-2">{L('sectionPassword')}</h3>
+      <p className="text-xs text-secondary/70 mb-3">{L('sectionPasswordDesc')}</p>
 
       {message && (
-        <div className={`mb-4 p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-rose-50 text-rose-800 border border-rose-200'}`}>
+        <div className={`mb-3 p-3 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-rose-50 text-rose-800 border border-rose-200'}`}>
           <div className="flex items-center gap-2">
             {message.type === 'success' ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             )}
-            <span className="text-sm font-medium">{message.text}</span>
+            <span className="text-xs font-medium">{message.text}</span>
           </div>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-sm font-medium text-secondary mb-2">{L('fieldCurrent')}</label>
+          <label className="block text-xs font-medium text-secondary mb-1.5">{L('fieldCurrent')}</label>
           <input
             type="password"
             value={currentPassword}
             onChange={(e) => { setCurrentPassword(e.target.value); if (errors.currentPassword) setErrors(prev => ({ ...prev, currentPassword: undefined })); }}
             placeholder={L('placeholderCurrent')}
-            className={`w-full px-4 py-2.5 rounded-lg border-2 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all ${errors.currentPassword ? 'border-red-300' : 'border-pink-100'}`}
+            className={`w-full px-3 py-2 rounded-lg border-2 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm ${errors.currentPassword ? 'border-red-300' : 'border-pink-100'}`}
           />
           {errors.currentPassword && (
             <p className="mt-1 text-xs text-red-600">{errors.currentPassword}</p>
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-secondary mb-2">{L('fieldNew')}</label>
+            <label className="block text-xs font-medium text-secondary mb-1.5">{L('fieldNew')}</label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => { setNewPassword(e.target.value); if (errors.newPassword) setErrors(prev => ({ ...prev, newPassword: undefined })); }}
               placeholder={L('placeholderNew')}
-              className={`w-full px-4 py-2.5 rounded-lg border-2 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all ${errors.newPassword ? 'border-red-300' : 'border-pink-100'}`}
+              className={`w-full px-3 py-2 rounded-lg border-2 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm ${errors.newPassword ? 'border-red-300' : 'border-pink-100'}`}
             />
             {errors.newPassword && (
               <p className="mt-1 text-xs text-red-600">{errors.newPassword}</p>
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-secondary mb-2">{L('fieldConfirm')}</label>
+            <label className="block text-xs font-medium text-secondary mb-1.5">{L('fieldConfirm')}</label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => { setConfirmPassword(e.target.value); if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: undefined })); }}
               placeholder={L('placeholderConfirm')}
-              className={`w-full px-4 py-2.5 rounded-lg border-2 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all ${errors.confirmPassword ? 'border-red-300' : 'border-pink-100'}`}
+              className={`w-full px-3 py-2 rounded-lg border-2 bg-white shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm ${errors.confirmPassword ? 'border-red-300' : 'border-pink-100'}`}
             />
             {errors.confirmPassword && (
               <p className="mt-1 text-xs text-red-600">{errors.confirmPassword}</p>
@@ -168,15 +168,15 @@ export default function ProfileClient() {
           </div>
         </div>
 
-        <div className="pt-2">
+        <div className="pt-1">
           <button
             type="submit"
             disabled={saving}
-            className="px-6 py-2.5 bg-gradient-to-r from-primary to-pink-400 text-white rounded-lg hover:shadow-lg hover:scale-105 disabled:opacity-50 transition-all font-medium inline-flex items-center gap-2"
+            className="px-5 py-2 bg-gradient-to-r from-primary to-pink-400 text-white rounded-lg hover:shadow-lg hover:scale-105 disabled:opacity-50 transition-all font-medium inline-flex items-center gap-2 text-sm"
           >
             {saving ? (
               <>
-                <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -184,7 +184,7 @@ export default function ProfileClient() {
               </>
             ) : (
               <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 {L('btnUpdate')}

@@ -87,7 +87,7 @@ export default function AdminCategoriesPage() {
     const key = (record.nameKey || '').split('.').pop() || record.slug || '';
     return key.replace(/[-_]/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
   };
-  const { categories, isLoading: loading, mutate } = useAdminCategories();
+  const { categories, isLoading: loading, mutate, deleteCategory, deleteSubCategory, deleteSubSubCategory } = useAdminCategories();
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [expandedSubCategories, setExpandedSubCategories] = useState<Set<string>>(new Set());
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -139,6 +139,10 @@ export default function AdminCategoriesPage() {
       const method = editingItem ? 'PUT' : 'POST';
 
       const editId = editingItem ? (editingItem as { id: string }).id : undefined;
+      
+      // Close modal immediately for better UX
+      closeModal();
+      
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -146,30 +150,32 @@ export default function AdminCategoriesPage() {
       });
 
       if (res.ok) {
-        await mutate();
-        closeModal();
+        // Background revalidation - non-blocking
+        mutate(undefined, true);
       }
     } catch (error) {
       console.error('Error saving item:', error);
+      // Revalidate to show current state
+      mutate(undefined, true);
     }
   };
 
   const handleDelete = async (type: 'category' | 'subcategory' | 'subsubcategory', id: string) => {
+    // Close confirm dialog immediately
+    setConfirmOpen(false);
+    setConfirmTarget(null);
+    
     try {
-      let url = '';
-      if (type === 'category') url = `/api/admin/categories?id=${encodeURIComponent(id)}`;
-      else if (type === 'subcategory') url = `/api/admin/subcategories?id=${encodeURIComponent(id)}`;
-      else url = `/api/admin/subsubcategories?id=${encodeURIComponent(id)}`;
-
-      const res = await fetch(url, { method: 'DELETE' });
-      if (res.ok) {
-        await mutate();
+      // Use optimistic delete helpers
+      if (type === 'category') {
+        await deleteCategory(id);
+      } else if (type === 'subcategory') {
+        await deleteSubCategory(id);
+      } else {
+        await deleteSubSubCategory(id);
       }
     } catch (error) {
       console.error('Error deleting item:', error);
-    } finally {
-      setConfirmOpen(false);
-      setConfirmTarget(null);
     }
   };
 

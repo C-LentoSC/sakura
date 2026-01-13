@@ -178,37 +178,101 @@ export default function AdminBookingsPage() {
 
   const handleCancelConfirm = async () => {
     if (!cancelModalId) return;
+    const idToCancel = cancelModalId;
+    const previousBookings = [...bookings];
+    
+    // Close modal immediately for instant feedback
+    setCancelModalId(null);
+    
+    // Optimistic update - update status instantly
+    mutate(
+      (current) => current?.map(b => b.id === idToCancel ? { ...b, status: 'canceled' } : b),
+      false
+    );
+    
     try {
-      const res = await fetch(`/api/admin/bookings/${cancelModalId}`, {
+      const res = await fetch(`/api/admin/bookings/${idToCancel}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "canceled" }),
       });
       if (!res.ok) throw new Error("Cancel failed");
-      await mutate();
-      setCancelModalId(null);
+      // Background revalidation
+      mutate();
     } catch {
+      // Rollback on error
+      mutate(previousBookings, false);
       alert("Failed to cancel booking");
     }
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const previousBookings = [...bookings];
+    const formData = { ...form };
+    const isEditing = !!form.id;
+    
+    // Close modal immediately for instant feedback
+    setIsModalOpen(false);
     setSaving(true);
+    
+    // Optimistic update
+    if (isEditing) {
+      mutate(
+        (current) => current?.map(b => 
+          b.id === formData.id 
+            ? { 
+                ...b, 
+                serviceId: formData.serviceId,
+                date: formData.date,
+                time: formData.time,
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                notes: formData.notes,
+                status: formData.status,
+              } 
+            : b
+        ),
+        false
+      );
+    } else {
+      // For create, add a temporary item with a temp ID
+      const tempId = `temp-${Date.now()}`;
+      mutate(
+        (current) => [
+          ...(current || []),
+          {
+            id: tempId,
+            serviceId: formData.serviceId,
+            date: formData.date,
+            time: formData.time,
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            notes: formData.notes,
+            status: formData.status,
+            createdAt: new Date().toISOString(),
+          },
+        ],
+        false
+      );
+    }
+    
     try {
-      if (form.id) {
-        const res = await fetch(`/api/admin/bookings/${form.id}`, {
+      if (isEditing) {
+        const res = await fetch(`/api/admin/bookings/${formData.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            serviceId: form.serviceId,
-            date: form.date,
-            time: form.time,
-            name: form.name,
-            email: form.email,
-            phone: form.phone,
-            notes: form.notes,
-            status: form.status,
+            serviceId: formData.serviceId,
+            date: formData.date,
+            time: formData.time,
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            notes: formData.notes,
+            status: formData.status,
           }),
         });
         if (!res.ok) throw new Error("Update failed");
@@ -217,21 +281,23 @@ export default function AdminBookingsPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            serviceId: form.serviceId,
-            date: form.date,
-            time: form.time,
-            name: form.name,
-            email: form.email,
-            phone: form.phone,
-            notes: form.notes,
-            status: form.status,
+            serviceId: formData.serviceId,
+            date: formData.date,
+            time: formData.time,
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            notes: formData.notes,
+            status: formData.status,
           }),
         });
         if (!res.ok) throw new Error("Create failed");
       }
-      setIsModalOpen(false);
-      await mutate();
+      // Background revalidation
+      mutate();
     } catch {
+      // Rollback on error
+      mutate(previousBookings, false);
       alert("Failed to save booking");
     } finally {
       setSaving(false);
@@ -264,6 +330,14 @@ export default function AdminBookingsPage() {
   };
 
   const updateStatus = async (id: string, status: string) => {
+    const previousBookings = [...bookings];
+    
+    // Optimistic update - update status instantly
+    mutate(
+      (current) => current?.map(b => b.id === id ? { ...b, status } : b),
+      false
+    );
+    
     try {
       const res = await fetch(`/api/admin/bookings/${id}`, {
         method: "PUT",
@@ -271,8 +345,11 @@ export default function AdminBookingsPage() {
         body: JSON.stringify({ status }),
       });
       if (!res.ok) throw new Error("Status update failed");
-      await mutate();
+      // Background revalidation
+      mutate();
     } catch {
+      // Rollback on error
+      mutate(previousBookings, false);
       alert("Failed to update status");
     }
   };

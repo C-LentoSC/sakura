@@ -53,7 +53,7 @@ export default function AdminServicesPage() {
   };
   const { services, isLoading: servicesLoading, mutate: mutateServices } = useServices({});
   const { categories, isLoading: categoriesLoading } = useAdminCategories();
-  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<SwrService | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -85,7 +85,7 @@ export default function AdminServicesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSaving(true);
 
     try {
       let imageUrl = formData.image;
@@ -137,6 +137,31 @@ export default function AdminServicesPage() {
         order: editingService ? editingService.order : 0, // Keep existing order for edits, 0 for new
       };
 
+      // Close modal immediately for better UX
+      setIsModalOpen(false);
+      resetForm();
+
+      // Optimistic update - add/update service immediately in UI
+      const optimisticService = {
+        id: editingService?.id || `temp-${Date.now()}`,
+        ...payload,
+        price: parseFloat(payload.price as string) || 0,
+        category: categories.find(c => c.id === payload.categoryId) || { id: payload.categoryId, slug: '', nameKey: '' },
+        subCategory: payload.subCategoryId ? { id: payload.subCategoryId, slug: '', nameKey: '' } : undefined,
+        subSubCategory: payload.subSubCategoryId ? { id: payload.subSubCategoryId, slug: '', nameKey: '' } : undefined,
+      } as SwrService;
+
+      if (editingService) {
+        // Update existing
+        mutateServices((current) => 
+          (current || []).map(s => s.id === editingService.id ? { ...s, ...optimisticService } : s),
+          false
+        );
+      } else {
+        // Add new
+        mutateServices((current) => [...(current || []), optimisticService], false);
+      }
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -144,15 +169,19 @@ export default function AdminServicesPage() {
       });
 
       if (res.ok) {
-        await mutateServices();
-        setIsModalOpen(false);
-        resetForm();
+        // Background revalidation to get real data
+        mutateServices(undefined, true);
+      } else {
+        // Revalidate to rollback on error
+        mutateServices(undefined, true);
       }
     } catch (error) {
       console.error('Error saving service:', error);
       alert(error instanceof Error ? error.message : 'Failed to save service');
+      // Revalidate to rollback
+      mutateServices(undefined, true);
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
@@ -163,19 +192,28 @@ export default function AdminServicesPage() {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
+    
+    // Close dialog immediately
+    setDeleteConfirmOpen(false);
+    const targetId = deleteTarget.id;
+    setDeleteTarget(null);
+
+    // Optimistic delete - remove from UI immediately
+    mutateServices((current) => (current || []).filter(s => s.id !== targetId), false);
 
     try {
-      const res = await fetch(`/api/admin/services?id=${deleteTarget.id}`, {
+      const res = await fetch(`/api/admin/services?id=${targetId}`, {
         method: 'DELETE',
       });
 
-      if (res.ok) {
-        await mutateServices();
-        setDeleteConfirmOpen(false);
-        setDeleteTarget(null);
+      if (!res.ok) {
+        // Revalidate to rollback on error
+        mutateServices(undefined, true);
       }
     } catch (error) {
       console.error('Error deleting service:', error);
+      // Revalidate to rollback
+      mutateServices(undefined, true);
     }
   };
 
@@ -202,6 +240,12 @@ export default function AdminServicesPage() {
   };
 
   const handleToggleActive = async (id: string, isActive: boolean) => {
+    // Optimistic update - toggle immediately in UI
+    mutateServices((current) => 
+      (current || []).map(s => s.id === id ? { ...s, isActive } : s),
+      false
+    );
+
     try {
       const response = await fetch(`/api/admin/services/${id}`, {
         method: 'PUT',
@@ -211,16 +255,15 @@ export default function AdminServicesPage() {
         body: JSON.stringify({ isActive }),
       });
 
-      if (response.ok) {
-        // If mutateServices exists, use it to refresh; otherwise fall back to optimistic UI
-        if (typeof mutateServices === 'function') {
-          await mutateServices();
-        }
-      } else {
+      if (!response.ok) {
+        // Revalidate to rollback on error
+        mutateServices(undefined, true);
         console.error('Failed to toggle service status');
       }
     } catch (error) {
       console.error('Error toggling service status:', error);
+      // Revalidate to rollback
+      mutateServices(undefined, true);
     }
   };
 
@@ -802,10 +845,10 @@ export default function AdminServicesPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={saving}
                   className="flex-1 px-4 py-2 bg-linear-to-r from-primary to-pink-400 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50"
                 >
-                  {loading ? t('admin.services.form.saving') : editingService ? t('admin.services.form.update') : t('admin.services.form.create')}
+                  {saving ? t('admin.services.form.saving') : editingService ? t('admin.services.form.update') : t('admin.services.form.create')}
                 </button>
               </div>
             </form>
